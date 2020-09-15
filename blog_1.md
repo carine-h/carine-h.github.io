@@ -5,7 +5,7 @@
 The 2020 presidential is now 50 days away. Many have called it an election like no other - a fight for the soul of the country, even. With so much at stake, it's no wonder that election predictions are plastering the media. 
 This week, I want to take a look at the history of electoral victories overtime using the two-party popular vote share as well as a "swing margin." What can these parameters tell us about the winning party? Can they help us predict the next winning party? Most of all, what can these parameters tell us about changes in the electorate?
 
-I'll take a look at electoral data of the popular vote share in American since 1960 to grapple with these questions.[^1]: I use data that contains the national and state-by-state popular vote share from 1948-2016. 
+I'll take a look at electoral data of the popular vote share in American since 1960 to grapple with these questions.^[I use data that contains the national and state-by-state popular vote share from 1948-2016.] 
 
 
 ## Win Margins
