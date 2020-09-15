@@ -5,8 +5,12 @@
 The 2020 presidential is now 50 days away. Many have called it an election like no other - a fight for the soul of the country, even. With so much at stake, it's no wonder that election predictions are plastering the media. 
 This week, I want to take a look at the history of electoral victories overtime using the two-party popular vote share margin as well as a "swing margin." What can these parameters tell us about the winning party? Can they help us predict the next winning party? Most of all, what can these parameters tell us about changes in the electorate?
 
+<<<<<<< HEAD
 I'll take a look at electoral data of the two-party popular vote share in the U.S. and in each state since 1948 to grapple with these questions.
 
+=======
+I'll take a look at electoral data^[I use data that contains the national and state-by-state popular vote share from 1948-2016.] of the popular vote share in American since 1960 to grapple with these questions.
+>>>>>>> 8941e84498c8c416a3841295a2716a3283d3da6a
 
 ## Win Margins
 Overtime, the vote margin (based on the two-party popular vote share) for each party has shifted, but, overall, has stayed under 25% in favor of either Democrats or Republicans. The national vote margin is a useful way to contextualize the favorability of a party on a national level come election time. It does not, however, tell the full story. State vote margins fluctuate differently, indicating that party favorability is highly regional as well. Take a look at Texas' vote margin which, since 1976, favors Republicans significantly more than the national vote margin (1976 was the last Democratic win in Texas for the presidential election to date). On a national level, however, the popular vote is more highly-contested than in Texas. 
