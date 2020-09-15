@@ -3,21 +3,21 @@
 ### Carine Hajjar, cmhajjar@college.harvard.edu
 
 The 2020 presidential is now 50 days away. Many have called it an election like no other - a fight for the soul of the country, even. With so much at stake, it's no wonder that election predictions are plastering the media. 
-This week, I want to take a look at the history of electoral victories overtime using the two-party popular vote share as well as a "swing margin." What can these parameters tell us about the winning party? Can they help us predict the next winning party? Most of all, what can these parameters tell us about changes in the electorate?
+This week, I want to take a look at the history of electoral victories overtime using the two-party popular vote share margin as well as a "swing margin." What can these parameters tell us about the winning party? Can they help us predict the next winning party? Most of all, what can these parameters tell us about changes in the electorate?
 
-I'll take a look at electoral data of the popular vote share in American since 1960 to grapple with these questions.[^1]: I use data that contains the national and state-by-state popular vote share from 1948-2016. 
+I'll take a look at electoral data of the two-party popular vote share in the U.S. and in each state since 1948 to grapple with these questions.
 
 
 ## Win Margins
-Overtime, the win margin (based on the two-party popular vote share) for each party has shifted, but, overall, has stayed under 25% in favor of either Democrats or Republicans. The national win margin is a useful way to contextualize the favorability of a party on a national level come election time. It does not, however, tell the full story. State win margins fluctuate differently, indicating that party favorability is highly regional as well. Take a look at Texas' win margin which, since 1976, favors Republicans significantly more than the national win margin (1976 was the last Democratic win in Texas for the presidential election to date). On a national level, however, the popular vote is more highly-contested than in Texas. 
+Overtime, the vote margin (based on the two-party popular vote share) for each party has shifted, but, overall, has stayed under 25% in favor of either Democrats or Republicans. The national vote margin is a useful way to contextualize the favorability of a party on a national level come election time. It does not, however, tell the full story. State vote margins fluctuate differently, indicating that party favorability is highly regional as well. Take a look at Texas' vote margin which, since 1976, favors Republicans significantly more than the national vote margin (1976 was the last Democratic win in Texas for the presidential election to date). On a national level, however, the popular vote is more highly-contested than in Texas. 
 
 ![](pop_vote_texas.png)
 
-Thus it makes sense to look at win margins on a state-by-state basis: 
+Thus it makes sense to look at vote margins on a state-by-state basis: 
 
 ![](pop_vote_margin_1996_2016.png)
 
-Win margins on a state-by-state basis overtime answer important questions: does a state consistently favor candidates from one party? Does a state's party preference fluctuate overtime? Which state is a deeply-entrenched red or blue territory? Knowing the answers to these questions are crucial to election prediction and campaigning. For instance, the Democratic party has refrained from costly campaigning in Texas since the 1980s. However, given an extremely narrow win margin for Republicans in the Cruz v. Beto 2018 Senate race, many have questioned whether or not Texas could become a "swing state." This matters.  In fact, the [Biden campaign](https://www.cbsnews.com/news/biden-campaign-texas-staff-resources/) purchased TV ads in and allocated more staff to the traditionally red state. 
+Two-party popular vote margins on a state-by-state basis overtime answer important questions: does a state consistently favor candidates from one party? Does a state's party preference fluctuate overtime? Which state is a deeply-entrenched red or blue territory? Knowing the answers to these questions are crucial to election prediction and campaigning. For instance, the Democratic party has refrained from costly campaigning in Texas since the 1980s. However, given an extremely narrow win margin for Republicans in the Cruz v. Beto 2018 Senate race, many have questioned whether or not Texas could become a "swing state." This matters.  In fact, the [Biden campaign](https://www.cbsnews.com/news/biden-campaign-texas-staff-resources/) purchased TV ads in and allocated more staff to the traditionally red state. 
 
 ## Swing Margins
 Swing margins are also incredibly helpful in understanding the electoral changes that states undergo from one election cycle to the next. The "swing" I am talking about this week deals with the change in magnitude and direction a state's popular vote margin from one presidential election to the next. A larger magnitude of "swing" signals a higher change in electoral preference. 
