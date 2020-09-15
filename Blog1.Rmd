@@ -125,7 +125,7 @@ plot_usmap(data = pv_margins_map, regions = "states", values = "win_margin") +
         plot.subtitle = element_text(face = "italic"))
 
 # I save the image 
-ggsave("pop_vote_margin_1996_2016.png", height = 4, width = 8)
+ggsave("pop_vote_margin_1996_2016.png", height = 3, width = 6)
 ```
 
 
@@ -180,7 +180,7 @@ plot_usmap(data = swing_plot_1, regions = "states", values = "swing") +
         plot.subtitle = element_text(face = "italic"))
 
 # I saved the image 
-  ggsave("swing_margin_1996-2016.png", height = 4, width = 8)
+  ggsave("swing_margin_1996-2016.png", height = 3, width = 6)
 
 #################
 # ORIGINAL:SWING margin map 2012 - 2016 
@@ -211,7 +211,7 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
         plot.subtitle = element_text(face = "italic"))
 
 # I saved the resulting image
-  ggsave("swing_margin_2012_2016.png", height = 4, width = 8)
+  ggsave("swing_margin_2012_2016.png", height = 3, width = 6)
   
 ```
 
@@ -221,6 +221,7 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
 #################
 
 # I found the annual win margin on the national basis
+# I spread the data to subtract republican pv2p from democrat pv2p
 x <- popvote_df%>%
   select(year, party, pv2p)%>%
   spread(party, pv2p)%>%
@@ -232,8 +233,8 @@ y <- pvstate_df%>%
 
 # I joined the two data sets to compare national and Texas vote margins 
 a <- left_join(x, y)%>%
-  select(year, state, vote_margin, overall_pv2_margin)%>% 
-  rename(TX_pv2_margin = vote_margin) %>%
+  select(year, state, R_pv2p, D_pv2p, overall_pv2_margin)%>% 
+  mutate(TX_pv2_margin = R_pv2p - D_pv2p) %>%
   filter(year >= 1960)
 
 # I updated my_pretty_theme 
@@ -273,7 +274,7 @@ ggplot(data = a, aes(x = year, y = TX_pv2_margin))+
   geom_dl(aes(label = state), method = list(dl.trans(x = x + 0.05), "last.points", cex = 0.6))
 
 # I saaved the figure
-  ggsave("pop_vote_texas.png", height = 4, width = 8)
+  ggsave("pop_vote_texas.png", height = 3, width = 6)
 
 
 ```
