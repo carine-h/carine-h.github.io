@@ -117,7 +117,7 @@ plot_usmap(data = pv_margins_map, regions = "states", values = "win_margin") +
         plot.subtitle = element_text(face = "italic"))
 
 # I save the image 
-ggsave("pop_vote_margin_1996_2016.png", height = 4, width = 8)
+ggsave("pop_vote_margin_1996_2016.png", height = 3, width = 6)
 
 
 #################
@@ -167,7 +167,7 @@ plot_usmap(data = swing_plot_1, regions = "states", values = "swing") +
         plot.subtitle = element_text(face = "italic"))
 
 # I saved the image 
-ggsave("swing_margin_1996-2016.png", height = 4, width = 8)
+ggsave("swing_margin_1996-2016.png", height = 3, width = 6)
 
 #################
 # ORIGINAL:SWING margin map 2012 - 2016 
@@ -198,7 +198,7 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
         plot.subtitle = element_text(face = "italic"))
 
 # I saved the resulting image
-ggsave("swing_margin_2012_2016.png", height = 4, width = 8)
+ggsave("swing_margin_2012_2016.png", height = 3, width = 6)
 
 
 #################
@@ -258,6 +258,6 @@ ggplot(data = a, aes(x = year, y = TX_pv2_margin))+
   geom_dl(aes(label = state), method = list(dl.trans(x = x + 0.05), "last.points", cex = 0.6))
 
 # I saaved the figure
-ggsave("pop_vote_texas.png", height = 4, width = 8)
+ggsave("pop_vote_texas.png", height = 3, width = 6)
 
 
