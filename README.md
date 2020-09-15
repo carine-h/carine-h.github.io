@@ -8,3 +8,7 @@ Welcome to my election analysis blog! Every **Sunday**, I'll update you with dif
 If you'd like to access my code or data, check out my [GitHub account](https://github.com/carine-h). 
 
 If you have any questions or comments, feel free to reach me at **cmhajjar@college.harvard.edu**. 
+
+## Blog Posts
+### [1. Introduction](posts/blog_1.md)
+
