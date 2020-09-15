@@ -17,309 +17,22 @@ library(gtsummary)
 ```
 
 ```{r}
-## read
+# read in national pop vote 
 popvote_df <- read_csv("popvote_1948-2016.csv")
 
-## subset
-popvote_df %>% 
-  filter(year == 2016) %>% 
-  select(party, candidate, pv2p)
-
-#pv_tx_gather <- pv_tx%>%
- # gather(key = "party", value = "pv", R_pv2p, D_pv2p)%>%
-  #arrange(year)
-
-
-## format
-(popvote_wide_df <- popvote_df %>%
-  select(year, party, pv2p) %>%
-  spread(party, pv2p))
-
-## modify
-(popvote_wide_df <- popvote_wide_df %>% 
-  mutate(winner = case_when(democrat > republican ~ "D",
-                            TRUE ~ "R")))
-
-## summarise
-popvote_wide_df %>% 
-  group_by(winner) %>%
-  summarise(races = n())
-
-
-rep_inc <- popvote_df %>%
-filter(party == "republican")
-
-###################################
-# EXTENSION 1: regression
-###################################
-# incumbents have a huge advantage in winning their second term elections
-#fit1 <- stan_glm(winner ~ incumbent, family = "binomial", #rep_inc, refresh = FALSE)
-
-```
-
-```{r}
-####----------------------------------------------------------#
-#### Visualize trends in national pres pop vote ####
-####----------------------------------------------------------#
-
-## example: histogram
-ggplot(popvote_df, aes(x = pv2p)) + 
-    geom_histogram()
-
-## example: barplot (+ custom colors)
-ggplot(popvote_df, aes(x = year, y = pv2p, fill = party)) +
-    geom_bar(stat = "identity") +
-    scale_fill_manual(values = c("blue", "red")) 
-
-## example: lineplot (+ custom colors + nicer theme)
-ggplot(popvote_df, aes(x = year, y = pv2p, colour = party)) +
-    geom_line() +
-    scale_color_manual(values = c("blue", "red")) + 
-    theme_bw()
-
-## BAD plot: 
-## dark background, "too much ink", no legend, small font, 
-ggplot(popvote_df, aes(x = year, y = pv2p, colour = party)) +
-    geom_line(stat = "identity") + 
-    theme_dark() +
-    theme(legend.position = "none", axis.title = element_text(size = 5))
-
-## GOOD plot:
-## high contrast, "minimal ink", legend, detailed x-ticks, larger font
-ggplot(popvote_df, aes(x = year, y = pv2p, colour = party)) +
-    geom_line(stat = "identity") + 
-    scale_x_continuous(breaks = seq(1948, 2016, 4)) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45))
-
-## EXCELLENT plot:
-## "pretty" customized theme
-my_pretty_theme <- theme_bw() + 
-    theme(panel.border = element_blank(),
-          plot.subtitle = element_text(hjust = 0.5),
-          plot.title   = element_text(size = 15, hjust = 0.5), 
-          axis.text.x  = element_text(angle = 45, hjust = 1),
-          axis.text    = element_text(size = 12),
-          strip.text   = element_text(size = 18),
-          axis.line    = element_line(colour = "black"),
-          legend.position = "top",
-          legend.text = element_text(size = 12))
-
-ggplot(popvote_df, aes(x = year, y = pv2p, colour = party)) +
-    geom_line(stat = "identity") +
-    scale_color_manual(values = c("blue", "red"), name = "") +
-    xlab("") + ## no need to label an obvious axis
-    ylab("popular vote %") +
-    ggtitle("Presidential Vote Share (1948-2016)") + 
-    scale_x_continuous(breaks = seq(from = 1948, to = 2016, by = 4)) +
-    my_pretty_theme
-
-## saves last displayed plot
-ggsave("PV_national_historical.png", height = 4, width = 8)
-
-
-```
-
-###################################
-# EXTENSION 2: Winners and Incumbency
-###################################
-incumbents have a huge advantage in winning their second term elections
-stan_glm(winner ~ incumbent, family = "binomial", rep_inc, refresh = FALSE)
-popvote_df%>% 
-  filter(winner == TRUE)%>%
-ggplot(aes(x = year, y = pv2p, fill = party)) +
-    geom_bar(stat = "identity") +
-    scale_fill_manual(values = c("blue", "red")) +
-  labs(y = "Two Party Popular Vote Share", 
-       x = "Year", 
-       title = "Two Party Vote Share of the Winning Party")+
-  theme(legend.title = element_text(size=10, 
-                                      face="bold")) +
-  scale_fill_discrete(name = "Party", labels = c("Democrat", "Republican"))+
-  scale_fill_manual(values = c("blue", "red"))
-  
-  
-```{r}
-####----------------------------------------------------------#
-#### State-by-state map of pres pop votes ####
-####----------------------------------------------------------#
-
-## read in state pop vote
+# read in state pop vote
 pvstate_df <- read_csv("popvote_bystate_1948-2016.csv")
-pvstate_df$full <- pvstate_df$state
-
-## shapefile of states from `usmap` library
-## note: `usmap` merges this internally, but other packages may not!
-states_map <- usmap::us_map()
-unique(states_map$abbr)
-
-## map: GOP pv2p (`plot_usmap` is wrapper function of `ggplot`)
-plot_usmap(data = pvstate_df, regions = "states", values = "R_pv2p") + 
-  scale_fill_gradient(low = "white", high = "red", name = "GOP two-party voteshare") +
-  theme_void()
-
-## map: wins
-pv_win_map <- pvstate_df %>%
-    filter(year == 2000) %>%
-    mutate(winner = ifelse(R > D, "republican", "democrat"))
-
-plot_usmap(data = pv_win_map, regions = "states", values = "winner") +
-    scale_fill_manual(values = c("blue", "red"), name = "state PV winner") +
-    theme_void()
-
-## map: win-margins
-pv_margins_map <- pvstate_df %>%
-    filter(year == 2000) %>%
-    mutate(win_margin = (R_pv2p-D_pv2p))
-
-plot_usmap(data = pv_margins_map, regions = "states", values = "win_margin") +
-    scale_fill_gradient2(
-      high = "red", 
-      # mid = scales::muted("purple"), ##TODO: purple or white better?
-      mid = "white",
-      low = "blue", 
-      breaks = c(-50,-25,0,25,50), 
-      limits = c(-50,50),
-      name = "win margin"
-    ) +
-    theme_void()
-
-## map grid
-pv_map_grid <- pvstate_df %>%
-    filter(year >= 1980) %>%
-    mutate(winner = ifelse(R > D, "republican", "democrat"))
-
-plot_usmap(data = pv_map_grid, regions = "states", values = "winner", color = "white") +
-    facet_wrap(facets = year ~.) + ## specify a grid by year
-    scale_fill_manual(values = c("blue", "red"), name = "PV winner") +
-    theme_void() +
-    theme(strip.text = element_text(size = 12),
-          aspect.ratio=1)
-
-ggsave("PV_states_historical.png", height = 3, width = 8)
 
 ```
-
-
-###################################
-# EXTENSION 3: TEXAS state map margins
-###################################
-
-# How the vote share margin has changed in Texas overtime compared to the rest of the country 
-pvstate_df %>%
-plot_usmap(data = "pvstate_df", regions = "state", include = "Texas", values = "R_pv2p") + 
-  facet_wrap(facets = year ~.) +
-  scale_fill_gradient(low = "white", high = "red", name = "GOP two-party voteshare") +
-  theme_void()
-
-pv_margins_map_tx <- pvstate_df %>%
-    filter(state == "Texas") %>%
-    mutate(win_margin_tx = (R_pv2p-D_pv2p))
-
-plot_usmap(data = pv_margins_map_tx, regions = "state", include = "Texas", values = "win_margin_tx") +
-  facet_wrap(facets = year ~.) +
-    scale_fill_gradient2(
-      high = "red", 
-      mid = "purple",
-      low = "blue", 
-      breaks = c(-50,-25,0,25,50), 
-      limits = c(-50,50),
-      name = "Win Margin"
-    ) +
-    theme_void()
-
-Texas has not gone blue since 1976 (and was mostly Democratic before that) - this may be changing. 
-
-
-###################################
-# EXTENSION 2: TEXAS state map margins line plot
-###################################
-
-## EXCELLENT plot: SOUBHIK'S PLOT OF PV2 OT
-## "pretty" customized theme
-my_pretty_theme <- theme_bw() + 
-    theme(panel.border = element_blank(),
-          plot.title   = element_text(size = 15, hjust = 0.5), 
-          axis.text.x  = element_text(angle = 45, hjust = 1),
-          axis.text    = element_text(size = 12),
-          strip.text   = element_text(size = 18),
-          axis.line    = element_line(colour = "black"),
-          legend.position = "top",
-          legend.text = element_text(size = 12))
-
-ggplot(popvote_df, aes(x = year, y = pv2p, colour = party)) +
-    geom_line(stat = "identity") +
-    scale_color_manual(values = c("blue", "red"), name = "") +
-    xlab("") + ## no need to label an obvious axis
-    ylab("Popular Vote %") +
-    ggtitle("Presidential Vote Share (1948-2016)") + 
-    scale_x_continuous(breaks = seq(from = 1948, to = 2016, by = 4)) +
-    my_pretty_theme
-
-## EXCELLENT plot: MY PLOT OF TX PV2 
-pv_tx <- pvstate_df %>%
-    filter(state == "Texas")
-
-ggplot(pv_tx, aes(x = year, y = pv2p, colour = party)) +
-    geom_line(stat = "identity") +
-    scale_color_manual(values = c("blue", "red"), name = "") +
-    xlab("") + ## no need to label an obvious axis
-    ylab("Popular Vote %") +
-    ggtitle("Presidential Vote Share (1948-2016)") + 
-    scale_x_continuous(breaks = seq(from = 1948, to = 2016, by = 4)) +
-    my_pretty_theme
-
-pv_tx
-
-
-```{r}
-####----------------------------------------------------------#
-#### Extra: FiveThirtyEight replication in ggplot2 ####
-#### https://projects.fivethirtyeight.com/swing-states-2020-election/
-####----------------------------------------------------------#
-
-pvstate_df$vote_margin <- pvstate_df$R_pv2p - pvstate_df$D_pv2p
-
-pvstate_df %>% 
-  ## subset data
-  filter(state %in% c("Arizona","Georgia","Texas")) %>%
-  filter(year >= 2000) %>%
-  ## pipe into ggplot()
-  ggplot(aes(x=year, y=vote_margin, color=vote_margin)) + 
-  ## specify a grid by state
-  facet_wrap(. ~ state) + 
-  ## add plot elements
-  geom_hline(yintercept=0,color="gray") +
-  geom_line(size=2) + 
-  geom_point(size=6) +
-  ## specify scale colors
-  scale_colour_gradient(low = "blue", high = "red") +
-  scale_fill_gradient(low = "blue", high = "red") +
-  ## specify titles, labels
-  xlab("") +
-  ylab("Republican vote-share margin") + 
-  ggtitle("Swing states that moved sharply to the left in 2016") +
-  ## switch position of x-axis and y-axis
-  coord_flip() +
-  ## make x-axis (year) run from top to bottom
-  scale_x_reverse(breaks=unique(pvstate_df$year)) +
-  theme_minimal() + 
-  theme(panel.border    = element_blank(),
-        plot.title      = element_text(size = 20, hjust = 0.5, face="bold"), 
-        legend.position = "none",
-        axis.title      = element_text(size=18),
-        axis.text.x     = element_text(angle = 45, hjust = 1),
-        axis.text       = element_text(size = 18),
-        strip.text      = element_text(size = 18, face = "bold"))
-```
-
 
 ```{r BLOG POST}
 ## map: win-margins 2000
+# I found the win margins for 2000
 pv_margins_map2000 <- pvstate_df %>%
     filter(year == 2000) %>%
     mutate(win_margin = (R_pv2p-D_pv2p))
 
+# I plotted the 2000 win margin using plot_usmap()
 plot_usmap(data = pv_margins_map2000, regions = "states", values = "win_margin") +
     scale_fill_gradient2(
       high = "red", 
@@ -333,10 +46,12 @@ plot_usmap(data = pv_margins_map2000, regions = "states", values = "win_margin")
     theme_void()
 
 ## map: win-margins 2016
+# I found the win margins for 2016
 pv_margins_map2016 <- pvstate_df %>%
     filter(year == 2016) %>%
     mutate(win_margin = (R_pv2p-D_pv2p))
 
+# I plotted the 2016 win margin using plot_usmap()
 plot_usmap(data = pv_margins_map2016, regions = "states", values = "win_margin") +
     scale_fill_gradient2(
       high = "red", 
@@ -347,6 +62,7 @@ plot_usmap(data = pv_margins_map2016, regions = "states", values = "win_margin")
       name = "win margin"
     ) +
     theme_void()+
+# I added titles and refined the theme
     labs(title = "Win Margin Map: 2000",
        subtitle = md("Win margin by two party popular vote")) + 
   theme(panel.background = element_rect(color = "black", fill = "grey"))+
@@ -354,15 +70,13 @@ plot_usmap(data = pv_margins_map2016, regions = "states", values = "win_margin")
         plot.subtitle = element_text(face = "italic"))
 
    
-#################
-# party winners based on popular vote 
-#################
-## map grid
-# changed from pv to pv2
+
+# party winners based on popular vote from 1996 to 2016
 pv_map_grid <- pvstate_df %>%
     filter(year >= 1996) %>%
-    mutate(winner = ifelse(R_pv2p > D_pv2p, "republican", "democrat"))
+    mutate(winner = ifelse(R_pv2p > D_pv2p, "republican", "democrat"))  # the winner is designated as the one with most of vote share 
 
+# This plots the party winners based on the two party popular vote
 plot_usmap(data = pv_map_grid, regions = "states", values = "winner", color = "white") +
     facet_wrap(facets = year ~.) + 
     scale_fill_manual(values = c("blue", "red"), name = "Two Party Popular Vote Winner") +
@@ -370,6 +84,7 @@ plot_usmap(data = pv_map_grid, regions = "states", values = "winner", color = "w
     theme(strip.text = element_text(size = 12),
           aspect.ratio=1) +
 theme_void()+
+# I refined the theme here 
     labs(title = "Two Party Popular Vote: 1996-2016",
        subtitle = md("Party with larger two party popular vote")) + 
   theme(panel.background = element_rect(color = "black", fill = "grey"))+
@@ -384,10 +99,12 @@ theme_void()+
 #################
 # ORIGINAL: win margin map 2000-2016 
 #################
+# I found the win margin for each election in each state from 1996-2016
 pv_margins_map <- pvstate_df %>%
     filter(year >= 1996)%>%
     mutate(win_margin = (R_pv2p-D_pv2p))
 
+# I plotted the win margin using plot_usmap
 plot_usmap(data = pv_margins_map, regions = "states", values = "win_margin") +
     scale_fill_gradient2(
       high = "red", 
@@ -397,14 +114,17 @@ plot_usmap(data = pv_margins_map, regions = "states", values = "win_margin") +
       limits = c(-50, 50),
       name = "Win Margin"
     ) +
+# I facetted by year to show the change over time
   facet_wrap(facet = year ~.)+
   theme_void()+
+# I refined the title and general display
     labs(title = "Win Margin Map: 1996-2016",
        subtitle = md("Win margin by two party vote")) + 
   theme(panel.background = element_rect(color = "black", fill = "grey"))+
   theme(plot.title = element_text(face = "bold"), 
         plot.subtitle = element_text(face = "italic"))
 
+# I save the image 
 ggsave("pop_vote_margin_1996_2016.png", height = 4, width = 8)
 ```
 
@@ -413,14 +133,17 @@ ggsave("pop_vote_margin_1996_2016.png", height = 4, width = 8)
 #################
 # SWING CALCULATIONS
 #################
+
+# Here I calculate the year by year "swing" in each state overtime 
 swing_data <- pvstate_df %>%
    select(year, state, D_pv2p) %>% 
    group_by(state) %>% ## need to do this lag WITHIN state
    mutate(D_pv2p_lastyr = lag(D_pv2p, n = 1, order_by = year),
           D_pv2p_lastlastyr = lag(D_pv2p, n = 2, order_by = year),
-          swing = D_pv2p - D_pv2p_lastyr) %>%
+          swing = D_pv2p - D_pv2p_lastyr) %>%  ## the swing is the change in pop vote share one year to next 
    ungroup()
 
+# I arrange the swing in order to see which states swung left and right the most
 swing_data %>%
   filter(year == 2016) %>%
   arrange(swing)
@@ -432,9 +155,11 @@ swing_data %>%
 #################
 # ORIGINAL:SWING margin map 2000-2016 
 #################
+# this is the data for a swing plot for 1996-2016
 swing_plot_1 <- swing_data %>%
   filter(year >= 1996)
 
+# I plotted the swing margin using plot_usmap
 plot_usmap(data = swing_plot_1, regions = "states", values = "swing") +
     scale_fill_gradient2(
       high = "blue", 
@@ -444,7 +169,9 @@ plot_usmap(data = swing_plot_1, regions = "states", values = "swing") +
       limits = c(-50,50),
       name = "Swing Margin"
     ) +
+# I facetted by year to show the progression overtime
   facet_wrap(facet = year ~.)+
+# I refined the titles and display
     theme_void()+
     labs(title = "Swing Map: 2000-2016",
        subtitle = md("Measure of a state's tendency to swing from one election to the next")) + 
@@ -452,14 +179,17 @@ plot_usmap(data = swing_plot_1, regions = "states", values = "swing") +
   theme(plot.title = element_text(face = "bold"), 
         plot.subtitle = element_text(face = "italic"))
 
+# I saved the image 
   ggsave("swing_margin_1996-2016.png", height = 4, width = 8)
 
 #################
-# ORIGINAL:SWING margin map 2016 
+# ORIGINAL:SWING margin map 2012 - 2016 
 #################
+# this is the data for a swing plot for 2012-2016
 swing_plot_2 <- swing_data %>%
   filter(year >= 2012)
 
+# I plotted the swing margin using plot_usmap
 plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
     scale_fill_gradient2(
       high = "blue", 
@@ -470,7 +200,9 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
       limits = c(-50, 50),
       name = "Swing Margin"
     ) +
+# I facetted by year to show the progression overtime
   facet_wrap(facet = year ~.)+
+# I refined the titles and display
     theme_void()+
     labs(title = "Swing Map: 2012 and 2016",
        subtitle = md("Measure of a state's tendency to swing from one election to the next")) + 
@@ -478,6 +210,7 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
   theme(plot.title = element_text(face = "bold"), 
         plot.subtitle = element_text(face = "italic"))
 
+# I saved the resulting image
   ggsave("swing_margin_2012_2016.png", height = 4, width = 8)
   
 ```
@@ -487,19 +220,23 @@ plot_usmap(data = swing_plot_2, regions = "states", values = "swing") +
 # TEXAS AND US MARGINS
 #################
 
+# I found the annual win margin on the national basis
 x <- popvote_df%>%
   select(year, party, pv2p)%>%
   spread(party, pv2p)%>%
   mutate(overall_pv2_margin = republican - democrat)
 
+# I shrunk the data to just Texas figures, including the Texas win margin
 y <- pvstate_df%>%
   filter(state == "Texas")
 
+# I joined the two data sets to compare national and Texas vote margins 
 a <- left_join(x, y)%>%
   select(year, state, vote_margin, overall_pv2_margin)%>% 
   rename(TX_pv2_margin = vote_margin) %>%
   filter(year >= 1960)
 
+# I updated my_pretty_theme 
 my_pretty_theme <- theme_bw() + 
     theme(panel.border = element_blank(),
           plot.subtitle = element_text(hjust = 0.5),
@@ -510,14 +247,19 @@ my_pretty_theme <- theme_bw() +
           axis.line    = element_line(colour = "black"),
           legend.position = "top",
           legend.text = element_text(size = 12))
+
+# This library allows me to label the Texas line
 library(directlabels)
 
+# I plotted the Texas and the national vote margin from 1960-2000
 ggplot(data = a, aes(x = year, y = TX_pv2_margin))+
   geom_line(aes(x = year, y = TX_pv2_margin),colour = "black", linetype = "dotted")+
   geom_line(aes(x = year, y = overall_pv2_margin), colour = "black")+
+# This highlighted the graph to denote a R or D vote share majority
   geom_rect(aes(ymin = -30, ymax = 0, xmin = 1960, xmax = 2016, fill = 'blue'), alpha = .01)+
   geom_rect(aes(ymin = 0, ymax = 40, xmin = 1960, xmax = 2016, fill = 'red'), alpha = .01)+
   scale_fill_manual(values = alpha(c("blue", "red")))+
+# I entitled the axes
   labs(title = "Two Party Vote Share Margin: The U.S. and Texas", 
        subtitle = "Vote margin from 1960-2000", 
        x = "Year", 
@@ -525,9 +267,12 @@ ggplot(data = a, aes(x = year, y = TX_pv2_margin))+
   my_pretty_theme+
   theme(plot.title = element_text(face = "bold"), 
         legend.position = "none")+
+# I labelled each year
   scale_x_continuous(breaks = seq(from = 1960, to = 2016, by = 4))+
+# This labels the Texas line
   geom_dl(aes(label = state), method = list(dl.trans(x = x + 0.05), "last.points", cex = 0.6))
 
+# I saaved the figure
   ggsave("pop_vote_texas.png", height = 4, width = 8)
 
 
