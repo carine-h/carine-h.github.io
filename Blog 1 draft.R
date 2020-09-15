@@ -217,8 +217,8 @@ y <- pvstate_df%>%
 
 # I joined the two data sets to compare national and Texas vote margins 
 a <- left_join(x, y)%>%
-  select(year, state, vote_margin, overall_pv2_margin)%>% 
-  rename(TX_pv2_margin = vote_margin) %>%
+  select(year, state, R_pv2p, D_pv2p, overall_pv2_margin)%>% 
+  rename(TX_pv2_margin = R_pv2p - Dpv2p) %>%
   filter(year >= 1960)
 
 # I updated my_pretty_theme 
