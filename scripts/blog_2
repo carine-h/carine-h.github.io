@@ -1,1 +1,373 @@
+---
+title: "Blog_2"
+author: "Carine Hajjar"
+date: "9/18/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+####----------------------------------------------------------#
+#### Pre-amble ####
+####----------------------------------------------------------#
+
+## install via `install.packages("name")`
+library(tidyverse)
+library(ggplot2)
+library(jtools) # for plot_summ 
+library(huxtable)
+
+## set working directory here
+setwd("~")
+
+```
+
+
+```{r}
+####----------------------------------------------------------#
+#### The relationship between economy and PV ####
+####----------------------------------------------------------#
+
+# reading in the data
+economy_df <- read_csv("~/Desktop/R studio/blog_2_elections/econ.csv") 
+popvote_df <- read_csv("~/Desktop/R studio/blog_2_elections/popvote_1948-2016 copy.csv") 
+
+data <- popvote_df %>% 
+  filter(incumbent_party == TRUE) %>%
+  select(year, winner, pv2p) %>%
+  left_join(economy_df %>% 
+  filter(quarter == 2))
+
+data
+
+
+```
+
+
+```{r}
+## scatterplot + line
+# this graphs the incumbent's popular vote according to second quarter GDP growth and includes a line for standard deviation 
+data %>%
+  ggplot(aes(x=GDP_growth_qt, y=pv2p,
+             label=year)) + 
+  geom_text() +
+# inserts error 
+  geom_smooth(method="lm", formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second quarter GDP growth") +
+  ylab("Incumbent party's national popular pv2p") +
+  theme_bw()
+
+## fit a model
+lm_econ <- lm(pv2p ~ GDP_growth_qt, data = data)
+summary(lm_econ)
+
+data %>%
+  ggplot(aes(x=GDP_growth_qt, y=pv2p,
+             label=year)) + 
+    geom_text(size = 8) +
+    geom_smooth(method="lm", formula = y ~ x) +
+    geom_hline(yintercept=50, lty=2) +
+    geom_vline(xintercept=0.01, lty=2) + # median
+    xlab("Q2 GDP growth (X)") +
+    ylab("Incumbent party PV (Y)") +
+    theme_bw() +
+    ggtitle("Y = 49.44 + 2.969 * X") + 
+    theme(axis.text = element_text(size = 20),
+          axis.title = element_text(size = 24),
+          plot.title = element_text(size = 32))
+```
+
+
+
+
+## model fit 
+
+#TODO
+
+```{r}
+## model testing: leave-one-out
+outsamp_mod  <- lm(pv2p ~ GDP_growth_qt, data[data$year != 2016,])
+outsamp_pred <- predict(outsamp_mod, data[data$year == 2016,])
+outsamp_true <- data$pv2p[data$year == 2016] 
+```
+
+
+```{r}
+## model testing: cross-validation (one run)
+years_outsamp <- sample(data$year, 8)
+mod <- lm(pv2p ~ GDP_growth_qt,
+          data[!(data$year %in% years_outsamp),])
+
+# outsamp_pred <- #TODO
+```
+
+
+```{r}
+## model testing: cross-validation (1000 runs)
+#outsamp_errors <- sapply(1:1000, function(i){
+  #TODO
+#})
+
+#hist(outsamp_errors,
+#     xlab = "",
+#     main = "mean out-of-sample residual\n(1000 runs of cross-validation)")
+
+```
+ 
+```{r}
+## prediction for 2020
+#GDP_new <- economy_df %>%
+#    subset(year == 2020 & quarter == 2) %>%
+#    select(GDP_growth_qt)
+
+#predict(lm_econ, GDP_new)
+
+#TODO: predict uncertainty
+```
+
+
+```{r}
+## extrapolation?
+##   replication of: https://nyti.ms/3jWdfjp
+
+economy_df %>%
+  subset(quarter == 2 & !is.na(GDP_growth_qt)) %>%
+  ggplot(aes(x=year, y=GDP_growth_qt,
+             fill = (GDP_growth_qt > 0))) +
+  geom_col() +
+  xlab("Year") +
+  ylab("GDP Growth (Second Quarter)") +
+  ggtitle("The percentage decrease in G.D.P. is by far the biggest on record.") +
+  theme_bw() +
+  theme(legend.position="none",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  face="bold"))
+
+```
+
+
+
+```{r, pretty theme}
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.title   = element_text(size = 15, hjust = 0.5), 
+        axis.text.x  = element_text(angle = 45, hjust = 1),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.position = "top",
+        legend.text = element_text(size = 12))
+```
+
+
+
+
+
+
+
+
+
+
+# BLOG MATERIAL
+*Extension: Heeterogenous Predictive Power of the Economy*
+Is the effect of the economy stronger for sitting presidents running for re-election compared to same-party heirs seeking the office?
+Does the predictive power of economy change across time? If so, why? 
+
+```{r}
+# joining popvote and econ data and using second quarter of the election year, per Achen and Bartels reading 
+data_1 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent, incumbent_party) %>%
+  left_join(economy_df)%>%
+    filter(quarter == 2)%>%
+# this column will tell us whether or not the winner was an incumbent or not  
+  select(year, winner, pv2p, winner, incumbent, incumbent_party, incumbent_winner, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+# GDP yearly vs. GDP quarter 
+fit_1 <- lm(pv2p ~ GDP_growth_qt, data = data_1)
+fit_1
+
+# Going to correlate economic growth (GDP quarter AND year) with incumbent wins 
+#library(rstanarm)
+#fit_lm_1 <- lm(incumbent_winner ~ GDP_growth_yr + GDP_growth_qt, data = data_1)
+#summary(fit_lm_1)
+# without economic growth, the incumbent is already likely to win by around 11% 
+# yearly GDP growth is a far weaker prediction that the quarterly GDP growth leading up to the election 
+# same is true with the Bayesian gaussian regression
+#fit_stan_1 <- stan_glm(data = data_1, incumbent_winner ~ GDP_growth_yr + GDP_growth_qt, refresh = FALSE)
+```
+This model tells us that incumbent winners see are likely associated with a GDP growth in their election year. However, GDP growth in the quarter concurrent with their reelection is actually a stronger predictor, consistent with Achen and Bartels' assessment of economic  voting. 
+
+Above, I use GDP growth to model incumbent wins. Here, more consistent with Achen and Bartel's study, I'll use "quarterly growth rates in real income" (which they believe to be a better indication of electoral preference in the popular vote share than GDP growth) in the short-term and long-term of a presidential election.  
+```{r}
+data_year_growth <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent, incumbent_party) %>%
+  left_join(economy_df)%>%
+# this column will tell us whether or not the winner was an incumbent or not  
+  mutate(incumbent_winner = ifelse(winner == TRUE & incumbent == TRUE, TRUE, FALSE))%>%
+  select(year, winner, pv2p, winner, incumbent, incumbent_party, incumbent_winner, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm(winner ~ RDI_growth, data = data_year_growth)
+# is winner best way? 
+# maybe PV2? 
+```
+
+```{r}
+# I updated my_pretty_theme 
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.position = "top",
+        legend.text = element_text(size = 12))
+
+# FIT 3: Second-Quarter Incumbent PV2P and RDI Growth
+data_quarter_growth <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent_party == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm(pv2p ~ RDI_growth, data = data_quarter_growth)
+summary(data_quarter_growth)
+
+# this graphs the incumbent's popular vote according to second quarter real income growth and includes a line for standard deviation 
+  ggplot(data = data_quarter_growth, aes(x=RDI_growth, y=pv2p,
+             label=year)) + 
+  geom_text() +
+# inserts error 
+  geom_smooth(method="lm", formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second Quarter RDI Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "RDI Growth and Vote Shares for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year") +
+  my_pretty_theme
+
+ggsave("RDI_pv2p.png", height = 2, width = 4)
+
+## fit a model
+lm_econ <- lm(pv2p ~ GDP_growth_qt, data = data_quarter_growth)
+summary(lm_econ)
+
+ggplot(data = data_quarter_growth, aes(x=GDP_growth_qt, y=pv2p,
+             label=year)) + 
+  geom_text() +
+# inserts error 
+  geom_smooth(method="lm", formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second Quarter GDP Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "GDP Growth and Vote Shares for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year") +
+  my_pretty_theme
+
+ggsave("GDP_pv2p.png", height = 2, width = 4)
+```
+
+Answering: Is the effect of the economy (using 2nd quarter GDP growth, RDI, Unemployment) stronger for sitting presidents running for re-election compared to same-party heirs seeking the office?
+
+```{r}
+# Incumbency is associated with electoral success
+
+# plot of incumbent vote share
+
+
+```
+
+ 
+```{r, results = 'asis'}
+data_incumbent <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+# impact of economy for incumbents 
+lm_incumbent <- lm(pv2p ~ GDP_growth_qt + RDI_growth, data = data_incumbent)
+summary(lm_incumbent)
+summ(lm_incumbent)
+export_summs(lm_incumbent)
+
+
+data_nonincumbent <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent == FALSE,
+         incumbent_party == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+# impact of economy for non-incumbents
+lm_nonincumbent <- lm(pv2p ~ GDP_growth_qt + RDI_growth, data = data_nonincumbent)
+summary(lm_nonincumbent)
+library(stargazer)
+summ(lm_nonincumbent)
+
+
+export_summs(lm_incumbent, lm_nonincumbent)
+
+
+plot_summs(lm_incumbent, lm_nonincumbent, scale = TRUE)
+
+
+# Unemployment
+lm_UE_inc <-  lm(pv2p ~ unemployment, data = data_incumbent)
+lm_UE_noninc <-  lm(pv2p ~ unemployment, data = data_nonincumbent)
+
+plot_summs(lm_UE_inc, lm_UE_noninc, scale = TRUE)
+
+```
+
+
+
+
+Does the predictive power of economy change across time? If so, why? 
+
+Going back to the incumbent reelection and its relationship with the economy, it's important to consider the correlation of these variables overtime. When is the economy the most important? 
+
+COMMENTARY
+
+This is a crucial question at the moment given the pandemic's effect on the American economy. Will the economy be a bigger predictor now more than ever?
+```{r}
+data_incumbent_80 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         year <= 1980) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+data_incumbent_after80 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         year > 1980) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm_incumbent_80 <- lm(pv2p ~ GDP_growth_qt, data = data_incumbent_80)
+summary(lm_incumbent_80)
+
+lm_incumbent_after80 <- lm(pv2p ~ GDP_growth_qt, data = data_incumbent_after80)
+summary(lm_incumbent_after80)
+
+
+export_summs(lm_incumbent_80, lm_incumbent_after80)
+```
+
+
+
+
 
