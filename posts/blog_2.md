@@ -32,7 +32,7 @@ Some key take-aways:
 # The Economy and Incumbency 
 Now that we've established the predicitive power of the economy in an election, it's important to consider another predicitive aspect - incumbency. 
 
-![](../images/GDP_RDI_model_sc.png)
+![](../images/RDI_GDP_model_sc.png)
 
 Model 1 looks at the relationship between the two party vote share and economic performance (measured in either GDP or real income). The blue line is for incumbents and the orange is for non-incumbents. For an incumbent president running for reelection, both measures of economic performance (in the second quarter of the election year) are positively correlated with vote share - incumbent candidates with good short-term economic performance get votes. 
 
