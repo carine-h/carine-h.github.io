@@ -22,7 +22,7 @@ It's important to note, however, that GDP growth isn't the only metric for econo
 
 ![](../images/RDI_pv2p.png)
 
-Overall, though there is some variation from election to election, these models tell us that incumbent winners are likely associated with a GDP or personal real income growth in their election year. It's important to note, however, that timeline matters. GDP or real income growth in the quarter concurrent with incumbent reelection is actually a stronger predictor than overall economic performance in a presidency, consistent with Achen and Bartels' assessment of economic voting. Achen and Bartels as well as various other political scientists note that voters retrospectively assess incumbents using the short run. Specifically, the relationship between two-party popular vote share and economic conditions are most correlated in the second quarter of an election year. 
+Overall, though there is some variation from election to election, these models tell us that incumbent winners are likely associated with a GDP or personal real income growth in their election year. It's important to note, however, that timeline matters. GDP or real income growth in the quarter concurrent with incumbent reelection is actually a stronger predictor than overall economic performance in a presidency, consistent with Achen and Bartels' assessment of economic voting. Achen and Bartels (152) as well as various other political scientists note that voters retrospectively assess incumbents using the short run. Specifically, the relationship between two-party popular vote share and economic conditions are most correlated in the second quarter of an election year. 
 
 Some key take-aways: 
 - Positive GDP and real income growth are associated with incumbent reelections 
