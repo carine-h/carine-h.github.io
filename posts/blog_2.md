@@ -14,11 +14,11 @@ From my analysis below, I've come to the following conclusions:
   
 
 # The Economy and Elections Overtime
-There's a clear graphical correlation between economic performance and the reelection of incumbent candidates. This makes sense: if GDP or real incomes are growing, voters are likely to "reward" incumbents with a vote [MAYBE INSERT A SOURCE]. This was cetainly the case in 2012 and 2016 which fall almost perfectly on the predictive line for popular vote share as predicted by GDP growth. 
+There's a clear graphical correlation between economic performance and the reelection of incumbent candidates. This makes sense: if GDP or real incomes are growing, voters are likely to "reward" incumbents with a vote. This was cetainly the case in 2012 and 2016 which fall almost perfectly on the predictive line for popular vote share as predicted by GDP growth. 
 
 ![](../images/GDP_pv2p.png)
 
-It's important to note, however, that GDP growth isn't the only metric for economic performance. Above, I use GDP growth to model incumbent wins. Here, more consistent with Achen and Bartel's study, I'll use "quarterly growth rates in real income" (which they believe to be a better indication of electoral preference in the popular vote share than GDP growth) in the short-term and long-term of a presidential election. When I use real income change to predict elections, 2012 is highly consistent with the model though 2016 is a bit farther off. 
+It's important to note, however, that GDP growth isn't the only metric for economic performance. Above, I use GDP growth to model incumbent wins. Here, more consistent with [Achen and Bartel's(2017)](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) study, I'll use growth rates in real income (which they believe to be a better indication of electoral preference in the popular vote share than GDP growth) in the short-term and long-term of a presidential election. When I use real income change to predict elections, 2012 is highly consistent with the model though 2016 is a bit farther off. 
 
 ![](../images/RDI_pv2p.png)
 
