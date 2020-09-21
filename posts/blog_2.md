@@ -1,4 +1,4 @@
-#The Economy and Elections: Money Makes the World Go 'Round
+# The Economy and Elections: Money Makes the World Go 'Round
 Today I want to consider a classic predictor of electoral outcomes: the economy. Over the history of American presidential elections, economic conditions have been a key criteria in the electorate's choice for their next president. Therefore, understanding the dynamic between the economy and the electorate is a critical component of election forecasting. 
 
 With a critical election around the corner amidst an unprecedented economic shock, I am keen to understand the link between the presidency and the economy. Today I will engage with the following questions:
@@ -13,7 +13,7 @@ From my analysis below, I've come to the following conclusions:
 - Good economies may actually **punish** non-incumbents in terms of the vote share
   
 
-#The Economy and Elections Overtime
+# The Economy and Elections Overtime
 There's a clear graphical correlation between economic performance and the reelection of incumbent candidates. This makes sense: if GDP or real incomes are growing, voters are likely to "reward" incumbents with a vote [MAYBE INSERT A SOURCE]. This was cetainly the case in 2012 and 2016 which fall almost perfectly on the predictive line for popular vote share as predicted by GDP growth. 
 
 ![](../images/GDP_pv2p.png)
