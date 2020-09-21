@@ -42,6 +42,8 @@ There's a similar trend with unemployment: when unemployment is low in the short
 
 ![](../images/UE_image_sc.png)
 
+Finally, it's important to note that economic metrics are better predictors in certain elections. For instance, 2004, 2012, and 2016's popular vote share of incumbents are almost perfectly predicted by the second-quarter GDP growth. The same is not true in 2008. Perhaps the power of the economy over the vote changes overtime depending on a variety of factors. 
+
 Some key take-aways:
 - Short-term economic success benefits incumbents running for reelection more than non-incumbents running for office 
 - Non-incumbents may actually **lose** vote share due to economic success during an incumbent's (short-term) tenure in office
