@@ -40,7 +40,7 @@ Meanwhile, positive (short-term) economic performance may actually **not** benef
 
 There's a similar trend with unemployment: when unemployment is low in the short-term, incumbents get a larger vote share. Meanwhile, challenger candidates actually **lose** vote share as a result of this economic success and voters remain with the politician that has secured a good economy. This is rather consistent with risk-averse behavior. 
 
-![](../images/UE_model.png)
+![](../images/UE_image_sc.png)
 
 Some key take-aways:
 - Short-term economic success benefits incumbents running for reelection more than non-incumbents running for office 
@@ -52,7 +52,11 @@ A [July article](https://www.npr.org/2020/07/09/889080504/the-economy-may-be-los
 
 For one, employment numbers are rising after falling precipitously due to the artifical demand shock caused by the pandemic. While the labor market is relatively weak when compared to the non-pandemic economy, it has seen a relatively dazzling recovery (which may, actually, be [slowing down](https://www.wsj.com/articles/unemployment-jobless-claims-09-17-2020-11600293082)). This realtive recovery in jobs could bode well for the Trump campaign as they tout their ability to economically recooperate amidst a global shock.
 
-Kurtzleben also notes that the economy could generally be out of style for predictions due to the heightening of partisan tribalism. As Americans settle deeper into their political camps, even the economy may not be enough to sway their vote. 
+![](../images/UE_final.png)
+
+Based on this regression, it's clear that unemployment is negatively correlated with popular vote share — an extra point of unemployment detracts about 0.7 points from the vote share. On the surface this could potentially play to President Trump's favor as unemployment falls. However, there are two crucial caveats. One, this regression does not tell us about **relative** unemployment and how the starting unemployment rate impacts the popular vote. Two, the 0.7 point value has a large p-value, meaning it is not statistically significant. 
+
+Nevertheless, Kurtzleben may still be right about Trump and the economy - but not because of unemployment or anything economic, at that. Her reason is simple: the rising partisan tribalism. As Americans settle deeper into their political camps, even the economy may not be enough to sway their vote. 
 
 
 
