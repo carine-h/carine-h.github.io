@@ -16,11 +16,11 @@ From my analysis below, I've come to the following conclusions:
 # The Economy and Elections Overtime
 There's a clear graphical correlation between economic performance and the reelection of incumbent candidates. This makes sense: if GDP or real incomes are growing, voters are likely to "reward" incumbents with a vote. This was cetainly the case in 2012 and 2016 which fall almost perfectly on the predictive line for popular vote share as predicted by GDP growth. 
 
-![](../images/GDP_pv2p.png)
+![](../images/GDP_graph.png)
 
 It's important to note, however, that GDP growth isn't the only metric for economic performance. Above, I use GDP growth to model incumbent wins. Here, more consistent with [Achen and Bartel's(2017)](https://muse-jhu-edu.ezp-prod1.hul.harvard.edu/book/64646) study, I'll use growth rates in real income (which they believe to be a better indication of electoral preference in the popular vote share than GDP growth) in the short-term and long-term of a presidential election. When I use real income change to predict elections, 2012 is highly consistent with the model though 2016 is a bit farther off. 
 
-![](../images/RDI_pv2p.png)
+![](../images/RDI_graph.png)
 
 Overall, though there is some variation from election to election, these models tell us that incumbent winners are likely associated with a GDP or personal real income growth in their election year. It's important to note, however, that timeline matters. GDP or real income growth in the quarter concurrent with incumbent reelection is actually a stronger predictor than overall economic performance in a presidency, consistent with Achen and Bartels' assessment of economic voting. Achen and Bartels (152) as well as various other political scientists note that voters retrospectively assess incumbents using the short run. Specifically, the relationship between two-party popular vote share and economic conditions are most correlated in the second quarter of an election year. 
 
@@ -32,7 +32,7 @@ Some key take-aways:
 # The Economy and Incumbency 
 Now that we've established the predicitive power of the economy in an election, it's important to consider another predicitive aspect - incumbency. 
 
-![](../images/GDP_RDI_model.png)
+![](../images/GDP_RDI_model_sc.png)
 
 Model 1 looks at the relationship between the two party vote share and economic performance (measured in either GDP or real income). The blue line is for incumbents and the orange is for non-incumbents. For an incumbent president running for reelection, both measures of economic performance (in the second quarter of the election year) are positively correlated with vote share - incumbent candidates with good short-term economic performance get votes. 
 
