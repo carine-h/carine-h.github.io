@@ -1,0 +1,264 @@
+---
+title: "blog_2_rmd"
+author: "Carine Hajjar"
+date: "9/20/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+####----------------------------------------------------------#
+#### Pre-amble ####
+####----------------------------------------------------------#
+
+## install via `install.packages("name")`
+library(tidyverse)
+library(ggplot2)
+library(jtools) # for plot_summ 
+library(huxtable)
+library(gt)
+library(gtsummary)
+library(broom.mixed)
+## set working directory here
+setwd("~")
+
+```
+
+
+```{r}
+####----------------------------------------------------------#
+#### The relationship between economy and PV ####
+####----------------------------------------------------------#
+
+# reading in the data
+economy_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/econ.csv") 
+popvote_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016 copy.csv") 
+
+# I updated my_pretty_theme 
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
+
+```
+
+# BLOG MATERIAL
+*Extension: Heeterogenous Predictive Power of the Economy*
+Is the effect of the economy stronger for sitting presidents running for re-election compared to same-party heirs seeking the office?
+Does the predictive power of economy change across time? If so, why? 
+
+```{r}
+# joining popvote and econ data and using second quarter of the election year, per Achen and Bartels reading 
+data_1 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent, incumbent_party) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2)
+
+# GDP yearly vs. GDP quarter 
+fit_1 <- lm(pv2p ~ GDP_growth_qt, data = data_1)
+fit_1
+
+```
+This model tells us that incumbent winners see are likely associated with a GDP growth in their election year. However, GDP growth in the quarter concurrent with their reelection is actually a stronger predictor, consistent with Achen and Bartels' assessment of economic  voting. 
+
+Above, I use GDP growth to model incumbent wins. Here, more consistent with Achen and Bartel's study, I'll use "quarterly growth rates in real income" (which they believe to be a better indication of electoral preference in the popular vote share than GDP growth) in the short-term and long-term of a presidential election.  
+```{r}
+data_year_growth <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent, incumbent_party) %>%
+  left_join(economy_df)%>%
+# this column will tell us whether or not the winner was an incumbent or not  
+  mutate(incumbent_winner = ifelse(winner == TRUE & incumbent == TRUE, TRUE, FALSE))%>%
+  select(year, winner, pv2p, winner, incumbent, incumbent_party, incumbent_winner, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm(winner ~ RDI_growth, data = data_year_growth)
+# is winner best way? 
+# maybe PV2? 
+```
+
+```{r}
+# FIT 3: Second-Quarter Incumbent PV2P and RDI Growth
+data_quarter_growth <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent_party == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm(pv2p ~ RDI_growth, data = data_quarter_growth)
+summary(data_quarter_growth)
+
+# this graphs the incumbent's popular vote according to second quarter real income growth and includes a line for standard deviation 
+  ggplot(data = data_quarter_growth, aes(x=RDI_growth, y=pv2p,
+             label=year)) + 
+  geom_text() +
+# inserts error 
+  geom_smooth(method="lm", formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second Quarter RDI Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "RDI Growth and Vote Shares for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year", 
+       caption = "Data from 1948-2016 U.S. elections and economies") +
+  my_pretty_theme
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/RDI_pv2p.png", height = 2, width = 4)
+
+## fit a model
+lm_econ <- lm(pv2p ~ GDP_growth_qt, data = data_quarter_growth)
+summary(lm_econ)
+
+ggplot(data = data_quarter_growth, aes(x=GDP_growth_qt, y=pv2p,
+             label=year)) + 
+  geom_text() +
+# inserts error 
+  geom_smooth(method="lm", formula = y ~ x) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second Quarter GDP Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "GDP Growth and Vote Shares for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year", 
+       caption = "Data from 1948-2016 U.S. elections and economies") +
+  my_pretty_theme
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/GDP_pv2p.png", height = 2, width = 4)
+```
+
+
+Answering: Is the effect of the economy (using 2nd quarter GDP growth, RDI, Unemployment) stronger for sitting presidents running for re-election compared to same-party heirs seeking the office?
+
+# Incumbent Non-Incumbent Economic Regressions
+```{r, results = 'asis'}
+##########
+# INCUMBENT/NON-INCUMBENT MODELS
+##########
+
+# DATA FOR INCUMBENTS
+data_incumbent <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+# impact of economy for INCUMBENTS 
+lm_incumbent <- lm(pv2p ~ GDP_growth_qt + RDI_growth, data = data_incumbent)
+
+# DATA FOR NON-INCUMBENTS
+data_nonincumbent <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent == FALSE,
+         incumbent_party == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+# impact of economy for NON-INCUMBENTS
+lm_nonincumbent <- lm(pv2p ~ GDP_growth_qt + RDI_growth, data = data_nonincumbent)
+
+
+plot_summs(lm_incumbent, lm_nonincumbent, coefs = c( "2nd Quarter \n GDP Growth" = "GDP_growth_qt", "2nd Quarter \n RDI Growth" = "RDI_growth"), scale = TRUE, robust = TRUE, legend.title = "Incumbent v. \n Non-incumbent Candidate")+
+  my_pretty_theme+
+  labs(title = "Impact of Economic Performance on the \n Two-Party Vote Share",
+       subtitle = "Second Quarter GDP and Real Income Growth (1948-2016)", 
+       caption = "Data from 1948-2016 U.S. elections and economies", 
+       y = "Economic Metric", 
+       x = "Estimate")
+ggsave("~/Desktop/R studio/carine-h.github.io/images/GDP_RDI_model.png", height = 2, width = 4)
+
+
+###############
+# UNEMPLOYMENT 
+###############
+# Unemployment
+lm_UE_inc <-  lm(pv2p ~ unemployment, data = data_incumbent)
+lm_UE_noninc <-  lm(pv2p ~ unemployment, data = data_nonincumbent)
+
+plot_summs(lm_UE_inc, lm_UE_noninc, coefs = c("Unemployment" = "unemployment"), scale = TRUE, robust = TRUE, legend.title = "Incumbent v. \n Non-incumbent Candidate")+
+    my_pretty_theme+
+  labs(title = "Impact of Unemployment on the \n Two-Party Vote Share",
+       subtitle = "Second Quarter Unemployment (1948-2016)",
+       caption = "Data from 1948-2016 U.S. elections and economies", 
+       y = "", 
+       x = "Estimate")
+ggsave("~/Desktop/R studio/carine-h.github.io/images/UE_model.png", height = 2, width = 4)
+
+# Regression summaries 
+export_summs(lm_incumbent, lm_nonincumbent)
+export_summs(lm_UE_inc, lm_UE_noninc)
+
+```
+
+
+
+# ECON OVERTIME 
+Does the predictive power of economy change across time? If so, why? 
+
+Going back to the incumbent reelection and its relationship with the economy, it's important to consider the correlation of these variables overtime. When is the economy the most important? 
+
+COMMENTARY
+
+This is a crucial question at the moment given the pandemic's effect on the American economy. Will the economy be a bigger predictor now more than ever?
+```{r}
+data_incumbent_80 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         year <= 1980) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+data_incumbent_after80 <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         year > 1980) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)
+
+lm_incumbent_80 <- lm(pv2p ~ GDP_growth_qt, data = data_incumbent_80)
+summary(lm_incumbent_80)
+
+lm_incumbent_after80 <- lm(pv2p ~ GDP_growth_qt, data = data_incumbent_after80)
+summary(lm_incumbent_after80)
+
+
+export_summs(lm_incumbent_80, lm_incumbent_after80)
+```
+
+
+```{r}
+data_inc <- popvote_df %>% 
+  select(year, winner, pv2p, incumbent_party, incumbent) %>%
+  left_join(economy_df)%>%
+  filter(quarter == 2, 
+         incumbent == TRUE) %>%
+  select(year, winner, pv2p, winner, incumbent_party, RDI_growth, GDP, GDP_growth_yr, GDP_growth_qt, inflation, unemployment)%>%
+  rename(Unemployment = unemployment)
+
+fit_econ <- lm(pv2p ~ Unemployment, data = data_inc)
+
+tbl_regression(fit_econ, intercept = TRUE) %>%
+  as_gt() %>%
+  tab_header(title = md("**Relationship Between the Vote Share and GDP Growth and Unemployment \n for Incumbent Presidential Campaigns**"), 
+              subtitle = md("*Second Quarter, 1948-2016*"))%>%
+  tab_source_note(md("**Source:** 1948-2016 election results and economic performance")) %>% 
+  tab_footnote( 
+    footnote = md("Calculated via a permutation test"),
+    locations = cells_column_labels(columns = vars(p.value))
+  )
+
+
+```
+
+
+
+
+
+
+
