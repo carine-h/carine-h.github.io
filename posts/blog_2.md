@@ -47,6 +47,12 @@ Some key take-aways:
 - Non-incumbents may actually **lose** vote share due to economic success during an incumbent's (short-term) tenure in office
 
 
+# Will the Economy Matter in this Election? 
+A [July article](https://www.npr.org/2020/07/09/889080504/the-economy-may-be-losing-its-impact-on-presidential-elections) by NPR's Danielle Kurtzleben notes that while the economy is historically a robust predictor of elections — which I've demonstrated above — it may not be this time around. 
+
+For one, employment numbers are rising after falling precipitously due to the artifical demand shock caused by the pandemic. While the labor market is relatively weak when compared to the non-pandemic economy, it has seen a relatively dazzling recovery (which may, actually, be [slowing down](https://www.wsj.com/articles/unemployment-jobless-claims-09-17-2020-11600293082)). This realtive recovery in jobs could bode well for the Trump campaign as they tout their ability to economically recooperate amidst a global shock.
+
+Kurtzleben also notes that the economy could generally be out of style for predictions due to the heightening of partisan tribalism. As Americans settle deeper into their political camps, even the economy may not be enough to sway their vote. 
 
 
 
