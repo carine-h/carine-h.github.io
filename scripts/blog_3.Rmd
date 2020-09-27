@@ -1,0 +1,282 @@
+---
+title: "Blog_3"
+author: "Carine Hajjar"
+date: "9/26/2020"
+output: html_document
+---
+Extension: How do state-level polls differ from national level polls? Using careful model evaluation techniques and considering possible choices of weighted ensembles, build a predictive model for 2020 using state-level polls.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(jtools) # for plot_summ 
+library(huxtable)
+library(gt)
+library(gtsummary)
+library(broom.mixed)
+
+#####------------------------------------------------------#
+##### Read and merge data ####
+#####------------------------------------------------------#
+
+popvote_df <- read_csv("data/popvote_1948-2016.csv")
+economy_df <- read_csv("data/econ.csv")
+poll_df    <- read_csv("data/pollavg_1968-2016.csv")
+poll_state_df <- read_csv("data/pollavg_bystate_1968-2016.csv")
+
+
+# 6 weeks left and 2nd quarter economy 
+dat <- popvote_df %>% 
+    full_join(poll_df %>% 
+                  filter(weeks_left == 6) %>% 
+                  group_by(year,party) %>% 
+                  summarise(avg_support=mean(avg_support))) %>% 
+    left_join(economy_df %>% 
+                  filter(quarter == 2))
+
+# My pretty theme
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
+```
+
+# Compare state and national polls visually
+```{r, fig.height= 4, fig.width= 8, eval =  FALSE}
+a <- poll_df %>%
+filter(year == 2016) %>%
+ggplot(aes(x = poll_date, y = avg_support, color = party)) +
+  geom_point(size = 1) + 
+  geom_line() +
+ scale_x_date(date_labels = "%b, %Y") + 
+scale_color_manual(values = c("blue","red"), name = "") +
+ylab("polling approval average on date") + 
+xlab("") + 
+theme_bw()
+
+b <- poll_state_df %>%
+arrange(poll_date)%>%
+filter(poll_date >= "2016-03-03") %>%
+group_by(party, poll_date)%>%
+summarise(avg_nat = mean(avg_poll))%>%
+ggplot(aes(x = poll_date, y = avg_nat, color = party)) +
+  geom_point(size = 1) + 
+  geom_line() +
+ scale_x_date(date_labels = "%b, %Y") + 
+scale_color_manual(values = c("blue","red"), name = "") +
+ylab("polling approval average on date") + 
+xlab("") + 
+theme_bw()
+
+
+
+#GGSAVE
+```
+We see that across state polls, daily averages are far more erradic than national polls. We do see that state averages match a similar trend to the national poll averages in 2016: Republicans overall polled below Democrats. 
+
+An important caveat: only certain states poll, so taking daily averages across states will be biased based on the states that poll and their predominant partisan leaning. It's also worth noting that only certain state polled at certain dates, meaning that state-based partisan biases are reflected at different points throughout the state average plot. I believe that these two reasons mostly explain erradic poll numbers and make state-based polling **less** reliable than national polls for national elections. I will explore this preliminary hypothesis throughout the rest of the blog. 
+
+
+# Predictive Model
+The 2016 poll is from after the election
+```{r, eval =  FALSE}
+download.file(url = "https://raw.githubusercontent.com/fivethirtyeight/data/master/pollster-ratings/2016/pollster-ratings.csv", destfile = "~/Desktop/R studio/carine-h.github.io/data/ratings_2016.csv")
+poll2016_rate <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ratings_2016.csv") %>% 
+                rename(pollster = Pollster)
+  
+
+download.file(url = "https://raw.githubusercontent.com/fivethirtyeight/data/master/pollster-ratings/2019/pollster-ratings.csv", destfile = "~/Desktop/R studio/carine-h.github.io/data/ratings_2020.csv")
+poll2020_rate <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ratings_2020.csv") %>%
+                  rename(pollster = Pollster)
+
+polls_2016 <- read_csv("data/polls_2016.csv")
+polls_2020 <- read_csv("data/polls_2020.csv")
+
+data_2016 <- left_join(poll2016_rate, polls_2016, by = c("pollster")) %>%
+  select(pollster, "538 Grade", state, samplesize, rawpoll_clinton, rawpoll_trump, adjpoll_clinton, adjpoll_trump, createddate) %>%
+  rename(grade_538 = "538 Grade")
+
+
+data_2020 <- left_join(poll2020_rate, polls_2020, by = c("pollster")) %>%
+  select(pollster, "538 Grade", state, sample_size, answer, candidate_party, pct) %>%
+  rename(grade_538 = "538 Grade")
+```
+
+
+```{r}
+
+df_time <- poll_df %>% 
+  left_join(popvote_df, by = c("year", "party"))
+
+df_20plus <- df_time %>% 
+  filter(weeks_left >= 20) %>% 
+  group_by(year, party) %>% 
+  mutate(avg_support = mean(avg_support))
+
+df_10plus <- df_time %>% 
+  filter(weeks_left >= 10 & weeks_left < 20) %>% 
+  group_by(year, party) %>% 
+  mutate(avg_support = mean(avg_support))
+
+df_5plus <- df_time %>% 
+  filter(weeks_left >= 5 & weeks_left < 10) %>% 
+  group_by(year, party) %>% 
+  mutate(avg_support = mean(avg_support))
+
+df_under5 <- df_time %>% 
+  filter(weeks_left < 5) %>% 
+  group_by(year, party) %>% 
+  mutate(avg_support = mean(avg_support))
+  
+  
+```
+
+# models
+```{r, fig.height= 7, fig.width= 9}
+# model for 20 plus weeks 
+dat_poll_inc20 <- df_20plus[df_20plus$winner,]
+dat_poll_chl20 <- df_20plus[!df_20plus$winner,]
+mod_poll_inc20 <- lm(pv ~ avg_support, data = dat_poll_inc20)
+mod_poll_chl20 <- lm(pv ~ avg_support, data = dat_poll_chl20)
+
+summary(mod_poll_inc20)
+summary(mod_poll_chl20)
+
+par(mfrow=c(1,2), oma=c(0,0,3,0))
+plot(mod_poll_inc20$fitted.values, dat_poll_inc20$pv,
+         main="Polls (Winner)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_inc20$fitted.values, dat_poll_inc20$pv, dat_poll_inc20$year)
+    abline(a=0, b=1, lty=2) 
+    
+    plot(mod_poll_chl20$fitted.values, dat_poll_chl20$pv,
+         main="Polls (Loser)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_chl20$fitted.values, dat_poll_chl20$pv, dat_poll_chl20$year)
+    abline(a=0, b=1, lty=2)
+mtext("Poll Prediction of Popular Vote: \n 20+ Weeks from Election", line=0, side=3, outer=TRUE, cex=1.5, font = 2)
+```
+
+
+
+```{r, fig.height= 7, fig.width= 9}
+# model for 10-20 weeks out from election
+dat_poll_inc10 <- df_10plus[df_10plus$winner,]
+dat_poll_chl10 <- df_10plus[!df_10plus$winner,]
+mod_poll_inc10 <- lm(pv ~ avg_support, data = dat_poll_inc10)
+mod_poll_chl10 <- lm(pv ~ avg_support, data = dat_poll_chl10)
+
+summary(mod_poll_inc10)
+summary(mod_poll_chl10)
+
+
+par(mfrow=c(1,2), oma=c(0,0,3,0))
+plot(mod_poll_inc10$fitted.values, dat_poll_inc10$pv,
+         main="Polls (Winner)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_inc10$fitted.values, dat_poll_inc10$pv, dat_poll_inc10$year)
+    abline(a=0, b=1, lty=2) 
+    
+    plot(mod_poll_chl10$fitted.values, dat_poll_chl10$pv,
+         main="Polls (Loser)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_chl10$fitted.values, dat_poll_chl10$pv, dat_poll_chl10$year)
+    abline(a=0, b=1, lty=2)
+mtext("Poll Prediction of Popular Vote: \n 10-20 Weeks from Election", line=0, side=3, outer=TRUE, cex=1.5, font = 2)
+```
+
+
+```{r, fig.height= 7, fig.width= 9}
+dat_poll_inc5 <- df_5plus[df_5plus$winner,]
+dat_poll_chl5 <- df_5plus[!df_5plus$winner,]
+mod_poll_inc5 <- lm(pv ~ avg_support, data = dat_poll_inc5)
+mod_poll_chl5 <- lm(pv ~ avg_support, data = dat_poll_chl5)
+
+summary(mod_poll_inc5)
+summary(mod_poll_chl5)
+
+par(mfrow=c(1,2), oma=c(0,0,3,0))
+plot(mod_poll_inc5$fitted.values, dat_poll_inc5$pv,
+         main="Polls (Winner)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_inc5$fitted.values, dat_poll_inc5$pv, dat_poll_inc5$year)
+    abline(a=0, b=1, lty=2) 
+    
+    plot(mod_poll_chl5$fitted.values, dat_poll_chl5$pv,
+         main="Polls (Loser)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_chl5$fitted.values, dat_poll_chl5$pv, dat_poll_chl5$year)
+    abline(a=0, b=1, lty=2)
+mtext("Poll Prediction of Popular Vote: \n 5-10 Weeks from Election", line=0, side=3, outer=TRUE, cex=1.5, font = 2)
+```
+
+
+```{r, fig.height= 7, fig.width= 9}
+dat_poll_inc5u <- df_under5[df_under5$winner,]
+dat_poll_chl5u <- df_under5[!df_under5$winner,]
+mod_poll_inc5u <- lm(pv ~ avg_support, data = dat_poll_inc5u)
+mod_poll_chl5u <- lm(pv ~ avg_support, data = dat_poll_chl5u)
+
+summary(mod_poll_inc5u)
+summary(mod_poll_chl5u)
+
+par(mfrow=c(1,2), oma=c(0,0,3,0))
+plot(mod_poll_inc5u$fitted.values, dat_poll_inc5u$pv,
+         main="Polls (Winner)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_inc5u$fitted.values, dat_poll_inc5u$pv, dat_poll_inc5u$year)
+    abline(a=0, b=1, lty=2) 
+    
+    plot(mod_poll_chl5u$fitted.values, dat_poll_chl5u$pv,
+         main="Polls (Loser)", xlab="Predicted Popular Vote", ylab="True Popular Vote", 
+         cex.lab=.9, cex.main=.9, type='n',xlim=c(35,55),ylim=c(35,55))
+    text(mod_poll_chl5u$fitted.values, dat_poll_chl5u$pv, dat_poll_chl5u$year)
+    abline(a=0, b=1, lty=2)
+mtext("Poll Prediction of Popular Vote: Up to 5 Weeks from Election", line=0, side=3, outer=TRUE, cex=1.5, font = 2)
+```
+
+
+
+```{r, fig.height= 5, fig.width= 9}
+
+pred_20 <- lm(pv ~ avg_support, data = df_20plus)
+pred_10 <- lm(pv ~ avg_support, data = df_10plus)
+pred_5 <- lm(pv ~ avg_support, data = df_5plus)
+pred_5u <- lm(pv ~ avg_support, data = df_under5)
+
+plot_summs(pred_20, pred_10, pred_5, pred_5u, scale = TRUE, robust = TRUE, legend.title = "20+, 10-20, 5-10, Under 5 Week Polls")+
+    my_pretty_theme+
+  labs(title = "Relationship Between Polls and Popular Vote \n in Presidential Election in Weeks Leading Up to Election",
+       subtitle = "Predictive Power of Polls 20+, 10+, <5 Weeks To Election",
+       caption = "Data from 1948-2016 U.S. elections and polls", 
+       y = "", 
+       x = "Estimate")
+#ggsave("~/Desktop/R studio/carine-h.github.io/images/UE_model.png", height = 2, width = 4)
+
+# Regression summaries 
+export_summs(pred_20, pred_10, pred_5, pred_5u, model.names = c("20+ Weeks","10-20 Weeks","5-10 Weeks", "5 and Under Weeks"))
+
+
+pred_5uinc <- lm(pv ~ avg_support + prev_admin, data = df_under5)
+export_summs(pred_5uinc, model.names = "5 Weeks to Election: \n Relationship Between Popular Vote, \n Poll Numbers, and Incumbency")
+
+
+## model testing: leave-one-out on pred_5uinc
+outsamp_mod  <- lm(pv ~ avg_support + prev_admin, df_under5[df_under5$year != 2016,])
+outsamp_pred <- predict(outsamp_mod, df_under5[df_under5$year == 2016,])
+outsamp_true <- df_under5$pv[df_under5$year == 2016] 
+mean(outsamp_pred - outsamp_true)
+
+```
+
+
+
+
+
+
