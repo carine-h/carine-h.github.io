@@ -18,7 +18,15 @@ With the following models, I'll establish the following about the timing of a po
 ## Winners and Losers 
 In the following plots, I take a look at a regression explaining the relationship between the popular vote and the (polled) average approval at the time of the poll. On the left, the regression looks at this relationship among winning candidates, and on the right, it examines losing candidates. I run this regression at four different time periods: 20+ weeks before an election, 10-20 weeks before an election, 5-10 weeks before an election, and under 5 weeks before an election. 
 
+![](../images/poll_20w.png)
+![](../images/poll_10w.png)
+![](../images/poll_5w.png)
+![](../images/poll_under5w.png)
 
+The plots show that there is certainly a positive relationship between the poll-predicted popular vote and the actual popular vote. While it's visually difficult to tell if prdictions and outcomes converge as polls approach election date, there is a noticeable convergence when comparing the 20+ week plot and the under 5 week plot. Preliminarily, this supports my hypothesis that polls become more predictive as election day nears. 
+
+In order to cut down on any visual confusion above, I also plot the coefficients from a regression of popular vote outcome and poll-predicted popular vote outcome from those four periods:
+![](../images/poll_weeks.png)
 
 ## The Moral of the Story 
 The moral of the story is, don't get worked up about polls early on. In fact, maybe don't pay attention to them at all...maybe not until October, that is! 
