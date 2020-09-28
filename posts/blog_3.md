@@ -40,5 +40,10 @@ Now that I have established that polls conducted closer to election day are a cl
 
 ![](../images/5_week_regression.png)
 
+Here we see that incumbency and polled approval (from five and under weeks out) are positively correlated with the acutal popular vote.
+
 ## The Moral of the Story 
+Overall, it looks like Gelman and King are right: the closer we get to election day, the better American voters can gage their election-day decision. Therefore, I conclude the following: 
+- well-conducted polls should become more predictive as election day looms 
+
 The moral of the story is, don't get worked up about polls early on. In fact, maybe don't pay attention to them at all...maybe not until October, that is! 
