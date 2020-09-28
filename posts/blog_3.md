@@ -33,6 +33,12 @@ Here we see that polls taken 20+ weeks before election day are less predictive a
 
 ![](../images/poll_week_regression.png)
 
+Based on the R^{2} measurement, overall, as polls approach election day, their prediction fit the actual outcome more closely. The predictive power of 10-20 and 5-10 week-from-election-day polls are virtually the same. 
+
+## The Final Countdown 
+Now that I have established that polls conducted closer to election day are a closer fit to the actual election outcome, I'll look specifically at a model that uses polled average approval (predicted popular vote) from 5 weeks and under from election day and incumbency to explain popular vote outcomes. 
+
+![](../images/5_week_regression.png)
 
 ## The Moral of the Story 
 The moral of the story is, don't get worked up about polls early on. In fact, maybe don't pay attention to them at all...maybe not until October, that is! 
