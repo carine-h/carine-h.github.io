@@ -9,12 +9,16 @@ So why, then, am I writing this blog post? It turns out that polls, overall, can
 - is the poll national or state-based?
 - how closely was the poll taken to the election? *(we'll explore this question in detail today)*
 
-The answer to the questions determine the **bias** of the poll. Bias is often the reason a singular poll is not the most reliable. Following [guy's] logic, averaging as many polls as possible helps better predict an election outcome and has in past elections. Another possible remedy to poll bias is **timing.** With the following models, I'll establish the following about the timing of a poll in its relation to predicting an election: 
+The answer to the questions determine the **bias** of the poll. Bias is often the reason a singular poll is not the most reliable. Following [guy's] logic, averaging as many polls as possible helps better predict an election outcome and has in past elections. Another possible remedy to poll uncertainty is **timing.** According to Gelman and King, over the course of the campaigning period, voters more clearly solidify their preferences as they gather more and more information on the candidates in question. Following this logic, reelatively sound polls should become more and more reflective of voter's final decisions, and therefore the election outcome, as the election day draws nearer. To test this claim, I will engage with the following question: do polls become more accurate (more reflective of the final outcome) as they are conducted closer to election day?
+
+With the following models, I'll establish the following about the timing of a poll in its relation to predicting an election: 
 - the closer a poll is to an election, the more certainty it has 
 - the closer a poll is to an election, the more it correlates with the election outcome 
 
-#### Winners and Losers 
+## Winners and Losers 
+In the following plots, I take a look at a regression explaining the relationship between the popular vote and the (polled) average approval at the time of the poll. On the left, the regression looks at this relationship among winning candidates, and on the right, it examines losing candidates. I run this regression at four different time periods: 20+ weeks before an election, 10-20 weeks before an election, 5-10 weeks before an election, and under 5 weeks before an election. 
 
 
-#### The Moral of the Story 
+
+## The Moral of the Story 
 The moral of the story is, don't get worked up about polls early on. In fact, maybe don't pay attention to them at all...maybe not until October, that is! 
