@@ -1,0 +1,2 @@
+# The Power of Polls 
+If you've watched the news, listened to a podcast, opened a snapchat, scrolled throughout Instagram, or perused your Facebook feed in the past year, chances are you've been bombarded with poll numbers. "Biden is up X points!" "Trump is leading in this week's polls!" Phrases like these seem so determinant: if a poll says it, it must be true. In reality, however, elections are decided by many factors 
