@@ -11,5 +11,6 @@ If you have any questions or comments, feel free to reach out to me at **cmhajja
 
 # [1. Introduction: Vote Shares and Swing Margins](posts/blog_1.md)
 
-# [1. Economies and Elections: Money Makes the World Go 'Round](posts/blog_2.md)
+# [2. Economies and Elections: Money Makes the World Go 'Round](posts/blog_2.md)
 
+# [3. Polls: Timing is Everything](posts/blog_3.md)
