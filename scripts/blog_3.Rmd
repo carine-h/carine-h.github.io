@@ -21,10 +21,10 @@ library(broom.mixed)
 ##### Read and merge data ####
 #####------------------------------------------------------#
 
-popvote_df <- read_csv("data/popvote_1948-2016.csv")
-economy_df <- read_csv("data/econ.csv")
-poll_df    <- read_csv("data/pollavg_1968-2016.csv")
-poll_state_df <- read_csv("data/pollavg_bystate_1968-2016.csv")
+popvote_df <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
+economy_df <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/econ.csv")
+poll_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/pollavg_1968-2016.csv")
+poll_state_df <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
 
 
 # 6 weeks left and 2nd quarter economy 
@@ -253,7 +253,7 @@ pred_5u <- lm(pv ~ avg_support, data = df_under5)
 plot_summs(pred_20, pred_10, pred_5, pred_5u, scale = TRUE, robust = TRUE, legend.title = "20+, 10-20, 5-10, Under 5 Week Polls")+
     my_pretty_theme+
   labs(title = "Relationship Between Polls and Popular Vote \n in Presidential Election in Weeks Leading Up to Election",
-       subtitle = "Predictive Power of Polls 20+, 10+, <5 Weeks To Election",
+       subtitle = "Predictive Power of Polls 20+, 10+, 5-10, <5 Weeks To Election",
        caption = "Data from 1948-2016 U.S. elections and polls", 
        y = "", 
        x = "Estimate")
