@@ -26,7 +26,13 @@ In the following plots, I take a look at a regression explaining the relationshi
 The plots show that there is certainly a positive relationship between the poll-predicted popular vote and the actual popular vote. While it's visually difficult to tell if prdictions and outcomes converge as polls approach election date, there is a noticeable convergence when comparing the 20+ week plot and the under 5 week plot. Preliminarily, this supports my hypothesis that polls become more predictive as election day nears. 
 
 In order to cut down on any visual confusion above, I also plot the coefficients from a regression of popular vote outcome and poll-predicted popular vote outcome from those four periods:
+
 ![](../images/poll_weeks.png)
+
+Here we see that polls taken 20+ weeks before election day are less predictive and less certain (it has a wider horizontal bar which indicates higher uncertainty) than the polls taken under 5 weeks before election day. This certainly makes sense given Gelman and King's assertion. There is, however, some abiguity with the polls from 10 and 5-10 weeks from election day. Below I take an even closer look at the regression: 
+
+![](../images/poll_week_regression.png)
+
 
 ## The Moral of the Story 
 The moral of the story is, don't get worked up about polls early on. In fact, maybe don't pay attention to them at all...maybe not until October, that is! 
