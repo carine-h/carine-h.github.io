@@ -18,12 +18,12 @@ library(gridExtra)
 
 ```{r}
 # reading in data
-popvote_df    <- read_csv("data/popvote_1948-2016.csv")
-pvstate_df    <- read_csv("data/popvote_bystate_1948-2016.csv")
-economy_df    <- read_csv("data/econ.csv")
-approval_df   <- read_csv("data/approval_gallup_1941-2020.csv")
-pollstate_df  <- read_csv("data/pollavg_bystate_1968-2016.csv")
-fedgrants_df  <- read_csv("data/fedgrants_bystate_1988-2008.csv")
+popvote_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
+pvstate_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+economy_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/econ.csv")
+approval_df   <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
+pollstate_df  <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+fedgrants_df  <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/fedgrants_bystate_1988-2008.csv")
 
 # I updated my_pretty_theme 
 my_pretty_theme <- theme_bw() + 
