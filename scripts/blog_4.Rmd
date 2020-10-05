@@ -1,0 +1,244 @@
+---
+title: "blog_4"
+author: "Carine Hajjar"
+date: "10/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(knitr)
+library(stargazer)
+library(jtools) 
+library(huxtable)
+library(gridExtra)
+```
+
+```{r}
+# reading in data
+popvote_df    <- read_csv("data/popvote_1948-2016.csv")
+pvstate_df    <- read_csv("data/popvote_bystate_1948-2016.csv")
+economy_df    <- read_csv("data/econ.csv")
+approval_df   <- read_csv("data/approval_gallup_1941-2020.csv")
+pollstate_df  <- read_csv("data/pollavg_bystate_1968-2016.csv")
+fedgrants_df  <- read_csv("data/fedgrants_bystate_1988-2008.csv")
+
+# I updated my_pretty_theme 
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
+```
+
+```{r}
+# cleaning and joining data 
+tfc_df <- popvote_df %>%
+  filter(incumbent_party) %>%
+  select(year, candidate, party, pv, pv2p, incumbent) %>%
+  inner_join(
+    approval_df %>% 
+      group_by(year, president) %>% 
+      slice(1) %>% 
+      # this is a NET APPROVAL
+      mutate(net_approve=approve-disapprove) %>% 
+      select(year, incumbent_pres=president, net_approve, poll_enddate),
+    by="year"
+  ) %>%
+  inner_join(
+    economy_df %>%
+      # SECOND QUARTER GDP
+      filter(quarter == 2) %>%
+      select(GDP_growth_qt, year, RDI_growth, quarter),
+    by="year"
+  )
+
+
+# all incumbent presidents? or just incumbent parties? ask on Slack
+
+fit_tfc <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, data = tfc_df)
+summary(fit_tfc)
+
+fit_ec <- lm(pv2p ~ GDP_growth_qt + RDI_growth + incumbent, data = tfc_df)
+summary(fit_ec)
+
+
+export_summs(fit_tfc, model.names = "Time-for-Change Model: \n Relationship Between Popular Vote, \n GDP Growth, Net Approval, and Incumbency")
+export_summs(fit_ec, model.names = "Economic Model: \n Relationship Between Popular Vote, \n GDP Growth, Real Income Growth, and Incumbency")
+
+
+
+
+
+```
+
+```{r, fig.height = 5, fig.width = 10}
+
+plot_ec <- ggplot(data = tfc_df, aes(x= GDP_growth_qt, y= pv2p,
+             label = year, 
+             color = party)) + 
+  geom_text() +
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Second Quarter GDP Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "GDP Growth and Vote Shares \n for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year", 
+       caption = "Data from 1948-2016 U.S. elections and economies")+
+  scale_color_manual(values = c("blue", "red"))+
+  scale_size_area(max_size = 3)+
+  my_pretty_theme
+
+plot_app <- ggplot(data = tfc_df, aes(x= net_approve, y= pv2p,
+             label = year, 
+             color = party)) + 
+  geom_text() +
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Net Approval") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "Net Approval and Vote Shares \n for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year", 
+       caption = "Data from 1948-2016 U.S. elections and economies; \n Gallup approval ratings")+
+  scale_color_manual(values = c("blue", "red"))+
+  scale_size_area(max_size = 3)+
+  my_pretty_theme
+
+grid.arrange(plot_ec, plot_app, ncol=2)
+
+```
+
+The time-for-change model is Alan Abramowitz's model of incumbency. Since 1992 it's been highly accurate, even correctly predicting the 2016 election in Trump's favor. The true out-of-sample popular vote prediction error is 1.7%. The model uses second quarter GDP growth, Gallup job approval, and incumbency to predict popular vote for the incumbent party. 
+
+```{r, fig.height = 5, fig.width = 11}
+# creating color vector for party id 
+tfc_df$color[tfc_df$party== "republican"]="red"
+tfc_df$color[tfc_df$party== "democrat"]="blue"
+
+par(mfrow = c(1, 2))
+
+# plotting residuals of TFC
+plot(tfc_df$year, tfc_df$pv2p, type = "l", 
+     main = "Time-For-Change Model: \n True Popular Vote vs. Predicted Popular Vote", 
+     xlab = "Year", 
+     ylab = "Popular Vote Share",
+     ylim = c(40, 65), 
+     xlim = c(1950, 2020))
+# predicted points
+points(tfc_df$year, predict(fit_tfc, tfc_df), 
+       col = tfc_df$color)
+# legend formatting
+legend("topright", 
+       legend = c("Actual Outcomes", "Predicted Outcomes", "   Republican", "   Democrat"), 
+       col = c("black", "black", "red", "blue"), 
+       lwd=1, 
+       lty=c(1,NA,NA,NA), 
+       pch=c(NA,1,1,1), 
+       merge=FALSE, 
+       cex = 0.7)
+
+# plotting residuals of EC model
+plot(tfc_df$year, tfc_df$pv2p, type = "l", 
+     main = "Economic Model: \n True Popular Vote vs. Predicted Popular Vote", 
+     xlab = "Year", 
+     ylab = "Popular Vote Share",
+     ylim = c(40, 65), 
+     xlim = c(1950, 2020))
+# predicted points
+points(tfc_df$year, predict(fit_ec, tfc_df), 
+       col = tfc_df$color)
+# legend formatting
+legend("topright", 
+       legend = c("Actual Outcomes", "Predicted Outcomes", "   Republican", "   Democrat"), 
+       col = c("black", "black", "red", "blue"), 
+       lwd=1, 
+       lty=c(1,NA,NA,NA), 
+       pch=c(NA,1,1,1), 
+       merge=FALSE, 
+       cex = 0.7)
+
+# mean residual of TFC is slights larger - but does that mean it's a better fit? the difference is negligible 
+# abs(mean(predict(fit_tfc, tfc_df) - tfc_df$pv2p, na.rm = TRUE)) - (mean(predict(fit_ec, tfc_df) - tfc_df$pv2p, na.rm = TRUE))
+
+```
+
+
+
+```{r, fig.width = 9, fig.height = 6}
+par(mfrow = c(1, 2))
+
+# TFC OUTSAMPLE ERROR
+# outsample errors for tfc model
+outsamp_errors <- sapply(1:1000, function(i){
+years_outsamp <- sample(tfc_df$year, 8)
+outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
+outsamp_pred <- predict(outsamp_mod, 
+                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
+outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
+mean(outsamp_pred - outsamp_true)
+})
+
+# visualize in histogram
+hist(outsamp_errors,
+     xlab = "Out-of-Sample Residual",
+     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
+     xlim = c(-15, 15), 
+     ylim = c(0, 270))
+
+# quantify by taking the means of the outsample errors 
+mean(abs(outsamp_errors))
+
+
+# ECON OUTSAMPLE ERROR
+# This is the best way for me to filter out the NAs in the econ data without decreasing useable data from tfc_df
+  # econ data has less years of economic data
+  # regression results are the same with tfc_df and dat 
+dat <- popvote_df %>% 
+  filter(incumbent_party == TRUE) %>%
+  select(year, winner, pv2p, incumbent) %>%
+  left_join(economy_df %>% filter(quarter == 2)) %>%
+  drop_na()
+
+#outsample errors for econ model 
+outsamp_errors <- sapply(1:1000, function(i){
+years_outsamp <- sample(dat$year, 8)
+outsamp_mod <- lm(pv2p ~ GDP_growth_qt + RDI_growth + incumbent, dat[!(dat$year %in% years_outsamp),])
+outsamp_pred <- na.omit(predict(outsamp_mod, 
+                        newdata = dat[dat$year %in% years_outsamp,]))
+outsamp_true <- dat$pv2p[dat$year %in% years_outsamp]
+mean(outsamp_pred - outsamp_true)
+})
+
+# visualize in histogram
+hist(outsamp_errors,
+     xlab = "Out-of-Sample Residual",
+     main = "Economic Model: \n Mean Out-of-Sample Residual (1000 Runs)",
+     xlim = c(-15, 15), 
+     ylim = c(0, 270))
+
+# quantify by taking the means of the outsample errors 
+mean(abs(outsamp_errors))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
