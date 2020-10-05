@@ -14,3 +14,5 @@ If you have any questions or comments, feel free to reach out to me at **cmhajja
 # [2. Economies and Elections: Money Makes the World Go 'Round](posts/blog_2.md)
 
 # [3. Polls: Timing is Everything](posts/blog_3.md)
+
+# [4. Prediction Models: Time-for-Change](posts/blog_4.md)
