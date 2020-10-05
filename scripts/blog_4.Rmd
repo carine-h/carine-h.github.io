@@ -93,7 +93,6 @@ plot_ec <- ggplot(data = tfc_df, aes(x= GDP_growth_qt, y= pv2p,
        subtitle = "Second Quarter of Election Year", 
        caption = "Data from 1948-2016 U.S. elections and economies")+
   scale_color_manual(values = c("blue", "red"))+
-  scale_size_area(max_size = 3)+
   my_pretty_theme
 
 plot_app <- ggplot(data = tfc_df, aes(x= net_approve, y= pv2p,
@@ -108,9 +107,8 @@ plot_app <- ggplot(data = tfc_df, aes(x= net_approve, y= pv2p,
   ylab("Popular Two Party Vote Share") +
   labs(title = "Net Approval and Vote Shares \n for Incumbent Parties", 
        subtitle = "Second Quarter of Election Year", 
-       caption = "Data from 1948-2016 U.S. elections and economies; \n Gallup approval ratings")+
+       caption = "Data from 1948-2016 U.S. elections and Gallup approval ratings")+
   scale_color_manual(values = c("blue", "red"))+
-  scale_size_area(max_size = 3)+
   my_pretty_theme
 
 grid.arrange(plot_ec, plot_app, ncol=2)
