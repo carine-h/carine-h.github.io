@@ -14,7 +14,7 @@ Today I'll be taking a general look at the use of ads over different elections, 
 ## Big Spenders 
 In the 2012 election, over *1 billion dollars* was spent on TV ads. 
 
-![](../images/state_table5.png)
+![](../images/table5.png)
 
   - *As an interesting side note, there is an interesting pattern emerging with incumbency: years with incumbents running for reelection (2004 and 2012) have relatively higher spending than years when two new candidates are running (2000 and 2008). This could be explained by the well-known phenomena of incumbent advantage. Incumbency, afterall, is one of the strongest predictors of popular vote.* 
   
@@ -29,7 +29,6 @@ The first thing to notice is that TV ad spending has increased over time. 2012 i
 
 What we also see here is that major battleground states — most notably, Florida — receive the bulk of campaign ad spending. This intuitively makes sense: why would either the GOP or Democratic Party spend millions on Massachusetts ads if MA has gone blue in the presidential election since 1988 and surely will remain blue? Campaigns strategically allocate their ad spending to states where the vote share margin is *expected* to be the smallest. Take a look at 2012: Ohio, Florida, Iowa, Nebraska, and other [Politico-designated](https://www.politico.com/2012-election/swing-state/) swing states received large sums of campaign ad money. Meanwhile, Massachusetts, which was firmly expected to vote for Obama, got little to no ad money.  
 
-CHECK ON THIS 
 ![](../images/swing_fit5.png)
 
 Seeing that battleground states receive the biggest spending, I wanted to check if there was any correlation with swing states using the measure I computed in blog 1. What I found is that there is a slight negative correlation between a state's "swinginess" and its level of campaign ad spending. I found this odd - shouldn't swing states, like battleground states, be the target of major campaigning? Are swing and battleground synonymous? It turns out that campaigns are spending the bulk of their TV budget on lesser-swing states. This could mean a couple things. Given the fact that swing is calculated retrospectively, perhaps campaigns are just choosing the wrong states as battelground targets. Another possibility could be that campaigns are unsure about what states will swing and by how much, so they stay safe and place their bets with less volatile states. 
