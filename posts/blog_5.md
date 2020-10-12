@@ -11,6 +11,18 @@ Today I'll be taking a general look at the use of ads over different elections, 
   
   It's important to note that data on the current ad spending is limited so I'll be using restrospective analysis to look at the general properties of the Air War. 
   
-  ### Big Spenders 
+## Big Spenders 
+In the 2012 election, over *1 billion dollars* was spent on TV ads. 
+CHART 
+
+*As an interesting side note, there is an interesting pattern emerging with incumbency: years with incumbents running for reelection (2004 and 2012) have relatively higher spending than years when two new candidates are running (2000 and 2008). This could be explained by the well-known phenomena of incumbent advantage. Incumbency, afterall, is one of the strongest predictors of popular vote.* 
   
-  
+Media campaigning, as we can see, takes a bulk of a campaign's monetary resources. Given this major expense, campaigns are as strategic as possible with their placement of TV ads.
+
+#### Where's the Money Going?
+Looking at state-by-state spending gives us a better idea of how campaigns strategically employ their resources in the form of ads. 
+
+STATE SPENDING
+
+What we see here is that major swing states — most notably, Florida — receive the bulk of campaign ad spending. This intuitevely makes sense: why would either the GOP or Democratic Party spend millions on Massachusetts ads if MA has gone blue in the presidential election since 1988 and surely will remain blue? 
+
