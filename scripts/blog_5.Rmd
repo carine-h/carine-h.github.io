@@ -1,0 +1,470 @@
+---
+title: "blog_5"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(cowplot)  ## easier to customize grids of plots
+library(scales)   ## more options for scales (e.g. formatting y axis to be $)
+library(geofacet) ## map-shaped grid of ggplots
+library(usmap)
+
+#####------------------------------------------------------#
+##### Read and merge data ####
+#####------------------------------------------------------#
+
+pvstate_df   <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+ad_creative  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ad_creative_2000-2012.csv")
+ad_campaigns <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ad_campaigns_2000-2012.csv")
+popvote_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
+pvstate_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+fb_ad_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_ad.csv")
+fb_location_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_location.csv")
+
+
+
+```
+
+SOUBHIK CODE
+```{r}
+# TONE
+ad_tone <- ad_campaigns %>%
+  left_join(ad_creative) %>%
+  group_by(cycle, party) %>% 
+  mutate(tot_n=n()) %>% ungroup() %>%
+  group_by(cycle, party, ad_tone) %>% summarise(pct=n()*100/first(tot_n)) %>%
+  filter(!is.na(ad_tone)) %>%
+  rename("year" = "cycle")
+pop <- popvote_df %>%
+  filter(year >= 2000)
+
+pv_tone <- ad_tone %>% 
+  left_join(pop, by = c("year", "party")) %>%
+  select(year, party, ad_tone, pct, winner, incumbent_party, pv2p)
+
+
+# PURPOSE
+ad_purp <- ad_campaigns %>%
+  left_join(ad_creative) %>%
+  group_by(cycle, party) %>% 
+  mutate(tot_n=n()) %>% 
+  ungroup() %>%
+  group_by(cycle, party, ad_purpose) %>% 
+  summarise(pct=n()*100/first(tot_n)) %>%
+  filter(!is.na(ad_purpose)) %>%
+  rename("year" = "cycle")
+pop <- popvote_df %>%
+  filter(year >= 2000)
+
+pv_purp <- ad_purp %>% 
+  left_join(pop, by = c("year", "party")) %>%
+  select(year, party, ad_purpose, pct, winner, incumbent_party, pv2p)
+
+
+inc <-c("TRUE" = "Incumbent Party", 
+        "FALSE" = "Non-Incumbent Party")
+## Tone and Political Ads
+pv_tone %>% 
+  ggplot(aes(x = year, y = pct, fill = ad_tone, group = incumbent_party)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(2000, 2012, 4)) +
+  ggtitle("Tone of TV Campaign Ads") +
+  scale_fill_manual(values = c("steelblue","indianred","darkgreen","grey"), name = "tone") +
+  xlab("") + ylab("Percentage") +
+  facet_wrap(incumbent_party~., labeller = as_labeller(inc)) + 
+    theme_minimal() +
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=15),
+        strip.text.x = element_text(size = 10))
+
+pv_purp %>% 
+  ggplot(aes(x = year, y = pct, fill = ad_purpose, group = incumbent_party)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(2000, 2012, 4)) +
+  ggtitle("Purpose of TV Campaign Ads") +
+  scale_fill_manual(values = c("steelblue","indianred","darkgreen","grey"), name = "tone") +
+  xlab("") + ylab("Percentage") +
+  facet_wrap(incumbent_party~., labeller = as_labeller(inc)) + 
+    theme_minimal() +
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=15),
+        strip.text.x = element_text(size = 10))
+```
+
+```{r}
+# trying to see if incumbency has a relationship with the type and amount of ad displayed 
+## TONE GRARPHS
+pv_tone%>%
+  filter(ad_tone == "attack") %>%
+  group_by(ad_tone)%>%
+  ggplot(aes(x = year, y = pct, fill = incumbent_party)) +
+  geom_col(position = "dodge", width = 3) +
+  theme_classic() +
+  scale_fill_manual(values = c("steelblue","indianred"), name = "Incumbent Party") +
+  labs(title = "Tone: Attack TV Ads Across Parties",
+       x = "Year",
+       y = "Percent",
+       fill = "Incumbent") +
+  scale_x_continuous(breaks = seq(2000, 2012, 4))+
+  facet_wrap("party")
+
+pv_tone%>%
+  filter(ad_tone == "contrast") %>%
+  group_by(ad_tone)%>%
+  ggplot(aes(x = year, y = pct, fill = incumbent_party)) +
+  geom_col(position = "dodge", width = 3) +
+  theme_classic() +
+  scale_fill_manual(values = c("steelblue","indianred"), name = "Incumbent Party") +
+  labs(title = "Tone: Contrast TV Ads Across Parties",
+       x = "Year",
+       y = "Percent",
+       fill = "Incumbent") +
+  scale_x_continuous(breaks = seq(2000, 2012, 4))+
+  facet_wrap("party")
+
+# PURPOSE GRAPH:POLICY
+pv_purp%>%
+  filter(ad_purpose == "policy") %>%
+  group_by(ad_purpose)%>%
+  ggplot(aes(x = year, y = pct, fill = incumbent_party)) +
+  geom_col(position = "dodge", width = 3) +
+  theme_classic() +
+  scale_fill_manual(values = c("steelblue","indianred"), name = "Incumbent Party") +
+  labs(title = "Purpose: Policy TV Ads Across Parties",
+       x = "Year",
+       y = "Percent",
+       fill = "Incumbent") +
+  scale_x_continuous(breaks = seq(2000, 2012, 4))+
+  facet_wrap("party")
+
+# change legend 
+# maybe label each bar to show incumbent or not 
+# fix years
+```
+
+
+
+INCUMBENT SPENDING ON ADS
+```{r}
+pop <- popvote_df %>%
+  filter(year >= 2000)
+pv_purp <- ad_purp %>% 
+  left_join(pop, by = c("year", "party")) %>%
+  select(year, party, ad_purpose, pct, winner, incumbent_party, pv2p) 
+
+
+ad_campaigns %>%
+  mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
+  mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
+  filter(year %in% c(2000, 2004, 2008, 2012), month > 7) %>%
+  left_join(pop, by = c("year", "party")) %>%
+  group_by(cycle, air_date, incumbent_party) %>%
+  mutate(total_cost = sum(total_cost)) %>%
+  ggplot(aes(x=air_date, y=total_cost, color= incumbent_party)) +
+  scale_x_date(date_labels = "%b") +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_color_manual(values = c("steelblue1","grey"), name = c("Incumbent Party")) +
+  geom_line() + 
+  geom_point(size=0.5) +
+  facet_wrap(cycle ~ ., scales="free") +
+  theme_bw() +
+  theme(axis.title = element_text(size=10),
+        axis.text = element_text(size=10),
+        strip.text.x = element_text(size = 10)) +
+  labs(title = "Presidential Campaign Spending on TV Ads", 
+       subtitle = "Non-Incumbent vs. Incumbent Party", 
+       x = "Date", 
+       y = "Ad Spending")
+```
+ad money spent per state
+```{r}
+# AD MONEY SPENT PER STATE
+total_ad <- ad_campaigns %>%
+  group_by(state, party, cycle) %>%
+  summarise(total_cost = sum(total_cost))%>%
+  rename(year = cycle) %>%
+  arrange(total_cost)
+
+summary(total_ad)
+
+  plot_usmap(data = total_ad, regions = "state", values = "total_cost") +
+  scale_fill_gradient2(
+    high = "red", 
+    mid = "white",
+    low = "grey", 
+    name = "Ad Money Spent",
+    limits = c(0, 100000000), 
+    breaks = c(0, 10000000, 100000000)) + 
+    facet_wrap(facet = year ~.) +
+    theme_void()+
+  labs(title = "Total TV Ad Money Spent") + 
+  theme(panel.background = element_rect(color = "black", fill = "grey"))+
+  theme(plot.title = element_text(face = "bold"))
+  
+  
+
+```
+
+
+
+FB Ad Spending
+```{r}
+fb_loc <- fb_location_df %>%
+  rename("state" = "Location Name", 
+         "spent" = "Amount Spent (USD)") %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() %>%
+  mutate(ad_spent = as.numeric(fb_loc$spent))
+
+plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
+  scale_fill_gradient2(
+    high = "red", 
+    mid = "white",
+    low = "grey", 
+    name = "Ad Money Spent")+ 
+    theme_void()+
+  labs(title = "2020: Total Facebook Ad Money Spent") + 
+  theme(panel.background = element_rect(color = "black"))+
+  theme(plot.title = element_text(face = "bold"))
+
+fb_ad_df %>%
+  select(`Page Name`, `Amount Spent (USD)`) %>%
+  group_by(`Page Name`)%>%
+  summarise(total = sum(`Amount Spent (USD)`)) %>%
+  arrange(desc(total))
+```
+DO SOMETHING HERE   
+```{r}
+ad_campaigns %>%
+  left_join(ad_creative) %>%
+  mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
+  mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
+  filter(year %in% c(2000, 2004, 2008, 2012), month > 7) %>%
+  group_by(air_date, party, cycle) %>%
+  summarise(total_cost = sum(total_cost)) %>%
+  ggplot(aes(x=air_date, y=total_cost, color = party)) +
+  geom_line()+
+  facet_wrap(cycle ~ ., scales="free")
+
+  
+
+
+```
+
+
+
+SOUBHIK
+```{r}
+## Campaign Ads Aired By Issue and Party: 2000
+party_issues2000 <- ad_campaigns %>%
+  filter(cycle == 2000) %>%
+  left_join(ad_creative) %>%
+  filter(ad_issue != "None") %>%
+  ## this `group_by` is to get our denominator
+  group_by(ad_issue) %>% mutate(tot_n=n()) %>% ungroup() %>%
+  ## this one is get numerator and calculate % by party
+  group_by(ad_issue, party) %>% summarise(p_n=n()*100/first(tot_n)) %>% ungroup() %>%
+  ## finally, this one so we can sort the issue names
+  ## by D% of issue ad-share instead of alphabetically
+  group_by(ad_issue) %>% mutate(Dp_n = ifelse(first(party) == "democrat", first(p_n), 0))
+
+ggplot(party_issues2000, aes(x = reorder(ad_issue, Dp_n), y = p_n, fill = party)) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("blue", "red")) +
+  ylab("% of ads on topic from each party") + xlab("issue") + 
+  # ggtitle("Campaign Ads Aired by Topic in 2000") +
+  coord_flip() + 
+  theme_bw()
+
+
+## Campaign Ads Aired By Issue and Party: 2012
+party_issues2012 <- ad_campaigns %>%
+  filter(cycle == 2012) %>%
+  left_join(ad_creative) %>%
+  filter(ad_issue != "None") %>%
+  group_by(cycle, ad_issue) %>% mutate(tot_n=n()) %>% ungroup() %>%
+  group_by(cycle, ad_issue, party) %>% summarise(p_n=n()*100/first(tot_n)) %>% ungroup() %>%
+  group_by(cycle, ad_issue) %>% mutate(Dp_n = ifelse(first(party) == "democrat", first(p_n), 0))
+
+ggplot(party_issues2012, aes(x = reorder(ad_issue, Dp_n), y = p_n, fill = party)) + 
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("blue", "red")) +
+  ylab("% of ads on topic from each party") + xlab("issue") +
+  # ggtitle("Campaign Ads Aired by Topic in 2012") +
+  coord_flip() + 
+  theme_bw()
+
+
+## When to Buy Ads? 
+ad_campaigns %>%
+  mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
+  mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
+  filter(year %in% c(2000, 2004, 2008, 2012), month > 7) %>%
+  group_by(cycle, air_date, party) %>%
+  summarise(total_cost = sum(total_cost)) %>%
+  ggplot(aes(x=air_date, y=total_cost, color=party)) +
+  # scale_x_date(date_labels = "%b, %Y") +
+  scale_y_continuous(labels = dollar_format()) +
+  scale_color_manual(values = c("blue","red"), name = "") +
+  geom_line() + geom_point(size=0.5) +
+  facet_wrap(cycle ~ ., scales="free") +
+  xlab("") + ylab("ad spend") +
+  theme_bw() +
+  theme(axis.title = element_text(size=20),
+        axis.text = element_text(size=11),
+        strip.text.x = element_text(size = 20))
+
+
+## Tone in Political Ads
+ad_campaigns %>%
+  left_join(ad_creative) %>%
+  filter(ad_tone %in% c("attack", "promote")) %>%
+  mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
+  mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
+  filter(year %in% c(2000, 2004, 2008, 2012), month > 7) %>%
+  group_by(cycle, air_date, ad_tone) %>%
+  summarise(total_cost = sum(n_stations)) %>%
+  group_by(cycle, air_date) %>%
+  mutate(total_cost = total_cost/sum(total_cost)) %>%
+  ungroup() %>%
+  ggplot(aes(x=air_date, y=total_cost, fill=ad_tone, color=ad_tone)) +
+  # scale_x_date(date_labels = "%b") +
+  scale_fill_manual(values = c("purple","green"), name = "ad tone") +
+  scale_color_manual(values = c("purple","green"), name = "ad tone") +
+  geom_bar(stat = "identity") +
+  facet_wrap(cycle ~ ., scales="free") +
+  xlab("") + ylab("% of ads bought on day") +
+  theme_bw() +
+  theme(axis.title = element_text(size=20),
+        axis.text = element_text(size=10),
+        strip.text.x = element_text(size = 20))
+
+
+## The State-level Air War in 2008 (Obama vs. McCain)
+ad_campaigns %>%
+  mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
+  mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
+  mutate(state = state.name[match(state, state.abb)]) %>%
+  filter(cycle == 2008) %>%
+  left_join(pvstate_df %>% filter(year == 2008) %>% select(-year), by="state") %>%
+  mutate(winner=ifelse(D_pv2p > R_pv2p, "democrat", "republican")) %>%
+  group_by(cycle, state, air_date, party, winner) %>%
+  summarise(total_cost = sum(total_cost)) %>%
+  filter(!is.na(state)) %>%
+  # ggplot(aes(x=air_date, y=log(total_cost+1), color=party)) +
+  ggplot(aes(x=party, y=total_cost, fill=party)) +
+  geom_bar(stat="identity") +
+  geom_rect(aes(fill=winner), xmin=-Inf, xmax=Inf, ymin=46.3*10^6, ymax=52*10^6) +
+  facet_geo(~ state, scales="free_x") +
+  scale_fill_manual(values = c("blue", "red")) +
+  scale_y_continuous(labels = unit_format(unit = "M", scale = 1e-6)) +
+  xlab("") + ylab("ad spend") +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+```{r}
+## The Purpose of Political Ads
+ad_campaigns %>%
+  left_join(ad_creative) %>%
+  group_by(cycle, party) %>% mutate(tot_n=n()) %>% ungroup() %>%
+  group_by(cycle, party, ad_purpose) %>% summarise(pct=n()*100/first(tot_n)) %>%
+  filter(!is.na(ad_purpose)) %>%
+  bind_rows( ##2016 raw data not public yet! This was entered manually
+    data.frame(cycle = 2016, ad_purpose = "personal", party = "democrat", pct = 67),
+    data.frame(cycle = 2016, ad_purpose = "policy", party = "democrat", pct = 12),
+    data.frame(cycle = 2016, ad_purpose = "both", party = "democrat", pct = 21),
+    data.frame(cycle = 2016, ad_purpose = "personal", party = "republican", pct = 11),
+    data.frame(cycle = 2016, ad_purpose = "policy", party = "republican", pct = 71),
+    data.frame(cycle = 2016, ad_purpose = "both", party = "republican", pct = 18)
+  ) %>%
+  ggplot(aes(x = cycle, y = pct, fill = ad_purpose, group = party)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(2000, 2016, 4)) +
+  # ggtitle("Campaign Ads Aired By Purpose") +
+  scale_fill_manual(values = c("grey","red","darkgreen","black","white"), name = "purpose") +
+  xlab("") + ylab("%") +
+  facet_wrap(~ party) + theme_minimal() +
+  theme(axis.title = element_text(size=20),
+        axis.text = element_text(size=15),
+        strip.text.x = element_text(size = 20))
+```
+
+
+```{r}
+## The Elections and Their Issues
+top_issues <- ad_campaigns %>% 
+  left_join(ad_creative) %>%
+  filter(!grepl("None|Other", ad_issue)) %>%
+  group_by(cycle, ad_issue) %>% summarise(n=n()) %>% top_n(5, n)
+
+### making each plot in a grid to have its own x-axis (issue name)
+### is tricky with `facet_wrap`, so we use this package `cowplot`
+### which allows us to take a list of separate plots and grid them together
+plist <- lapply(c(2000,2004,2008,2012), function(c) {
+  top_issues %>% filter(cycle == c) %>% 
+    ggplot(aes(x = reorder(ad_issue, n), y = n)) +
+    geom_bar(stat = "identity") + coord_flip() + theme_bw() +
+    xlab("") + ylab("number ads aired") + ggtitle(paste("Top 5 Ad\nIssues in",c))
+  
+})
+cowplot::plot_grid(plotlist = plist, nrow = 2, ncol = 2, align = "hv")
+```
+
+SWING STUFF
+```{r}
+# money spent and swinginess 
+# Here I calculate the year by year "swing" in each state overtime 
+swing_data <- pvstate_df %>%
+   select(year, state, D_pv2p) %>% 
+   group_by(state) %>% ## need to do this lag WITHIN state
+   mutate(D_pv2p_lastyr = lag(D_pv2p, n = 1, order_by = year),
+          D_pv2p_lastlastyr = lag(D_pv2p, n = 2, order_by = year),
+          swing = D_pv2p - D_pv2p_lastyr) %>%
+   ungroup() %>%
+  filter(year == 2012) %>%
+  arrange(swing)
+
+swing_df <- swing_data %>%
+  mutate(state = state.abb[match(state,state.name)])
+
+state_ad_swing <- ad_campaigns %>%
+  rename(year = cycle) %>%
+  filter(year == 2012) %>%
+  group_by(state, party, year) %>%
+  summarise(total_cost = sum(total_cost))%>%
+  left_join(swing_df, by = c("year", "state")) %>%
+  select(state, party, year, total_cost, swing) 
+
+state_ad_swing %>%
+  ggplot(aes(x= abs(swing), y= total_cost,
+             label = year)) + 
+  geom_point()+
+  facet_wrap(~party)
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) + 
+  labs(title = "TV Ad Spending and State Swing Measures: Presidential Election 2012" , 
+       caption = "Data from 1948-2016 U.S. elections and economies")+
+  facet_wrap(~party)
+
+
+state_ad_swing %>%
+  filter(party == "republican") %>%
+  ggplot(aes(x= swing, y= total_cost,
+             label = year)) + 
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) + 
+  xlab("Second Quarter GDP Growth") +
+  ylab("Popular Two Party Vote Share") +
+  labs(title = "GDP Growth and Vote Shares \n for Incumbent Parties", 
+       subtitle = "Second Quarter of Election Year", 
+       caption = "Data from 1948-2016 U.S. elections and economies")+
+  scale_color_manual(values = c("blue", "red"))
+
+```
