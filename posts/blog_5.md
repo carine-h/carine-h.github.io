@@ -1,4 +1,4 @@
-# Air Wars: The Fight for Media??
+# Air Wars: Presidential Campaign Ads 
 Every presidential election, *millions* of dollars are spent on campaign ads, whether that be on TV, the radio, social media, or elsewhere. Campaigns use all of these forms of media to meet voters where they're at and persuade them from the comfort of their own homes or on their own social media feeds to 1) vote and 2) vote for their candidate.
 
 Today I'll be taking a general look at the use of ads over different elections, their purpose, their location, and the money spent on them. I ask the following questions: 
@@ -33,6 +33,14 @@ What we also see here is that major battleground states — most notably, Florid
 
 Seeing that battleground states receive the biggest spending, I wanted to check if there was any correlation with swing states using the measure I computed in blog 1. What I found is that there is a slight negative correlation between a state's "swinginess" and its level of campaign ad spending. I found this odd - shouldn't swing states, like battleground states, be the target of major campaigning? Are swing and battleground synonymous? It turns out that campaigns are spending the bulk of their TV budget on lesser-swing states. This could mean a couple things. Given the fact that swing is calculated retrospectively, perhaps campaigns are just choosing the wrong states as battelground targets. Another possibility could be that campaigns are unsure about what states will swing and by how much, so they stay safe and place their bets with less volatile states. 
 
+#### Main Points 
+- TV ad spending has gone up dramatically over time
+- Races without an presidential incumbent see relatively more spending 
+  - This could be due to the fact that both campaigns are fighting for votes without the incumbent advantage in the way 
+- Ad spending is concentrated in projected battleground states 
+- Looking restrospectively at swing states, there is a negative correlation between ad spending and the magnitude of swing 
+  - This could either be due to campaigns playing it safe *or* incorrectly projecting battleground states 
+
 ## Incumbency and Ads
 Last week I spent some time talking about incumbency and its impact on electoral outcomes. Incumbency is seen as a major advantage in elections and is a successful predictor of popular vote outcomes. Given these realities, I wondered if incumbency (specifically party incumbency) would impact ad spending *and* ad content. 
 
@@ -58,6 +66,11 @@ Again, I don't see a clear trend between incumbency and tone/purpose of ads. My 
   2. The incumbent's policies are well-established after a term in office so a challenger would have to especially focus on conveying their agenda
 
 While my predictions proved incorrect in the 2000-2012 elections, perhaps there is some helpful insight for future campaigns: focusing on attacking an incumbent and conveying a challenger's policy could help a challenger campaign shrink the incumbent advantage. 
+
+#### Main Points 
+- Non-incumbents out-spend incumbent party candidates presumably to compete with the incumbent advantage 
+- There is no clear pattern between incumbency and ad tone/purpose 
+- Campaigns spend more on ads as election day approaches (presumably to cope with the quick decay of ad persuasion)
 
 ## 2020 Update
 With a firm overview of TV campaigning under our belt, it's time to take a quick look at 2020! While there's limited data on current social media spending, Facebook has started to release its data on presidential ad purchases. These are purchases not only made by the official campaigns, but other PACs and organizations behind either candidate. 
