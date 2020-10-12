@@ -67,3 +67,4 @@ With a firm overview of TV campaigning under our belt, it's time to take a quick
 
 [Projected](https://www.nytimes.com/live/2020/battleground-states-2020-election) swing states like Florida, Pennsylvania, North Carolina, and even Texas are getting the bulk of FB ad spending to date. Interestingly California has a heavy amount of spending though it is firmly projected to vote Biden. 
 
+
