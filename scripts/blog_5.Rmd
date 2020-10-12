@@ -13,11 +13,10 @@ library(scales)   ## more options for scales (e.g. formatting y axis to be $)
 library(geofacet) ## map-shaped grid of ggplots
 library(usmap)
 library(gridExtra)
+library(gt)
 
-#####------------------------------------------------------#
-##### Read and merge data ####
-#####------------------------------------------------------#
 
+# reading in data 
 pvstate_df   <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
 ad_creative  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ad_creative_2000-2012.csv")
 ad_campaigns <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ad_campaigns_2000-2012.csv")
@@ -27,12 +26,20 @@ fb_ad_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_ad.csv")
 fb_location_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_location.csv")
 
 
-
+# I updated my_pretty_theme 
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 10),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
 ```
 
 Tone and Purpose Plots: Incumbent parties
 ```{r fig.width= 10}
-# TONE
+# joining ad tone data and popular vote data
 ad_tone <- ad_campaigns %>%
   left_join(ad_creative) %>%
   group_by(cycle, party) %>% 
@@ -42,13 +49,13 @@ ad_tone <- ad_campaigns %>%
   rename("year" = "cycle")
 pop <- popvote_df %>%
   filter(year >= 2000)
-
+# joining by year and party
 pv_tone <- ad_tone %>% 
   left_join(pop, by = c("year", "party")) %>%
   select(year, party, ad_tone, pct, winner, incumbent_party, pv2p)
 
 
-# PURPOSE
+# joining ad purpose data and popular vote data
 ad_purp <- ad_campaigns %>%
   left_join(ad_creative) %>%
   group_by(cycle, party) %>% 
@@ -60,15 +67,18 @@ ad_purp <- ad_campaigns %>%
   rename("year" = "cycle")
 pop <- popvote_df %>%
   filter(year >= 2000)
-
+# joining by year and party
 pv_purp <- ad_purp %>% 
   left_join(pop, by = c("year", "party")) %>%
   select(year, party, ad_purpose, pct, winner, incumbent_party, pv2p)
+```
 
-
+```{r fig.width= 10}
+# facet labels 
 inc <-c("TRUE" = "Incumbent Party", 
         "FALSE" = "Non-Incumbent Party")
-## Tone and Political Ads
+
+# Tone of political adds between incumbents/non-incumbents in a bar plot
 tone_plot <- pv_tone %>% 
   ggplot(aes(x = year, y = pct, fill = ad_tone, group = incumbent_party)) +
   geom_bar(stat = "identity") +
@@ -83,6 +93,7 @@ tone_plot <- pv_tone %>%
         axis.text = element_text(size=10),
         strip.text.x = element_text(size = 10))
 
+# Purpose of political adds between incumbent/non-incumbent parties in a bar plot
 purpose_plot <- pv_purp %>% 
   ggplot(aes(x = year, y = pct, fill = ad_purpose, group = incumbent_party)) +
   geom_bar(stat = "identity") +
@@ -98,13 +109,16 @@ purpose_plot <- pv_purp %>%
         axis.text = element_text(size=10),
         strip.text.x = element_text(size = 10))
 
-
+# arrange next to each other 
 grid.arrange(tone_plot, purpose_plot, ncol = 2)
 ```
 
 ```{r, fig.width= 12}
-# trying to see if incumbency has a relationship with the type and amount of ad displayed 
-## TONE GRARPHS
+# facet labels
+p <-c("democrat" = "Democrat", 
+        "republican" = "Republican")
+
+# Looking closer at attack tone across elections between incumbents and non-incumbents in a bar plot
 attack_plot <- pv_tone%>%
   filter(ad_tone == "attack") %>%
   group_by(ad_tone)%>%
@@ -120,8 +134,9 @@ attack_plot <- pv_tone%>%
        fill = "Incumbent") +
   theme(plot.title = element_text(face = "bold")) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
-  facet_wrap("party")
+  facet_wrap(party~., labeller = as_labeller(p)) 
 
+# Looking closer at contrast tone across elections between incumbents and non-incumbents in a bar plot
 contrast_plot <- pv_tone%>%
   filter(ad_tone == "contrast") %>%
   group_by(ad_tone)%>%
@@ -136,9 +151,9 @@ contrast_plot <- pv_tone%>%
        fill = "Incumbent") +
   theme(plot.title = element_text(face = "bold")) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
-  facet_wrap("party")
+  facet_wrap(party~., labeller = as_labeller(p)) 
 
-# PURPOSE GRAPH:POLICY
+# Looking closer at policy purpose ads across elections between incumbents and non-incumbents in a bar plot
 policy_plot <- pv_purp%>%
   filter(ad_purpose == "policy") %>%
   group_by(ad_purpose)%>%
@@ -154,23 +169,23 @@ policy_plot <- pv_purp%>%
        caption = "Data: Campaign TV ad spending 2000-2012") +
   theme(plot.title = element_text(face = "bold")) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
-  facet_wrap("party")
+  facet_wrap(party~., labeller = as_labeller(p)) 
 
+# arrange next to each other 
 grid.arrange(attack_plot, contrast_plot, policy_plot, ncol = 3)
 
 ```
 
-
-
-INCUMBENT SPENDING ON ADS
 ```{r}
+# joining popular vote and purpose data by year and party
 pop <- popvote_df %>%
   filter(year >= 2000)
 pv_purp <- ad_purp %>% 
   left_join(pop, by = c("year", "party")) %>%
   select(year, party, ad_purpose, pct, winner, incumbent_party, pv2p) 
 
-
+# graphing total spending in 2000-2012 elections between incumbents and non-incumbents 
+  # faceted for election
 ad_campaigns %>%
   mutate(year = as.numeric(substr(air_date, 1, 4))) %>%
   mutate(month = as.numeric(substr(air_date, 6, 7))) %>%
@@ -181,7 +196,7 @@ ad_campaigns %>%
   ggplot(aes(x=air_date, y=total_cost, color= incumbent_party)) +
   scale_x_date(date_labels = "%b") +
   scale_y_continuous(labels = dollar_format()) +
-  scale_color_manual(values = c("steelblue1","grey"), name = c("Incumbent Party")) +
+  scale_color_manual(values = c("steelblue","grey"), name = "", labels = c("Non-Incumbent Party", "Incumbent Party")) +
   geom_line() + 
   geom_point(size=0.5) +
   facet_wrap(cycle ~ ., scales="free") +
@@ -190,7 +205,6 @@ ad_campaigns %>%
         axis.text = element_text(size=10),
         strip.text.x = element_text(size = 10)) +
   theme(plot.title = element_text(face = "bold")) +
-  scale_fill_discrete(labels = c("Non-Incumbent Party", "Incumbent Party")) +
   labs(title = "Presidential Campaign Spending on TV Ads", 
        subtitle = "Non-Incumbent vs. Incumbent Party", 
        x = "Date", 
@@ -202,7 +216,7 @@ So where we do see a clear pattern with incumbency is total spending, not necess
 
 A general look at things:
 ```{r}
-# AD MONEY SPENT PER STATE
+# finding total spent per state on ads
 total_ad <- ad_campaigns %>%
   group_by(state, party, cycle) %>%
   summarise(total_cost = sum(total_cost))%>%
@@ -211,9 +225,11 @@ total_ad <- ad_campaigns %>%
 
 summary(total_ad)
 
+# map plot showing total spent per state
+  # faceted per election
   plot_usmap(data = total_ad, regions = "state", values = "total_cost") +
   scale_fill_gradient2(
-    high = "red", 
+    high = "indianred", 
     mid = "white",
     low = "grey", 
     name = "Ad Money Spent",
@@ -227,25 +243,38 @@ summary(total_ad)
        caption = "Data: 2000-2012 presidential campaign ad spending") + 
   theme(plot.title = element_text(face = "bold"))
   
-  
+ggsave("~/Desktop/R studio/carine-h.github.io/images/spending_by_state.png", height = 5, width =10)
 
+ year_spent <- total_ad %>%
+    group_by(year) %>%
+    summarise(year_total = sum(total_cost))
+ 
+ gt(year_spent) %>%
+ tab_header(title = md("**Total Money Spent on TV Ads for Presidential Campaigns**"), 
+              subtitle = "Elections 2000-2012") %>%
+  cols_label(year = "Election",
+             year_total = "Total Spent") %>%
+   fmt_currency(columns = vars(year_total), 
+                 decimals = 0) 
+# screenshot
 ```
 
 
 
 ```{r}
+# cleaning and joining FB data 
 fb_loc <- fb_location_df %>%
   rename("state" = "Location Name", 
          "spent" = "Amount Spent (USD)") %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   na.omit() 
-
  fb_loc <- fb_loc %>%
    mutate(ad_spent = as.numeric(fb_loc$spent))
-
+ 
+# plotting amount spent per state on FB ads
 plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
   scale_fill_gradient2(
-    high = "red", 
+    high = "indianred", 
     mid = "white",
     low = "grey", 
     name = "Ad Money Spent", 
@@ -260,7 +289,6 @@ plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
 
 Swing stuff
 ```{r}
-# money spent and swinginess 
 # Here I calculate the year by year "swing" in each state overtime 
 swing_data <- pvstate_df %>%
    select(year, state, D_pv2p) %>% 
@@ -270,9 +298,11 @@ swing_data <- pvstate_df %>%
           swing = D_pv2p - D_pv2p_lastyr) %>%
    ungroup() 
 
+# abbreviating state names to join with campaign 
 swing_df <- swing_data %>%
   mutate(state = state.abb[match(state,state.name)])
 
+# joining swing and campaign ad spending data
 state_ad_swing <- ad_campaigns %>%
   rename(year = cycle) %>%
   group_by(state, party, year) %>%
@@ -281,9 +311,11 @@ state_ad_swing <- ad_campaigns %>%
   select(state, party, year, total_cost, swing) %>%
   arrange(year)
 
+# just checking out correlation
 fit_1 <- lm(total_cost ~ abs(swing), data = state_ad_swing)
 summary(fit_1)
 
+# plotting relationship between swing and total cost of ads spent per state 
 state_ad_swing %>%
   ggplot(aes(x= abs(swing), y= total_cost,
              label = year)) + 
@@ -291,19 +323,15 @@ state_ad_swing %>%
   facet_wrap(~party) +
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) + 
-  labs(title = "TV Ad Spending and State Swing Measures: Presidential Elections 2000-2012" , 
+  labs(title = "TV Ad Spending and State Swing Measures: \n Presidential Elections 2000-2012" , 
        caption = "Data from 1948-2016 U.S. elections", 
        x = "State Swing Measure", 
        y = "Total Cost of Ads")+
   scale_y_continuous(labels=scales::dollar_format())+
-  facet_wrap(~party)
-
+  facet_wrap(party~., labeller = as_labeller(p)) + 
+  my_pretty_theme
+ggsave("~/Desktop/R studio/carine-h.github.io/images/swing_fit5.png", height = 5, width =10)
 ```
 
-fb_ad_df %>%
-  select(`Page Name`, `Amount Spent (USD)`) %>%
-  group_by(`Page Name`)%>%
-  summarise(total = sum(`Amount Spent (USD)`)) %>%
-  arrange(desc(total))
 
 
