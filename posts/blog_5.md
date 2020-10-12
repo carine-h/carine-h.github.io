@@ -16,7 +16,7 @@ In the 2012 election, over *1 billion dollars* was spent on TV ads.
 
 ![](../images/table5.png)
 
-  - *As an interesting side note, there is an interesting pattern emerging with incumbency: years with incumbents running for reelection (2004 and 2012) have relatively higher spending than years when two new candidates are running (2000 and 2008). This could be explained by the well-known phenomena of incumbent advantage. Incumbency, afterall, is one of the strongest predictors of popular vote.* 
+  - *As an interesting side note, there is a pattern emerging with incumbency: years with incumbents running for reelection (2004 and 2012) have relatively higher spending than years when two new candidates are running (2000 and 2008). This could be explained by the well-known phenomena of incumbent advantage. Incumbency, afterall, is one of the strongest predictors of popular vote.* 
   
 Media campaigning, as we can see, takes a bulk of a campaign's monetary resources. Given this major expense, campaigns are as strategic as possible with their placement of TV ads.
 
