@@ -61,7 +61,7 @@ for (s in unique(poll_pvstate_df$state)) {
 ## graphs: polls in different states / parties different levels 
 ##         of strength / significance of outcome
 library(geofacet)
-state_forecast_trends <- state_forecast_outputs %>% ##TODO: maybe place this above
+state_forecast_trends <- state_forecast_outputs %>%    
   mutate(`0` = intercept,
          `25` = intercept + slope*25,
          `50` = intercept + slope*50,

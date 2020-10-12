@@ -1,0 +1,16 @@
+---
+title: "Tutorial installation gov 51"
+author: "Carine Hajjar"
+date: "9/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+remotes::install_github("kosukeimai/qss-package", build_vignettes = TRUE)
+remotes::install_github("rstudio/learnr")
+remotes::install_github("rstudio-education/gradethis")
+remotes::install_github("mattblackwell/qsslearnr")
+```
+
