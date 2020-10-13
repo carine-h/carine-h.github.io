@@ -78,3 +78,10 @@ With a firm overview of TV campaigning under our belt, it's time to take a quick
 ![](../images/fb_ad5.png)
 
 [Projected](https://www.nytimes.com/live/2020/battleground-states-2020-election) swing states like Florida, Pennsylvania, North Carolina, and even Texas are getting the bulk of FB ad spending to date. Interestingly California has a heavy amount of spending though it is firmly projected to vote Biden. 
+
+## Concluding on Ads
+Overall, we've seen that ads are strategically employed in battelground states (though not restrospective swing states). Swing is negatively correlated with ad spending presumably because of a campaign's miscalculations on what will or will not be a battleground state *or* their own caution. 
+
+As for incumbency, we've seen that non-incumbent parties spent more than incumbent parties and that *both* spend more and more approaching election day. That's where the pattern ends with incumbency and ads - the tone and purpose of ads does not seem to correlate with incumbency. 
+
+Finally, as we look to 2020, states like Florida, Ohio, and North Carolina are getting plenty of Facebook ads. These seem to be some of the main battleground states going into November. Perhaps with sustained ad purchases, the Trump and Biden campaigns can persuade some Facebook users. 
