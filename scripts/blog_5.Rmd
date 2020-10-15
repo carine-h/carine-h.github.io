@@ -14,6 +14,7 @@ library(geofacet) ## map-shaped grid of ggplots
 library(usmap)
 library(gridExtra)
 library(gt)
+library(webshot)
 
 
 # reading in data 
@@ -31,14 +32,14 @@ my_pretty_theme <- theme_bw() +
   theme(panel.border = element_blank(),
         plot.subtitle = element_text(hjust = 0.5),
         plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
-        axis.text    = element_text(size = 10),
+        axis.text    = element_text(size = 12),
         strip.text   = element_text(size = 18),
         axis.line    = element_line(colour = "black"),
         legend.text = element_text(size = 12))
 ```
 
 Tone and Purpose Plots: Incumbent parties
-```{r fig.width= 10}
+```{r}
 # joining ad tone data and popular vote data
 ad_tone <- ad_campaigns %>%
   left_join(ad_creative) %>%
@@ -73,7 +74,7 @@ pv_purp <- ad_purp %>%
   select(year, party, ad_purpose, pct, winner, incumbent_party, pv2p)
 ```
 
-```{r fig.width= 10}
+```{r}
 # facet labels 
 inc <-c("TRUE" = "Incumbent Party", 
         "FALSE" = "Non-Incumbent Party")
@@ -88,10 +89,11 @@ tone_plot <- pv_tone %>%
   xlab("") + ylab("Percentage") +
   facet_wrap(incumbent_party~., labeller = as_labeller(inc)) + 
     theme_minimal() +
-  theme(plot.title = element_text(face = "bold")) +
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=10),
-        strip.text.x = element_text(size = 10))
+  theme(plot.title = element_text(face = "bold", size = 20),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
 
 # Purpose of political adds between incumbent/non-incumbent parties in a bar plot
 purpose_plot <- pv_purp %>% 
@@ -104,16 +106,19 @@ purpose_plot <- pv_purp %>%
   facet_wrap(incumbent_party~., labeller = as_labeller(inc)) + 
   theme(caption = "Data: Campaign TV ad spending 2000-2012") +
     theme_minimal() +
-  theme(plot.title = element_text(face = "bold")) +
-  theme(axis.title = element_text(size=10),
-        axis.text = element_text(size=10),
-        strip.text.x = element_text(size = 10))
+  theme(plot.title = element_text(face = "bold", size = 20),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
 
 # arrange next to each other 
-grid.arrange(tone_plot, purpose_plot, ncol = 2)
+incad <- grid.arrange(tone_plot, purpose_plot, ncol = 2)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/inc_ad_comp5.png", incad, height = 7, width =15)
 ```
 
-```{r, fig.width= 12}
+```{r}
 # facet labels
 p <-c("democrat" = "Democrat", 
         "republican" = "Republican")
@@ -128,13 +133,17 @@ attack_plot <- pv_tone%>%
   scale_fill_manual(values = c("grey","indianred"), labels = c("Non-Incumbent Party", "Incumbent Party")) +
   theme(legend.position= c(0.25, 0.85), 
         legend.title = element_blank()) +
-  labs(title = "Tone: Attack TV Ads Across Parties",
+  labs(title = "Tone: Attack TV \n Ads Across Parties",
        x = "Year",
        y = "Percent",
        fill = "Incumbent") +
-  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.title = element_text(face = "bold", size = 20),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12)) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
-  facet_wrap(party~., labeller = as_labeller(p)) 
+  facet_wrap(party~., labeller = as_labeller(p))
 
 # Looking closer at contrast tone across elections between incumbents and non-incumbents in a bar plot
 contrast_plot <- pv_tone%>%
@@ -145,11 +154,15 @@ contrast_plot <- pv_tone%>%
   theme_classic() +
   scale_fill_manual(values = c("grey","indianred"), name = "Incumbent Party") +
   theme(legend.position = "none") +
-  labs(title = "Tone: Contrast TV Ads Across Parties",
+  labs(title = "Tone: Contrast TV \n Ads Across Parties",
        x = "Year",
        y = "Percent",
        fill = "Incumbent") +
-  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.title = element_text(face = "bold", size = 20),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12)) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
   facet_wrap(party~., labeller = as_labeller(p)) 
 
@@ -162,17 +175,23 @@ policy_plot <- pv_purp%>%
   theme_classic() +
   scale_fill_manual(values = c("grey","indianred"), name = "Incumbent \n Party") +
   theme(legend.position = "none") +
-  labs(title = "Purpose: Policy TV Ads Across Parties",
+  labs(title = "Purpose: Policy TV \n Ads Across Parties",
        x = "Year",
        y = "Percent",
        fill = "Incumbent", 
        caption = "Data: Campaign TV ad spending 2000-2012") +
-  theme(plot.title = element_text(face = "bold")) +
+  theme(plot.title = element_text(face = "bold", size = 20),
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12)) +
   scale_x_continuous(breaks = seq(2000, 2012, 4))+
   facet_wrap(party~., labeller = as_labeller(p)) 
 
 # arrange next to each other 
-grid.arrange(attack_plot, contrast_plot, policy_plot, ncol = 3)
+inc_comp <- grid.arrange(attack_plot, contrast_plot, policy_plot, ncol = 3)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/inc_comp5.png", inc_comp, height = 7, width =15)
 
 ```
 
@@ -210,6 +229,8 @@ ad_campaigns %>%
        x = "Date", 
        y = "Ad Spending", 
        caption = "Data: Campaign TV ad spending 2000-2012")
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/inc_spending5.png", height = 5, width =10)
 ```
 So where we do see a clear pattern with incumbency is total spending, not necessarily with message or tone. 
 
@@ -244,19 +265,22 @@ summary(total_ad)
   theme(plot.title = element_text(face = "bold"))
   
 ggsave("~/Desktop/R studio/carine-h.github.io/images/spending_by_state.png", height = 5, width =10)
+```
 
+```{r, fig.height= 4, fig.width= 8}
+# Looking at total spent per election
  year_spent <- total_ad %>%
     group_by(year) %>%
     summarise(year_total = sum(total_cost))
  
- gt(year_spent) %>%
+ gt <- gt(year_spent) %>%
  tab_header(title = md("**Total Money Spent on TV Ads for Presidential Campaigns**"), 
               subtitle = "Elections 2000-2012") %>%
   cols_label(year = "Election",
              year_total = "Total Spent") %>%
    fmt_currency(columns = vars(year_total), 
                  decimals = 0) 
-# screenshot
+gtsave(gt, "~/Desktop/R studio/carine-h.github.io/images/table5.png")
 ```
 
 
@@ -284,7 +308,7 @@ plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
        subtitle = "Presidential Campaigns and their Supporters", 
        caption = "Data: Facebook") + 
   theme(plot.title = element_text(face = "bold"))
-
+ggsave("~/Desktop/R studio/carine-h.github.io/images/fb_ad5.png", height = 5, width =10)
 ```
 
 Swing stuff
@@ -312,12 +336,12 @@ state_ad_swing <- ad_campaigns %>%
   arrange(year)
 
 # just checking out correlation
-fit_1 <- lm(total_cost ~ abs(swing), data = state_ad_swing)
+fit_1 <- lm(total_cost ~ abs(swing) + party, data = state_ad_swing)
 summary(fit_1)
 
 # plotting relationship between swing and total cost of ads spent per state 
 state_ad_swing %>%
-  ggplot(aes(x= abs(swing), y= total_cost,
+  ggplot(aes(x= abs(swing), y= log(total_cost),
              label = year)) + 
   geom_point()+
   facet_wrap(~party) +
@@ -326,7 +350,7 @@ state_ad_swing %>%
   labs(title = "TV Ad Spending and State Swing Measures: \n Presidential Elections 2000-2012" , 
        caption = "Data from 1948-2016 U.S. elections", 
        x = "State Swing Measure", 
-       y = "Total Cost of Ads")+
+       y = "Log of Total Cost of Ads")+
   scale_y_continuous(labels=scales::dollar_format())+
   facet_wrap(party~., labeller = as_labeller(p)) + 
   my_pretty_theme

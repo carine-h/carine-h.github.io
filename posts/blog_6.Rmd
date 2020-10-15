@@ -1,0 +1,255 @@
+---
+title: "blog_6"
+author: "Carine Hajjar"
+date: "10/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(statebins)
+library(stargazer)
+library(cowplot)
+```
+
+CLASS FORECAST 
+```{r}
+demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+
+demog # age, race, state, year, and count
+pvstate_df # state by state popular vote 
+pollstate_df # poll numbers 
+
+pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
+pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
+
+dat <- pvstate_df %>% 
+  full_join(pollstate_df %>% 
+              filter(weeks_left == 3) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) %>%
+  left_join(demog %>%
+              select(-c("total")),
+            by = c("year" ,"state"))
+# demographics, poll numbers, and popular vote 
+
+dat$region <- state.division[match(dat$state, state.abb)]
+demog$region <- state.division[match(demog$state, state.abb)]
+
+dat_change <- dat %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year),
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  )
+```
+
+```{r}
+#####------------------------------------------------------#
+#####  Proposed models ####
+#####------------------------------------------------------#
+
+mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         Female_change +
+                         age3045_change + age4565_change + age65_change +
+                         as.factor(region), data = dat_change)
+# democratic vote share is positively correlated with Asian, Black, Female, Hispanic, 30-45
+
+stargazer(mod_demog_change, header=FALSE, type='latex', no.space = TRUE,
+          column.sep.width = "3pt", font.size = "scriptsize", single.row = TRUE,
+          keep = c(1:7, 62:66), omit.table.layout = "sn",
+          title = "The electoral effects of demographic change (across states)")
+```
+```{r}
+#####------------------------------------------------------#
+##### How would our forecast change if there's a Latino surge for Democrats in 2020?
+#####------------------------------------------------------#
+
+# new data for 2020
+demog_2020 <- subset(demog, year == 2018)
+demog_2020 <- as.data.frame(demog_2020)
+rownames(demog_2020) <- demog_2020$state
+demog_2020 <- demog_2020[state.abb, ] # prints regions of the US 
+
+demog_2020_change <- demog %>%
+  filter(year %in% c(2016, 2018)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  ) %>%
+  filter(year == 2018)
+
+demog_2020_change <- as.data.frame(demog_2020_change)
+rownames(demog_2020_change) <- demog_2020_change$state
+demog_2020_change <- demog_2020_change[state.abb, ]
+
+# prediction
+predict(mod_demog_change, newdata = demog_2020_change) + # original model (mod_demog_change) parameters with new data for 2020 which predicts double hispanic vote turnout - Latino surge 
+  (1.28-0.64)*demog_2020$Hispanic
+his_original <- tibble(predict(mod_demog_change, newdata = demog_2020_change), state = state.abb, pred = `predict(mod_demog_change, newdata = demog_2020_change)`)
+his1 <- tibble(predict(mod_demog_change, newdata = demog_2020_change) + (1.28-0.64)*demog_2020$Hispanic, state = state.abb, pred = `+...`)
+
+plot_original <- his_original %>%  ##`statebins` needs state to be character, not factor!
+  mutate(state = as.character(state)) %>%
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 Presidential Election Prediction",
+       subtitle = "historical Hispanic demographic change effect (0.64)",
+       fill = "") +
+  theme(legend.position = "none")
+
+plot_1 <- his1 %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 Presidential Election Prediction",
+       subtitle = "hypothetical Hispanic demographic change surge (1.28)",
+       fill = "") +
+  theme(legend.position = "none")
+
+plot_grid(plot_original, plot_1)
+```
+
+MY FORECAST 
+I want to make a more realistic Hispanic projection by using actual change in demographics since 2016
+
+```{r}
+#####------------------------------------------------------#
+#####  Proposed models ####
+#####------------------------------------------------------#
+
+mod_demog_change <- lm(R_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         Female_change +
+                         age3045_change + age4565_change + age65_change +
+                         as.factor(region), data = dat_change)
+# democratic vote share is positively correlated with Asian, Black, Female, Hispanic, 30-45
+
+stargazer(mod_demog_change, header=FALSE, type='latex', no.space = TRUE,
+          column.sep.width = "3pt", font.size = "scriptsize", single.row = TRUE,
+          keep = c(1:7, 62:66), omit.table.layout = "sn",
+          title = "The electoral effects of demographic change (across states)")
+```
+
+```{r}
+#####------------------------------------------------------#
+##### How would our forecast change if there's a 11.8% Latino surge for Democrats in 2020?
+#####------------------------------------------------------#
+
+# Hispanic demographic change according to Pew: https://www.pewresearch.org/fact-tank/2019/04/11/6-demographic-trends-shaping-the-u-s-and-the-world-in-2019/
+mean(demog_2020_change$Hispanic) # 10.8 hispanic in 2018 but in Pew it was 11.9 in 2016 and then rose to 13.3 (these are electorally eligible)
+# Pew Hispanic voter demog percent change estimate: 11.76% increase
+((13.3-11.9)/11.9)
+# So I'll calculate for a 11.8% increase in voters rather than a double increase
+
+# new data for 2020
+demog_2020 <- subset(demog, year == 2018)
+demog_2020 <- as.data.frame(demog_2020)
+rownames(demog_2020) <- demog_2020$state
+demog_2020 <- demog_2020[state.abb, ] # prints regions of the US 
+
+demog_2020_change <- demog %>%
+  filter(year %in% c(2016, 2018)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  ) %>%
+  filter(year == 2018)
+
+demog_2020_change <- as.data.frame(demog_2020_change)
+rownames(demog_2020_change) <- demog_2020_change$state
+demog_2020_change <- demog_2020_change[state.abb, ]
+
+# prediction
+predict(mod_demog_change, newdata = demog_2020_change) + # original model (mod_demog_change) parameters with new data for 2020 which predicts double hispanic vote turnout - Latino surge 
+  ((0.1176 * 0.64) + 0.64)*demog_2020$Hispanic
+# this is an 11.8% increase in voting by increasing coefficient by same percentage 
+
+
+his_original <- tibble(predict(mod_demog_change, newdata = demog_2020_change), state = state.abb, pred = `predict(mod_demog_change, newdata = demog_2020_change)`)
+his1 <- tibble(predict(mod_demog_change, newdata = demog_2020_change) + ((0.1176 * 0.64) + 0.64)*demog_2020$Hispanic, state = state.abb, pred = `+...`)
+
+plot_original <- his_original %>%  ##`statebins` needs state to be character, not factor!
+  mutate(state = as.character(state)) %>%
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 Presidential Election Prediction",
+       subtitle = "historical Hispanic demographic change effect (0.64)",
+       fill = "") +
+  theme(legend.position = "none")
+
+plot_1 <- his1 %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 Presidential Election Prediction",
+       subtitle = "hypothetical Hispanic demographic change surge (1.28)",
+       fill = "") +
+  theme(legend.position = "none")
+
+plot_grid(plot_original, plot_1)
+```
+Makes Texas turn blue!! 
+
+Using 2050's predicted demographics: what would this election look like?
+https://www.pewresearch.org/hispanic/2008/02/11/us-population-projections-2005-2050/
+
+White - 47% 
+Hispanic - 29%
+Black - 13% 
+Asian - 9%
+
+```{r}
+# first I'll calculate what these percentage changes would be from the 2018 demogs in the data set to the projected Pew demogs of 2050
+demog_2020_change
+
+# White
+mean(demog_2020_change$White) # 71.6 Q: IS THIS AN OK WAY TO GET NATIONAL DEMOG?
+
+((13.3-11.9)/11.9)
+# So I'll calculate for a 11.8% increase in voters rather than a double increase
+
+
+
+mod_demog_change
+
+
+```
+
+
+

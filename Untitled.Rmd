@@ -1,0 +1,97 @@
+---
+title: "blog5scratch"
+author: "Carine Hajjar"
+date: "10/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(geofacet) ## map-shaped grid of ggplots
+
+#####------------------------------------------------------#
+##### Read and merge data ####
+#####------------------------------------------------------#
+
+pvstate_df    <- read_csv("popvote_bystate_1948-2016.csv")
+economy_df    <- read_csv("econ.csv")
+pollstate_df  <- read_csv("pollavg_bystate_1968-2016.csv")
+
+poll_pvstate_df <- pvstate_df %>%
+  inner_join(
+    pollstate_df %>% 
+      filter(weeks_left == 5)
+      # group_by(state, year) %>%
+      # top_n(1, poll_date)
+  )
+poll_pvstate_df$D_pv <- (poll_pvstate_df$D / poll_pvstate_df$total)*100
+poll_pvstate_df$R_pv <- (poll_pvstate_df$R / poll_pvstate_df$total)*100
+poll_pvstate_df$state <- state.abb[match(poll_pvstate_df$state, state.name)]
+
+#####------------------------------------------------------#
+##### Map of univariate poll-based state forecasts ####
+#####------------------------------------------------------#
+
+state_forecast <- list()
+state_forecast_outputs <- data.frame()
+for (s in unique(poll_pvstate_df$state)) {
+  state_forecast[[s]]$dat_D <- poll_pvstate_df %>% 
+    filter(state == s, party == "democrat")
+  state_forecast[[s]]$mod_D <- lm(D_pv ~ avg_poll, 
+                                  state_forecast[[s]]$dat_D)
+  
+  state_forecast[[s]]$dat_R <- poll_pvstate_df %>% 
+    filter(state == s, party == "republican")  
+  state_forecast[[s]]$mod_R <- lm(R_pv ~ avg_poll, 
+                                  state_forecast[[s]]$dat_R)
+  if (nrow(state_forecast[[s]]$dat_R) > 2) {
+    state_forecast_outputs <- rbind(
+      state_forecast_outputs,
+      rbind(
+        cbind.data.frame(
+          intercept = summary(state_forecast[[s]]$mod_D)$coefficients[1,1],
+          intercept_se = summary(state_forecast[[s]]$mod_D)$coefficients[1,2],
+          slope = summary(state_forecast[[s]]$mod_D)$coefficients[2,1],
+          state = s, party = "democrat"),
+        cbind.data.frame(
+          intercept = summary(state_forecast[[s]]$mod_R)$coefficients[1,1],
+          intercept_se = summary(state_forecast[[s]]$mod_R)$coefficients[1,2],
+          slope = summary(state_forecast[[s]]$mod_R)$coefficients[2,1],
+          state = s, party = "republican")
+      )
+    )
+  }
+}
+
+## graphs: polls in different states / parties different levels 
+##         of strength / significance of outcome
+library(geofacet)
+state_forecast_trends <- state_forecast_outputs %>%    
+  mutate(`0` = intercept,
+         `25` = intercept + slope*25,
+         `50` = intercept + slope*50,
+         `75` = intercept + slope*75,
+         `100` = intercept + slope*100) %>%
+  select(-intercept, -slope) %>%
+  gather(x, y, -party, -state, -intercept_se) %>%
+  mutate(x = as.numeric(x))
+  
+## Q: what's wrong with this map?
+## A: (1) no polls in some states 
+##    (2) very high variance for some states / negative slopes 
+##    (3) y not always in [0,100] range
+ggplot(state_forecast_trends, aes(x=x, y=y, ymin=y-intercept_se, ymax=y+intercept_se)) + 
+  facet_geo(~ state) +
+  geom_line(aes(color = party)) + 
+  geom_ribbon(aes(fill = party), alpha=0.5, color=NA) +
+  coord_cartesian(ylim=c(0, 100)) +
+  scale_color_manual(values = c("blue", "red")) +
+  scale_fill_manual(values = c("blue", "red")) +
+  xlab("hypothetical poll support") +
+  ylab("predicted voteshare\n(pv = A + B * poll)") +
+  ggtitle("") +
+  theme_bw()
+```
