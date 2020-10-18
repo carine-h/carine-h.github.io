@@ -28,7 +28,14 @@ While the right panel offers a useful prediction with fairly recent data, I went
 
 ![](../images/2020_plot.png)
 
+### Electoral Outcomes
+The models predicting with 2016-2018 data and 2018-2020 data pick up different states for both parties. While they are broadly the same, Republicans win the popular vote in Hawaii with the more recent data and Democrats pick up Delaware, South Carolina, and Florida. While this suggests a broader shift toward the left, it's important to count electoral votes. 
 
+By translating the popular majority winners in each state to electoral votes, I find that Trump wins in the first model: 
+![](../images/trump_electoral.png)
+
+Biden, however, wins with the more updated demographic data: 
+![](../images/biden_electoral.png)
 
 
  
