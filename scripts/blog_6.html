@@ -649,7 +649,7 @@ plot_original &lt;- his_original %&gt;%  ##`statebins` needs state to be charact
   ggplot(aes(state = state, fill = (pred &gt;= 50))) +
   geom_statebins() +
   theme_statebins() +
-  labs(title = &quot;Original 2020 Presidential Election Prediction&quot;,
+  labs(title = &quot;Original 2020 Presidential Popular Vote Prediction&quot;,
        subtitle = &quot;Demographic Change Effect \n Using 2016-2018 Demographic Shifts&quot;,
        fill = &quot;&quot;) +
   theme(legend.position = &quot;none&quot;, 
@@ -661,7 +661,7 @@ plot_1 &lt;- his_2020 %&gt;%
   ggplot(aes(state = state, fill = (pred &gt;= 50))) +
   geom_statebins() +
   theme_statebins() +
-  labs(title = &quot;Updated 2020 Presidential Election Prediction&quot;,
+  labs(title = &quot;Updated 2020 Popular Vote Prediction&quot;,
        subtitle = &quot;Demographic Change Effect \n Using 2018-2020 Demographic Shifts&quot;,
        fill = &quot;&quot;, 
        caption = &quot;Data: World Population Review&quot;) +
@@ -683,7 +683,7 @@ his_original %&gt;%
   group_by(state_win) %&gt;%
   summarise(electoral_votes = sum(`2020`)) %&gt;%
   gt() %&gt;%
-  tab_header(title = md(&quot;**2020 Electoral Outcome Using 2016-2018 Demographics**&quot;), 
+  tab_header(title = md(&quot;**2020 Electoral Vote Outcome Using 2016-2018 Demographics**&quot;), 
                subtitle = &quot;Trump Wins&quot;) %&gt;%
   cols_label(state_win = md(&quot;**Candidate**&quot;),
                electoral_votes = md(&quot;**Total Electoral Votes**&quot;)) </code></pre>
@@ -692,7 +692,7 @@ his_original %&gt;%
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#bspkulimzh .gt_table {
+#oolmaqkigo .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -717,7 +717,7 @@ his_original %&gt;%
   border-left-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_heading {
+#oolmaqkigo .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -729,7 +729,7 @@ his_original %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_title {
+#oolmaqkigo .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -739,7 +739,7 @@ his_original %&gt;%
   border-bottom-width: 0;
 }
 
-#bspkulimzh .gt_subtitle {
+#oolmaqkigo .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -749,13 +749,13 @@ his_original %&gt;%
   border-top-width: 0;
 }
 
-#bspkulimzh .gt_bottom_border {
+#oolmaqkigo .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_col_headings {
+#oolmaqkigo .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -770,7 +770,7 @@ his_original %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_col_heading {
+#oolmaqkigo .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -790,7 +790,7 @@ his_original %&gt;%
   overflow-x: hidden;
 }
 
-#bspkulimzh .gt_column_spanner_outer {
+#oolmaqkigo .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -802,15 +802,15 @@ his_original %&gt;%
   padding-right: 4px;
 }
 
-#bspkulimzh .gt_column_spanner_outer:first-child {
+#oolmaqkigo .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#bspkulimzh .gt_column_spanner_outer:last-child {
+#oolmaqkigo .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#bspkulimzh .gt_column_spanner {
+#oolmaqkigo .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -822,7 +822,7 @@ his_original %&gt;%
   width: 100%;
 }
 
-#bspkulimzh .gt_group_heading {
+#oolmaqkigo .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -844,7 +844,7 @@ his_original %&gt;%
   vertical-align: middle;
 }
 
-#bspkulimzh .gt_empty_group_heading {
+#oolmaqkigo .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -859,15 +859,15 @@ his_original %&gt;%
   vertical-align: middle;
 }
 
-#bspkulimzh .gt_from_md > :first-child {
+#oolmaqkigo .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#bspkulimzh .gt_from_md > :last-child {
+#oolmaqkigo .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#bspkulimzh .gt_row {
+#oolmaqkigo .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -886,7 +886,7 @@ his_original %&gt;%
   overflow-x: hidden;
 }
 
-#bspkulimzh .gt_stub {
+#oolmaqkigo .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -898,7 +898,7 @@ his_original %&gt;%
   padding-left: 12px;
 }
 
-#bspkulimzh .gt_summary_row {
+#oolmaqkigo .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -908,7 +908,7 @@ his_original %&gt;%
   padding-right: 5px;
 }
 
-#bspkulimzh .gt_first_summary_row {
+#oolmaqkigo .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -918,7 +918,7 @@ his_original %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_grand_summary_row {
+#oolmaqkigo .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -928,7 +928,7 @@ his_original %&gt;%
   padding-right: 5px;
 }
 
-#bspkulimzh .gt_first_grand_summary_row {
+#oolmaqkigo .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -938,11 +938,11 @@ his_original %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_striped {
+#oolmaqkigo .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#bspkulimzh .gt_table_body {
+#oolmaqkigo .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -951,7 +951,7 @@ his_original %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_footnotes {
+#oolmaqkigo .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -965,13 +965,13 @@ his_original %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_footnote {
+#oolmaqkigo .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#bspkulimzh .gt_sourcenotes {
+#oolmaqkigo .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -985,49 +985,49 @@ his_original %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#bspkulimzh .gt_sourcenote {
+#oolmaqkigo .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#bspkulimzh .gt_left {
+#oolmaqkigo .gt_left {
   text-align: left;
 }
 
-#bspkulimzh .gt_center {
+#oolmaqkigo .gt_center {
   text-align: center;
 }
 
-#bspkulimzh .gt_right {
+#oolmaqkigo .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#bspkulimzh .gt_font_normal {
+#oolmaqkigo .gt_font_normal {
   font-weight: normal;
 }
 
-#bspkulimzh .gt_font_bold {
+#oolmaqkigo .gt_font_bold {
   font-weight: bold;
 }
 
-#bspkulimzh .gt_font_italic {
+#oolmaqkigo .gt_font_italic {
   font-style: italic;
 }
 
-#bspkulimzh .gt_super {
+#oolmaqkigo .gt_super {
   font-size: 65%;
 }
 
-#bspkulimzh .gt_footnote_marks {
+#oolmaqkigo .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="bspkulimzh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="oolmaqkigo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
-      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Outcome Using 2016-2018 Demographics</strong></th>
+      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Vote Outcome Using 2016-2018 Demographics</strong></th>
     </tr>
     <tr>
       <th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Trump Wins</th>
@@ -1063,7 +1063,7 @@ his_2020 %&gt;%
   group_by(state_win) %&gt;%
   summarise(electoral_votes = sum(`2020`)) %&gt;%
   gt() %&gt;%
-  tab_header(title = md(&quot;**2020 Electoral Outcome Using 2020 Demographics**&quot;), 
+  tab_header(title = md(&quot;**2020 Electoral Vote Outcome Using 2020 Demographics**&quot;), 
                subtitle = &quot;Biden Wins&quot;) %&gt;%
    cols_label(state_win = md(&quot;**Candidate**&quot;),
                electoral_votes = md(&quot;**Total Electoral Votes**&quot;)) %&gt;%
@@ -1073,7 +1073,7 @@ his_2020 %&gt;%
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#hssxuhvztd .gt_table {
+#ddracdtzjv .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1098,7 +1098,7 @@ his_2020 %&gt;%
   border-left-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_heading {
+#ddracdtzjv .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1110,7 +1110,7 @@ his_2020 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_title {
+#ddracdtzjv .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1120,7 +1120,7 @@ his_2020 %&gt;%
   border-bottom-width: 0;
 }
 
-#hssxuhvztd .gt_subtitle {
+#ddracdtzjv .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1130,13 +1130,13 @@ his_2020 %&gt;%
   border-top-width: 0;
 }
 
-#hssxuhvztd .gt_bottom_border {
+#ddracdtzjv .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_col_headings {
+#ddracdtzjv .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1151,7 +1151,7 @@ his_2020 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_col_heading {
+#ddracdtzjv .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1171,7 +1171,7 @@ his_2020 %&gt;%
   overflow-x: hidden;
 }
 
-#hssxuhvztd .gt_column_spanner_outer {
+#ddracdtzjv .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1183,15 +1183,15 @@ his_2020 %&gt;%
   padding-right: 4px;
 }
 
-#hssxuhvztd .gt_column_spanner_outer:first-child {
+#ddracdtzjv .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#hssxuhvztd .gt_column_spanner_outer:last-child {
+#ddracdtzjv .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#hssxuhvztd .gt_column_spanner {
+#ddracdtzjv .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1203,7 +1203,7 @@ his_2020 %&gt;%
   width: 100%;
 }
 
-#hssxuhvztd .gt_group_heading {
+#ddracdtzjv .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1225,7 +1225,7 @@ his_2020 %&gt;%
   vertical-align: middle;
 }
 
-#hssxuhvztd .gt_empty_group_heading {
+#ddracdtzjv .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1240,15 +1240,15 @@ his_2020 %&gt;%
   vertical-align: middle;
 }
 
-#hssxuhvztd .gt_from_md > :first-child {
+#ddracdtzjv .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#hssxuhvztd .gt_from_md > :last-child {
+#ddracdtzjv .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#hssxuhvztd .gt_row {
+#ddracdtzjv .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1267,7 +1267,7 @@ his_2020 %&gt;%
   overflow-x: hidden;
 }
 
-#hssxuhvztd .gt_stub {
+#ddracdtzjv .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1279,7 +1279,7 @@ his_2020 %&gt;%
   padding-left: 12px;
 }
 
-#hssxuhvztd .gt_summary_row {
+#ddracdtzjv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1289,7 +1289,7 @@ his_2020 %&gt;%
   padding-right: 5px;
 }
 
-#hssxuhvztd .gt_first_summary_row {
+#ddracdtzjv .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1299,7 +1299,7 @@ his_2020 %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_grand_summary_row {
+#ddracdtzjv .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1309,7 +1309,7 @@ his_2020 %&gt;%
   padding-right: 5px;
 }
 
-#hssxuhvztd .gt_first_grand_summary_row {
+#ddracdtzjv .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1319,11 +1319,11 @@ his_2020 %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_striped {
+#ddracdtzjv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#hssxuhvztd .gt_table_body {
+#ddracdtzjv .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1332,7 +1332,7 @@ his_2020 %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_footnotes {
+#ddracdtzjv .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1346,13 +1346,13 @@ his_2020 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_footnote {
+#ddracdtzjv .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#hssxuhvztd .gt_sourcenotes {
+#ddracdtzjv .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1366,49 +1366,49 @@ his_2020 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#hssxuhvztd .gt_sourcenote {
+#ddracdtzjv .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#hssxuhvztd .gt_left {
+#ddracdtzjv .gt_left {
   text-align: left;
 }
 
-#hssxuhvztd .gt_center {
+#ddracdtzjv .gt_center {
   text-align: center;
 }
 
-#hssxuhvztd .gt_right {
+#ddracdtzjv .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#hssxuhvztd .gt_font_normal {
+#ddracdtzjv .gt_font_normal {
   font-weight: normal;
 }
 
-#hssxuhvztd .gt_font_bold {
+#ddracdtzjv .gt_font_bold {
   font-weight: bold;
 }
 
-#hssxuhvztd .gt_font_italic {
+#ddracdtzjv .gt_font_italic {
   font-style: italic;
 }
 
-#hssxuhvztd .gt_super {
+#ddracdtzjv .gt_super {
   font-size: 65%;
 }
 
-#hssxuhvztd .gt_footnote_marks {
+#ddracdtzjv .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="hssxuhvztd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="ddracdtzjv" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
-      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Outcome Using 2020 Demographics</strong></th>
+      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Vote Outcome Using 2020 Demographics</strong></th>
     </tr>
     <tr>
       <th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Biden Wins</th>
@@ -1528,7 +1528,7 @@ plot_original &lt;- his_original %&gt;%  ##`statebins` needs state to be charact
   ggplot(aes(state = state, fill = (pred &gt;= 50))) +
   geom_statebins() +
   theme_statebins() +
-  labs(title = &quot;2020 Presidential Election Prediction&quot;,
+  labs(title = &quot;2020 Popular Vote Prediction&quot;,
        subtitle = &quot;Historical Demographic Change Effect&quot;,
        fill = &quot;&quot;) +
   theme(legend.position = &quot;none&quot;, 
@@ -1540,7 +1540,7 @@ plot_1 &lt;- his_2050 %&gt;%
   ggplot(aes(state = state, fill = (pred &gt;= 50))) +
   geom_statebins() +
   theme_statebins() +
-  labs(title = &quot;2020 Presidential Election Prediction&quot;,
+  labs(title = &quot;2020 Popular Vote Prediction&quot;,
        subtitle = &quot;2050 National Demographic Changes&quot;,
        fill = &quot;&quot;) +
   theme(legend.position = &quot;none&quot;, 
@@ -1560,7 +1560,7 @@ his_2050 %&gt;%
   group_by(state_win) %&gt;%
   summarise(electoral_votes = sum(`2020`)) %&gt;%
   gt() %&gt;%
-  tab_header(title = md(&quot;**2020 Electoral Outcome Using 2050 National Demographics**&quot;), 
+  tab_header(title = md(&quot;**2020 Electoral Vote Outcome Using 2050 National Demographics**&quot;), 
                subtitle = &quot;Biden Wins&quot;) %&gt;%
    cols_label(state_win = md(&quot;**Candidate**&quot;),
                electoral_votes = md(&quot;**Total Electoral Votes**&quot;)) %&gt;%
@@ -1570,7 +1570,7 @@ his_2050 %&gt;%
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#smwzlmgzon .gt_table {
+#bdyxbbgnrd .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -1595,7 +1595,7 @@ his_2050 %&gt;%
   border-left-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_heading {
+#bdyxbbgnrd .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1607,7 +1607,7 @@ his_2050 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_title {
+#bdyxbbgnrd .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1617,7 +1617,7 @@ his_2050 %&gt;%
   border-bottom-width: 0;
 }
 
-#smwzlmgzon .gt_subtitle {
+#bdyxbbgnrd .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1627,13 +1627,13 @@ his_2050 %&gt;%
   border-top-width: 0;
 }
 
-#smwzlmgzon .gt_bottom_border {
+#bdyxbbgnrd .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_col_headings {
+#bdyxbbgnrd .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1648,7 +1648,7 @@ his_2050 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_col_heading {
+#bdyxbbgnrd .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1668,7 +1668,7 @@ his_2050 %&gt;%
   overflow-x: hidden;
 }
 
-#smwzlmgzon .gt_column_spanner_outer {
+#bdyxbbgnrd .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1680,15 +1680,15 @@ his_2050 %&gt;%
   padding-right: 4px;
 }
 
-#smwzlmgzon .gt_column_spanner_outer:first-child {
+#bdyxbbgnrd .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#smwzlmgzon .gt_column_spanner_outer:last-child {
+#bdyxbbgnrd .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#smwzlmgzon .gt_column_spanner {
+#bdyxbbgnrd .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1700,7 +1700,7 @@ his_2050 %&gt;%
   width: 100%;
 }
 
-#smwzlmgzon .gt_group_heading {
+#bdyxbbgnrd .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1722,7 +1722,7 @@ his_2050 %&gt;%
   vertical-align: middle;
 }
 
-#smwzlmgzon .gt_empty_group_heading {
+#bdyxbbgnrd .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1737,15 +1737,15 @@ his_2050 %&gt;%
   vertical-align: middle;
 }
 
-#smwzlmgzon .gt_from_md > :first-child {
+#bdyxbbgnrd .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#smwzlmgzon .gt_from_md > :last-child {
+#bdyxbbgnrd .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#smwzlmgzon .gt_row {
+#bdyxbbgnrd .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1764,7 +1764,7 @@ his_2050 %&gt;%
   overflow-x: hidden;
 }
 
-#smwzlmgzon .gt_stub {
+#bdyxbbgnrd .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1776,7 +1776,7 @@ his_2050 %&gt;%
   padding-left: 12px;
 }
 
-#smwzlmgzon .gt_summary_row {
+#bdyxbbgnrd .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1786,7 +1786,7 @@ his_2050 %&gt;%
   padding-right: 5px;
 }
 
-#smwzlmgzon .gt_first_summary_row {
+#bdyxbbgnrd .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1796,7 +1796,7 @@ his_2050 %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_grand_summary_row {
+#bdyxbbgnrd .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1806,7 +1806,7 @@ his_2050 %&gt;%
   padding-right: 5px;
 }
 
-#smwzlmgzon .gt_first_grand_summary_row {
+#bdyxbbgnrd .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1816,11 +1816,11 @@ his_2050 %&gt;%
   border-top-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_striped {
+#bdyxbbgnrd .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#smwzlmgzon .gt_table_body {
+#bdyxbbgnrd .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1829,7 +1829,7 @@ his_2050 %&gt;%
   border-bottom-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_footnotes {
+#bdyxbbgnrd .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1843,13 +1843,13 @@ his_2050 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_footnote {
+#bdyxbbgnrd .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#smwzlmgzon .gt_sourcenotes {
+#bdyxbbgnrd .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1863,49 +1863,49 @@ his_2050 %&gt;%
   border-right-color: #D3D3D3;
 }
 
-#smwzlmgzon .gt_sourcenote {
+#bdyxbbgnrd .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#smwzlmgzon .gt_left {
+#bdyxbbgnrd .gt_left {
   text-align: left;
 }
 
-#smwzlmgzon .gt_center {
+#bdyxbbgnrd .gt_center {
   text-align: center;
 }
 
-#smwzlmgzon .gt_right {
+#bdyxbbgnrd .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#smwzlmgzon .gt_font_normal {
+#bdyxbbgnrd .gt_font_normal {
   font-weight: normal;
 }
 
-#smwzlmgzon .gt_font_bold {
+#bdyxbbgnrd .gt_font_bold {
   font-weight: bold;
 }
 
-#smwzlmgzon .gt_font_italic {
+#bdyxbbgnrd .gt_font_italic {
   font-style: italic;
 }
 
-#smwzlmgzon .gt_super {
+#bdyxbbgnrd .gt_super {
   font-size: 65%;
 }
 
-#smwzlmgzon .gt_footnote_marks {
+#bdyxbbgnrd .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="smwzlmgzon" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="bdyxbbgnrd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
-      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Outcome Using 2050 National Demographics</strong></th>
+      <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>2020 Electoral Vote Outcome Using 2050 National Demographics</strong></th>
     </tr>
     <tr>
       <th colspan="2" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>Biden Wins</th>
