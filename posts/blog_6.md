@@ -18,7 +18,7 @@ This week I wonder how quickly-changing demographics will impact elections. Spec
 2. What do current demographics predict for this election's popular vote? Its electoral votes?
 3. If Trump and Biden were running in a majority-minority America (like the projected 2050 America), who would win this election? 
 
-# 2016-2018 Demographics Predicting This Election
+## 2016-2018 Demographics Predicting This Election
 In order the understand how race, gender, and age demographics could predict November's popular vote outcome, you would often have to fetch data from prior years. Given census cycles, it's quite difficult to get an exact, annual state-by-state demographic report. For this reason, the model that predicts the popular vote outcome on the left panel uses demographic shifts from 2016 to 2018, factoring *percentage changes* in the following groups: 
 - Black, Hispanic, and Asian racial groups
 - Gender
@@ -28,16 +28,32 @@ While the right panel offers a useful prediction with fairly recent data, I went
 
 ![](../images/2020_plot.png)
 
-### Electoral Outcomes
+#### Electoral Outcomes
 The models predicting with 2016-2018 data and 2018-2020 data pick up different states for both parties. While they are broadly the same, Republicans win the popular vote in Hawaii with the more recent data and Democrats pick up Delaware, South Carolina, and Florida. While this suggests a broader shift toward the left, it's important to count electoral votes. 
 
-By translating the popular majority winners in each state to electoral votes, I find that Trump wins in the first model: 
+By translating the popular majority winners in each state to electoral votes, I find that **Trump wins** in the **first model**: 
 
 ![](../images/trump_electoral.png)
 
-Biden, however, wins with the more updated demographic data: 
+However, **Biden wins** with the more **updated demographic data**: 
 
 ![](../images/biden_electoral.png)
+
+This is not surprising. If even in the short run, the country is trending toward a majority-minority country, Democrats would on average have more electoral success given their historically higher appeal among minority groups. 
+
+As for Trump winning with the 2016-2018 demographics, this also makes sense. These were, after all, close to the demographics that Trump won with in 2016. 
+
+## Who Would Win in 2050 America? 
+Fast forward to 2050. The country is going to be a far more diverse place, meaning there will be a more diverse electorate. Again, I'll look at shifts in racial demographics to imagine a Trump-Biden election with a 2050 electorate. 
+
+Disclaimer: There are not state-by-state demographic projections, only national. Therefore, unlike the prediction above, which plugs in new state-by-state demographic changes, I will calculate the percentage change of racial makeup from 2018 to 2020, proportionally applying the change to the respective demographic categories' coefficients in the predictive model. While this is not as accurate as my methods above, this is an interesting exploration of the impact demographics have on electoral outcomes. 
+
+![](../images/2050_plot.png)
+
+Compared to the original prediction (using 2016-2018 data), the 2050 demographic predictions paint a startling, but logical, picture: an almost entirely Democratic country. The electoral votes also confirm that Trump, a Republican, would not be able to win an election in 2050. 
+
+![](../images/2050_electoral.png)
+
 
 
  
