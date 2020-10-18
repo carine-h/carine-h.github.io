@@ -173,7 +173,7 @@ plot_original <- his_original %>%  ##`statebins` needs state to be character, no
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
   theme_statebins() +
-  labs(title = "Original 2020 Presidential Popular Vote Prediction",
+  labs(title = "Original 2020 Popular Vote Prediction",
        subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
        fill = "") +
   theme(legend.position = "none", 
