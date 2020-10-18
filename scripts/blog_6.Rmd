@@ -117,7 +117,7 @@ mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
 
 # My 2020 Realistic Forecast 
 I want to make a more realistic projection by using *current* demographic information
-```{r, fig.height = 3, fig.width = 6}
+```{r, fig.width= 10}
 # updated demographics
 dat_2020 <- race_2020 %>%
   left_join(hispanic_2020, by = "State") %>%
@@ -177,8 +177,8 @@ plot_original <- his_original %>%  ##`statebins` needs state to be character, no
        subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
        fill = "") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 9, hjust = 0.5),
-        plot.title   = element_text(size = 11, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 7, hjust = 0.5),
+        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
 
 plot_1 <- his_2020 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
@@ -190,8 +190,8 @@ plot_1 <- his_2020 %>%
        fill = "", 
        caption = "Data: World Population Review") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 9, hjust = 0.5),
-        plot.title   = element_text(size = 11, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 7, hjust = 0.5),
+        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
 
 plot_2020 <- plot_grid(plot_original, plot_1)
 
@@ -250,7 +250,7 @@ mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
 # democratic vote share is positively correlated with Asian, Black, Female, Hispanic, 30-45
 ```
 
-```{r, fig.height = 3, fig.width = 6}
+```{r, fig.width = 10}
 # Demographic change according to Pew: https://www.pewresearch.org/fact-tank/2019/04/11/6-demographic-trends-shaping-the-u-s-and-the-world-in-2019/
 mean(demog_2020_change$Hispanic) # 10.79 hispanic in 2018 but in Pew it was 11.9 in 2016 and then rose to 13.3 (these are electorally eligible)
 mean(demog_2020_change$White) # 71.62
@@ -319,7 +319,9 @@ plot_original <- his_original %>%  ##`statebins` needs state to be character, no
   labs(title = "2020 Presidential Election Prediction",
        subtitle = "Historical Demographic Change Effect",
        fill = "") +
-  theme(legend.position = "none")
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 7, hjust = 0.5),
+        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
 
 plot_1 <- his_2050 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
@@ -329,7 +331,9 @@ plot_1 <- his_2050 %>%
   labs(title = "2020 Presidential Election Prediction",
        subtitle = "2050 National Demographic Changes",
        fill = "") +
-  theme(legend.position = "none")
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 7, hjust = 0.5),
+        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
 
 plot_2050 <- plot_grid(plot_original, plot_1)
 
