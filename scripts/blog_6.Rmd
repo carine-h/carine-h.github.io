@@ -177,8 +177,8 @@ plot_original <- his_original %>%  ##`statebins` needs state to be character, no
        subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
        fill = "") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 7, hjust = 0.5),
-        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 plot_1 <- his_2020 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
@@ -190,8 +190,8 @@ plot_1 <- his_2020 %>%
        fill = "", 
        caption = "Data: World Population Review") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 7, hjust = 0.5),
-        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 plot_2020 <- plot_grid(plot_original, plot_1)
 
@@ -320,8 +320,8 @@ plot_original <- his_original %>%  ##`statebins` needs state to be character, no
        subtitle = "Historical Demographic Change Effect",
        fill = "") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 7, hjust = 0.5),
-        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 plot_1 <- his_2050 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
@@ -332,8 +332,8 @@ plot_1 <- his_2050 %>%
        subtitle = "2050 National Demographic Changes",
        fill = "") +
   theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 7, hjust = 0.5),
-        plot.title   = element_text(size = 9, hjust = 0.5, face = "bold"))
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 plot_2050 <- plot_grid(plot_original, plot_1)
 
