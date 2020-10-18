@@ -27,4 +27,7 @@ In order the understand how race, gender, and age demographics could predict Nov
 While the right panel offers a useful prediction with fairly recent data, I went searching for 2020 demographics, hoping to get an even more accurate prediction for November. While I did not find data on gender or age *(so I marked the percentage change from 2018-2020 as 0)*, I did find data on the Hispanic, Black, and Asian demographics of 2020 from [World Population Review](https://worldpopulationreview.com/states/states-by-race). Using a percentage change in these groups from 2018 to present, I predict the popular vote outcome in the right panel. 
 
 ![](../images/2020_plot.png)
+
+
+
  
