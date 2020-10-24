@@ -29,7 +29,6 @@ my_pretty_theme <- theme_bw() +
 ```
 
 ```{r}
-
 # state covid stats
 state <- read_csv("~/Desktop/R studio/carine-h.github.io/data/United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv") 
 st <- state %>% 
@@ -66,9 +65,6 @@ concern
 
 
 ```
-# critical battleground states
-Arizona, Florida, Georgia, Michigan, Minnesota, North Carolina, Pennsylvania and Wisconsin
-https://www.politico.com/news/2020/10/14/swing-states-2020-presidential-election-429160
 
 # plan 1
 - plot state covid spikes and approval nationally 
@@ -88,8 +84,6 @@ summary(fit_pos_inc)
 # plot of case increase and approval
 plot(nat_app$positiveIncrease, nat_app$approve_estimate)
 abline(fit_pos_inc)
-
-
 
 ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) + 
 # inserts error and lm
@@ -186,9 +180,36 @@ ggplot(app, aes(x=date)) +
        y = "Percentage of Approval/Disapproval", 
        x = "Date")
   my_pretty_theme
+  
 ```
 To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock."
 
 
 # October Cases and Swing States
+Politico's critical battelgrounds
+- Arizona, Florida, Georgia, Michigan, Minnesota, North Carolina, Pennsylvania and Wisconsin
+- https://www.politico.com/news/2020/10/14/swing-states-2020-presidential-election-429160
+```{r}
+bg <- state_covid %>%
+  filter(state %in% c("AZ", "FL", "GA", "MI", "MN", "NC", "PA", "WI")) %>%
+  group_by(state, date)
+
+summary(bg)
+
+ggplot(bg, aes(x = date, y = new_case)) +
+  geom_line() +
+  facet_wrap(~state)
+
+predict <- bg %>%
+  filter(date == "2020-10-21") %>%
+  select(new_case) %>%
+  rename("positiveIncrease" = "new_case") %>%
+  as.data.frame()
+# ONLY HAD OCTOBER 21
+
+# try to use NATIONAL approval regression to predict approval in each state 
+
+predict(fit_pos_inc, new = predict)
+```
+
 
