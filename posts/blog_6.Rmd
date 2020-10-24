@@ -1,0 +1,194 @@
+---
+title: "blog_7"
+author: "Carine Hajjar"
+date: "10/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(reshape2)
+library(directlabels)
+library(scales)
+library("readxl")
+library("janitor")
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+my_pretty_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 10),
+        strip.text   = element_text(size = 10),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 10))
+```
+
+```{r}
+
+# state covid stats
+state <- read_csv("~/Desktop/R studio/carine-h.github.io/data/United_States_COVID-19_Cases_and_Deaths_by_State_over_Time.csv") 
+st <- state %>% 
+  mutate(date = as.Date(submission_date, format = "%m/%d/%Y"))
+download.file("https://covidtracking.com/data/download/all-states-history.csv", 
+              "~/Desktop/R studio/carine-h.github.io/data/covid_test.csv")
+
+test <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_test.csv") 
+state_covid <- test %>%
+  left_join(st, by = c("state", "date")) %>%
+  select(date, state, death, deathIncrease, hospitalized, hospitalizedIncrease, positive, positiveIncrease, totalTestResults, totalTestsViralIncrease, tot_cases, new_case, tot_death, new_death) %>%
+  filter(date >= "2020-02-15")
+
+
+# national covid stats
+download.file("https://covidtracking.com/data/download/national-history.csv", 
+              "~/Desktop/R studio/carine-h.github.io/data/national_covid.csv")
+nat_covid <- read_csv("~/Desktop/R studio/carine-h.github.io/data/national_covid.csv") %>%
+             filter(date >= "2020-02-15") %>%
+             select(date, death, deathIncrease, positive, positiveIncrease)
+
+# fivethirtyeight polls
+app <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_approval_toplines.csv") %>%
+        mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
+        select(date, party, approve_estimate, disapprove_estimate) %>%
+        filter(date != "2020-10-23")
+app # approval, disapproval, party for each - weighted average of different polls that 538 averaged themselves
+    # Our averages are calculated similarly to how we handle [presidential approval ratings](https://projects.fivethirtyeight.com/trump-approval-ratings/), which means we [account for the quality of the pollster and each pollster’s house effects](https://fivethirtyeight.com/features/how-were-tracking-donald-trumps-approval-ratings/) (whether they seem to yield unusually high or low numbers for each question compared with the polling consensus), in addition to a poll’s recency and sample size. In cases where the pollster did not provide sample sizes by party, they were calculated based on the percentage of total respondents who identified with each party. If the same poll asked more than one relevant question (using different wording), we included both questions, but the results of those questions were averaged together, then input into the model, so the poll was not double counted.
+concern <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_concern_toplines.csv") %>%
+            mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
+            select(date, subject, very_estimate, somewhat_estimate, not_very_estimate, not_at_all_estimate) %>%
+            filter(date != "2020-10-23")
+concern
+
+
+```
+# critical battleground states
+Arizona, Florida, Georgia, Michigan, Minnesota, North Carolina, Pennsylvania and Wisconsin
+https://www.politico.com/news/2020/10/14/swing-states-2020-presidential-election-429160
+
+# plan 1
+- plot state covid spikes and approval nationally 
+- maybe throw in states 
+- DATES: Feb 15th - October 22rd 
+
+```{r}
+# case increase and approval rating 
+nat_app <- app %>%
+  filter(party == "all") %>%
+  left_join(nat_covid, by = "date") 
+
+fit_pos_inc <- lm(approve_estimate ~ positiveIncrease, data = nat_app)
+print(fit_pos_inc)
+summary(fit_pos_inc)
+
+# plot of case increase and approval
+plot(nat_app$positiveIncrease, nat_app$approve_estimate)
+abline(fit_pos_inc)
+
+
+
+ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) + 
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Positive Case Increase") +
+  ylab("Approval Estimate") +
+  labs(title = "Linear Relationship Between Trump Covid Approval and \n Positive Case Increase", 
+       subtitle = "March - October 2020")+
+  my_pretty_theme
+
+```
+What we see here is a very slight negative correlation between the daily increase in Covid cases and the approval rating of the president's handling of the pandemic. While the outcome is technically statistically significant, it appears that approval drops by less than 1% with a positive change of 1 extra case. 
+
+This response is counterintuitive: shouldn't presidential approval drop with more Covid cases? At first, that is what I suspected, but zooming out, it's important to remember that these are national numbers. The US has been hit by Covid in different places at different times, so perhaps, any negative effect of a case spike in one area is cancelled out by another region that has not experienced the negative impacts of Covid. 
+
+More likely, what we are seeing is merely a relationship with plenty of confounders. Polarization, the economy, Trump's policy responses outside of Covid, and campaign tactics may all be shifting measures of the president's approval on Covid.
+
+Or, perhaps, these results are challenging Achen and Bartels' shark attack rational. Achen and Bartels found that voters irrationally blame elected officials for shocks out of their control, like a shark attack.
+
+
+# plan 2: types of concern
+- economy versus infection with approval or disapproval 
+```{r}
+# concern: infection versus economy
+  # join very and somewhat concerned responses
+con <- concern %>%
+  mutate(concern = very_estimate + somewhat_estimate) %>%
+  select(date, subject, concern) %>%
+  left_join(nat_covid, by = "date")
+
+con_ec <- con %>%
+  filter(subject == "concern-economy")
+
+con_inf <- con %>%
+  filter(subject == "concern-infected")
+
+# economy concern and case increase
+fit_con_ec <- lm(concern ~ positiveIncrease, data = con_ec)
+plot(con_ec$positiveIncrease, con_ec$concern)
+abline(fit_con_ec)
+
+ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) + 
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Positive Case Increase") +
+  ylab("Approval Estimate") +
+  labs(title = "Linear Relationship Between Economic Conern and \n Positive Case Increase", 
+       subtitle = "March - October 2020")+
+  my_pretty_theme
+
+# infection concern and case increase
+fit_con_inf <- lm(concern ~ positiveIncrease, data = con_inf)
+plot(con_inf$positiveIncrease, con_inf$concern)
+abline(fit_con_inf)
+
+ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) + 
+# inserts error and lm
+  geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_hline(yintercept=50, lty=2) +
+  geom_vline(xintercept=0.01, lty=2) + # median
+  xlab("Positive Case Increase") +
+  ylab("Approval Estimate") +
+  labs(title = "Linear Relationship Between Infection Conern and \n Positive Case Increase", 
+       subtitle = "March - October 2020")+
+  my_pretty_theme
+
+# cases and party approval rating 
+```
+I did, however, want to see if concern among voters was impacted by shifts in cases. More specifically, I wanted to know what kinds of concern emerged from rising cases. By looking at a linear regression with economic concerns as the dependent variable and positive case increases as the independent variable, I found that there is a positive relationship between the two variables. The same is true when I swapped economic concern with concern about the infection. This intuitively makes sense: Covid has been attack both the health of American citizens and the American economy. 
+
+The graphs, however, tell a different story: cases and concern to not have a linear relationship. Though both variable have an overall positive correlation, it is not completely fit to my linear model. 
+
+The graphs show an interesting trend where concern (either economic or infection-based) increases sharply until approximately 10,000 positive case increases per day. After this large number, any increase in cases does not have a huge effect - the majority of those who are concerned will remain concerned. This means that after a certain threshold of daily case increases, concern remains more or less fixed.
+
+Something important to note about these two graphs: a larger percentage of Americans are worried about the economy than the infection. This makes sense: while some communities have been untouched by the virus and others may see it as a "hoax," the **entire** country is facing an economic downturn and unemployment. 
+
+Finally, in weeks past, I have discussed the powerful predictive properties of economic performance. Namely, incumbents with strong economies tend to do better than those without. While this figure and regression does not use a typical measure of economic performance (like GDP or real income growth), it does reflect the economic concern Americans are feeling as the virus grows. Overall, I interpret high levels of economic concern as a negative sign for the Trump campaign. 
+
+
+# break down by party: approval
+```{r}
+p <- c(all = "All", D = "Democrats", I = "Independents", R = "Republicans")
+# how to democrats and republicans perceive approval differently 
+ggplot(app, aes(x=date)) + 
+  geom_line(aes(y = approve_estimate), color = "blue") + 
+  geom_line(aes(y = disapprove_estimate), color="black", linetype="twodash")+
+  facet_wrap(~party,  labeller = labeller(party = p)) +
+  labs(title = "Approval and Disapproval of Trump's COVID Response",
+       subtitle = "March - October 2020",
+       y = "Percentage of Approval/Disapproval", 
+       x = "Date")
+  my_pretty_theme
+```
+To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock."
+
+
+# October Cases and Swing States
+
