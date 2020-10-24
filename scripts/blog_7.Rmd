@@ -17,6 +17,7 @@ library("janitor")
 library(ggplot2)
 library(dplyr)
 library(lubridate)
+library(gt)
 
 my_pretty_theme <- theme_bw() + 
   theme(panel.border = element_blank(),
@@ -36,6 +37,7 @@ st <- state %>%
 download.file("https://covidtracking.com/data/download/all-states-history.csv", 
               "~/Desktop/R studio/carine-h.github.io/data/covid_test.csv")
 
+# state case statistics 
 test <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_test.csv") 
 state_covid <- test %>%
   left_join(st, by = c("state", "date")) %>%
@@ -50,18 +52,18 @@ nat_covid <- read_csv("~/Desktop/R studio/carine-h.github.io/data/national_covid
              filter(date >= "2020-02-15") %>%
              select(date, death, deathIncrease, positive, positiveIncrease)
 
-# fivethirtyeight polls
+# fivethirtyeight polls about approval and concern
 app <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_approval_toplines.csv") %>%
         mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
         select(date, party, approve_estimate, disapprove_estimate) %>%
         filter(date != "2020-10-23")
-app # approval, disapproval, party for each - weighted average of different polls that 538 averaged themselves
+    # approval, disapproval, party for each - weighted average of different polls that 538 averaged themselves
     # Our averages are calculated similarly to how we handle [presidential approval ratings](https://projects.fivethirtyeight.com/trump-approval-ratings/), which means we [account for the quality of the pollster and each pollster’s house effects](https://fivethirtyeight.com/features/how-were-tracking-donald-trumps-approval-ratings/) (whether they seem to yield unusually high or low numbers for each question compared with the polling consensus), in addition to a poll’s recency and sample size. In cases where the pollster did not provide sample sizes by party, they were calculated based on the percentage of total respondents who identified with each party. If the same poll asked more than one relevant question (using different wording), we included both questions, but the results of those questions were averaged together, then input into the model, so the poll was not double counted.
 concern <- read_csv("~/Desktop/R studio/carine-h.github.io/data/covid_concern_toplines.csv") %>%
             mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
             select(date, subject, very_estimate, somewhat_estimate, not_very_estimate, not_at_all_estimate) %>%
             filter(date != "2020-10-23")
-concern
+
 
 
 ```
@@ -88,6 +90,7 @@ abline(fit_pos_inc)
 ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_point() +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -124,12 +127,11 @@ con_inf <- con %>%
 
 # economy concern and case increase
 fit_con_ec <- lm(concern ~ positiveIncrease, data = con_ec)
-plot(con_ec$positiveIncrease, con_ec$concern)
-abline(fit_con_ec)
 
 ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_point() +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -140,12 +142,12 @@ ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
 
 # infection concern and case increase
 fit_con_inf <- lm(concern ~ positiveIncrease, data = con_inf)
-plot(con_inf$positiveIncrease, con_inf$concern)
-abline(fit_con_inf)
+
 
 ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
+  geom_point() +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -170,16 +172,22 @@ Finally, in weeks past, I have discussed the powerful predictive properties of e
 # break down by party: approval
 ```{r}
 p <- c(all = "All", D = "Democrats", I = "Independents", R = "Republicans")
+colors <- c("Approval" = "darkgrey", "Disapproval" = "indianred")
 # how to democrats and republicans perceive approval differently 
 ggplot(app, aes(x=date)) + 
-  geom_line(aes(y = approve_estimate), color = "blue") + 
-  geom_line(aes(y = disapprove_estimate), color="black", linetype="twodash")+
+  geom_line(aes(y = approve_estimate, color = "Approval")) + 
+  geom_line(aes(y = disapprove_estimate, color = "Disapproval"))+
   facet_wrap(~party,  labeller = labeller(party = p)) +
   labs(title = "Approval and Disapproval of Trump's COVID Response",
        subtitle = "March - October 2020",
        y = "Percentage of Approval/Disapproval", 
-       x = "Date")
-  my_pretty_theme
+       x = "Date") +
+  scale_color_manual(values = colors) +
+  my_pretty_theme +
+  theme(legend.title=element_blank())
+
+
+
   
 ```
 To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock."
@@ -196,9 +204,10 @@ bg <- state_covid %>%
 
 summary(bg)
 
-ggplot(bg, aes(x = date, y = new_case)) +
+ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
   geom_line() +
-  facet_wrap(~state)
+  facet_wrap(~state) +
+  my_pretty_theme
 
 predict <- bg %>%
   filter(date == "2020-10-21") %>%
@@ -209,7 +218,21 @@ predict <- bg %>%
 
 # try to use NATIONAL approval regression to predict approval in each state 
 
-predict(fit_pos_inc, new = predict)
+preds <- as.data.frame(predict(fit_pos_inc, new = predict)) %>%
+  mutate(State = c("AZ", "FL", "GA", "MI", "MN", "NC", "PA", "WI")) %>%
+  rename("Predicted Approval" = "predict(fit_pos_inc, new = predict)") %>%
+  select(State, 'Predicted Approval') %>%
+  mutate("Predicted Approval" = round(`Predicted Approval`, 2))
+
+gt(preds)
+
+
+
+# what would it be in TN? in MA? 
+controls <- state_covid %>%
+  filter(date == "2020-10-21") %>%
+  filter(state %in% c("TN", "MA")) %>%
+  group_by(state, date)
 ```
 
 
