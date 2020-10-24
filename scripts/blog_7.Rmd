@@ -234,5 +234,5 @@ controls <- state_covid %>%
   filter(state %in% c("TN", "MA")) %>%
   group_by(state, date)
 ```
-
+So what would approval look like in battle ground states? If Covid has an electoral effect, these are the states where candidates should be the most attentive. According to Politico, Arizona, Florida, Georgial, Michigan, Minnesota, North Carolina, Pennsylvania, and Wisconsin are 2020's key battleground states. Using the national correlation between case increases and approval, this is what I predict approvaal (about Trump's Covid handling) to be in each state using the most recent case increase numbers in each state. While this is not totally acurate, as it uses national correlations (since there are not state-by-state approval numbers), it does show that Trump could be in trouble in these key states. None of them show a more-than-half approval of his handling of Covid. 
 
