@@ -50,7 +50,7 @@ Disclaimer: There are not state-by-state demographic projections, only national.
 
 ![](../images/2050_plot.png)
 
-Compared to the original prediction (using 2016-2018 data), the 2050 demographic predictions paint a startling, but logical, picture: an almost entirely Democratic country. The electoral votes also confirm that Trump, a Republican, would not be able to win an election in 2050. 
+Compared to the original prediction (using 2016-2018 data), the 2050 demographic predictions paint a startling, but logical, picture: an almost entirely Democratic country and a **Biden win**. The electoral votes also confirm that Trump, a Republican, would not be able to win an election in 2050. 
 
 ![](../images/2050_electorals.png)
 
@@ -58,7 +58,7 @@ So by 2050, will all minorities continue to back the Left? Will the GOP become o
 
 While the Democratic party of today resonates most with minorities, this will not necessarily always be the case. Parties shift and change overtime, appealing to different groups as policy issues and priorities change. The GOP of the future could champion policy positions that resonate with certain minority groups. 
 
-Moreover, "minorities" are not a monolith. While recent trends show most minority groups trending blue, different groups have and will develop different priorities. There may even be electoral division within a single group. We are seeing this today: there is a growing bloc of conservative Hispanic voters, especially among those of Cuban and Veneuelan descent. 
+Moreover, "minorities" are not a monolith. While recent trends show most minority groups trending blue, different groups have and will develop different priorities. There may even be electoral division within a single group. We are seeing this today: there is a growing bloc of conservative Hispanic voters, especially among those of Cuban and Venezuelan descent. 
 
 Finally, minority groups will have different priorities based on where they live. My projection above assumes national trends will hold in each state. That will certainly not be the case and Asian voters in state X may grow less that Asian voters in state Y. They may also vote less liberally or conservatively. 
 
