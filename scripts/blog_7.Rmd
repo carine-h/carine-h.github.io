@@ -99,7 +99,7 @@ plot_approval <- ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_esti
   ylab("Approval Percentage") +
   labs(title = "Linear Relationship Between Trump Covid Approval and \n Positive Case Increase", 
        subtitle = "March - October 2020", 
-       caption = "Data: Covid Tracking Project and CDC")+
+       caption = "Data: Covid Tracking Project and FiveThirtyEight")+
   my_pretty_theme
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/plot_approval.png", plot_approval)
@@ -145,7 +145,7 @@ plot1 <- ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
   ylab("Percent of Concerned") +
   labs(title = "Linear Relationship Between Economic \n Concern and Positive Case Increase", 
        subtitle = "March - October 2020", 
-       caption = "Data: FiveThirtyEight and CDC")+
+       caption = "Data: Covid Tracking Project and FiveThirtyEight")+
   my_pretty_theme
 
 # infection concern and case increase
@@ -164,7 +164,7 @@ plot2 <- ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
   ylab("Percent of Concerned") +
   labs(title = "Linear Relationship Between Infection \n Concern and Positive Case Increase", 
        subtitle = "March - October 2020", 
-       caption = "Data: FiveThirtyEight and CDC")+
+       caption = "Data: Covid Tracking Project and FiveThirtyEight")+
   my_pretty_theme
 
 plot_concern <- plot_grid(plot1, plot2)
@@ -250,7 +250,7 @@ preds <- as.data.frame(predict(fit_pos_inc, new = predict)) %>%
 
 gt(preds) %>%
 tab_header(title = md("**Predict Approval of Trump's Covid Response in Battle Ground States**")) %>%
-  tab_source_note(md("*Data: Politico*"))
+  tab_source_note(md("*Data: Politico and CDC*"))
 
 
 ## average approval in October
