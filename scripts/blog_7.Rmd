@@ -96,7 +96,8 @@ ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) +
   xlab("Positive Case Increase") +
   ylab("Approval Estimate") +
   labs(title = "Linear Relationship Between Trump Covid Approval and \n Positive Case Increase", 
-       subtitle = "March - October 2020")+
+       subtitle = "March - October 2020", 
+       caption = "Data: Covid Tracking Project and CDC")+
   my_pretty_theme
 
 ```
@@ -153,7 +154,8 @@ ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
   xlab("Positive Case Increase") +
   ylab("Approval Estimate") +
   labs(title = "Linear Relationship Between Infection Concern and \n Positive Case Increase", 
-       subtitle = "March - October 2020")+
+       subtitle = "March - October 2020", 
+       caption = "Data: FiveThirtyEight and CDC")+
   my_pretty_theme
 
 # cases and party approval rating 
@@ -181,7 +183,8 @@ ggplot(app, aes(x=date)) +
   labs(title = "Approval and Disapproval of Trump's COVID Response",
        subtitle = "March - October 2020",
        y = "Percentage of Approval/Disapproval", 
-       x = "Date") +
+       x = "Date", 
+       caption = "Data: FiveThirtyEight") +
   scale_color_manual(values = colors) +
   my_pretty_theme +
   theme(legend.title=element_blank())
@@ -209,7 +212,8 @@ ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
   facet_wrap(~state) +
   labs(title = "Daily New Cases: Battleground States", 
        y = "New Cases", 
-       x = "Date") +
+       x = "Date", 
+       caption = "Data: CDC") +
   my_pretty_theme +
   theme(legend.position = "none") 
 
