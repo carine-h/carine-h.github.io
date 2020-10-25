@@ -58,4 +58,3 @@ At the same time, however, the average national approval of Trump's Covid in Oct
 
 
 
-
