@@ -522,7 +522,7 @@ abline(fit_pos_inc)</code></pre>
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab(&quot;Positive Case Increase&quot;) +
-  ylab(&quot;Approval Estimate&quot;) +
+  ylab(&quot;Approval Percentage&quot;) +
   labs(title = &quot;Linear Relationship Between Trump Covid Approval and \n Positive Case Increase&quot;, 
        subtitle = &quot;March - October 2020&quot;, 
        caption = &quot;Data: Covid Tracking Project and CDC&quot;)+
@@ -561,10 +561,11 @@ plot1 &lt;- ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
   geom_smooth(method=&quot;lm&quot;, formula = y ~ x, alpha = 0.15) +
   geom_point() +
   xlim(c(0,81000)) +
+  ylim(c(30, 100)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab(&quot;Positive Case Increase&quot;) +
-  ylab(&quot;Approval Estimate&quot;) +
+  ylab(&quot;Percent of Concerned&quot;) +
   labs(title = &quot;Linear Relationship Between Economic \n Concern and Positive Case Increase&quot;, 
        subtitle = &quot;March - October 2020&quot;, 
        caption = &quot;Data: FiveThirtyEight and CDC&quot;)+
@@ -579,10 +580,11 @@ plot2 &lt;- ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
   geom_smooth(method=&quot;lm&quot;, formula = y ~ x, alpha = 0.15) +
   geom_point() +
   xlim(c(0,81000)) +
+  ylim(c(30, 100)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab(&quot;Positive Case Increase&quot;) +
-  ylab(&quot;Approval Estimate&quot;) +
+  ylab(&quot;Percent of Concerned&quot;) +
   labs(title = &quot;Linear Relationship Between Infection \n Concern and Positive Case Increase&quot;, 
        subtitle = &quot;March - October 2020&quot;, 
        caption = &quot;Data: FiveThirtyEight and CDC&quot;)+
@@ -698,7 +700,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#fcibjchdzo .gt_table {
+#thwwvzeyzk .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -723,7 +725,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-left-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_heading {
+#thwwvzeyzk .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -735,7 +737,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-right-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_title {
+#thwwvzeyzk .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -745,7 +747,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-bottom-width: 0;
 }
 
-#fcibjchdzo .gt_subtitle {
+#thwwvzeyzk .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -755,13 +757,13 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-top-width: 0;
 }
 
-#fcibjchdzo .gt_bottom_border {
+#thwwvzeyzk .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_col_headings {
+#thwwvzeyzk .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -776,7 +778,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-right-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_col_heading {
+#thwwvzeyzk .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -796,7 +798,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   overflow-x: hidden;
 }
 
-#fcibjchdzo .gt_column_spanner_outer {
+#thwwvzeyzk .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -808,15 +810,15 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   padding-right: 4px;
 }
 
-#fcibjchdzo .gt_column_spanner_outer:first-child {
+#thwwvzeyzk .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fcibjchdzo .gt_column_spanner_outer:last-child {
+#thwwvzeyzk .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fcibjchdzo .gt_column_spanner {
+#thwwvzeyzk .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -828,7 +830,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   width: 100%;
 }
 
-#fcibjchdzo .gt_group_heading {
+#thwwvzeyzk .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -850,7 +852,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   vertical-align: middle;
 }
 
-#fcibjchdzo .gt_empty_group_heading {
+#thwwvzeyzk .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -865,15 +867,15 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   vertical-align: middle;
 }
 
-#fcibjchdzo .gt_from_md > :first-child {
+#thwwvzeyzk .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fcibjchdzo .gt_from_md > :last-child {
+#thwwvzeyzk .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fcibjchdzo .gt_row {
+#thwwvzeyzk .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -892,7 +894,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   overflow-x: hidden;
 }
 
-#fcibjchdzo .gt_stub {
+#thwwvzeyzk .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -904,7 +906,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   padding-left: 12px;
 }
 
-#fcibjchdzo .gt_summary_row {
+#thwwvzeyzk .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -914,7 +916,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   padding-right: 5px;
 }
 
-#fcibjchdzo .gt_first_summary_row {
+#thwwvzeyzk .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -924,7 +926,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-top-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_grand_summary_row {
+#thwwvzeyzk .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -934,7 +936,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   padding-right: 5px;
 }
 
-#fcibjchdzo .gt_first_grand_summary_row {
+#thwwvzeyzk .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -944,11 +946,11 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-top-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_striped {
+#thwwvzeyzk .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fcibjchdzo .gt_table_body {
+#thwwvzeyzk .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -957,7 +959,7 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-bottom-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_footnotes {
+#thwwvzeyzk .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -971,13 +973,13 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-right-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_footnote {
+#thwwvzeyzk .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#fcibjchdzo .gt_sourcenotes {
+#thwwvzeyzk .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -991,46 +993,46 @@ tab_header(title = md(&quot;**Predict Approval of Trump&#39;s Covid Response in 
   border-right-color: #D3D3D3;
 }
 
-#fcibjchdzo .gt_sourcenote {
+#thwwvzeyzk .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#fcibjchdzo .gt_left {
+#thwwvzeyzk .gt_left {
   text-align: left;
 }
 
-#fcibjchdzo .gt_center {
+#thwwvzeyzk .gt_center {
   text-align: center;
 }
 
-#fcibjchdzo .gt_right {
+#thwwvzeyzk .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fcibjchdzo .gt_font_normal {
+#thwwvzeyzk .gt_font_normal {
   font-weight: normal;
 }
 
-#fcibjchdzo .gt_font_bold {
+#thwwvzeyzk .gt_font_bold {
   font-weight: bold;
 }
 
-#fcibjchdzo .gt_font_italic {
+#thwwvzeyzk .gt_font_italic {
   font-style: italic;
 }
 
-#fcibjchdzo .gt_super {
+#thwwvzeyzk .gt_super {
   font-size: 65%;
 }
 
-#fcibjchdzo .gt_footnote_marks {
+#thwwvzeyzk .gt_footnote_marks {
   font-style: italic;
   font-size: 65%;
 }
 </style>
-<div id="fcibjchdzo" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
+<div id="thwwvzeyzk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;"><table class="gt_table">
   <thead class="gt_header">
     <tr>
       <th colspan="2" class="gt_heading gt_title gt_font_normal" style><strong>Predict Approval of Trump's Covid Response in Battle Ground States</strong></th>

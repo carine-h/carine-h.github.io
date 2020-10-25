@@ -96,7 +96,7 @@ plot_approval <- ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_esti
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
-  ylab("Approval Estimate") +
+  ylab("Approval Percentage") +
   labs(title = "Linear Relationship Between Trump Covid Approval and \n Positive Case Increase", 
        subtitle = "March - October 2020", 
        caption = "Data: Covid Tracking Project and CDC")+
@@ -138,10 +138,11 @@ plot1 <- ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
   geom_point() +
   xlim(c(0,81000)) +
+  ylim(c(30, 100)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
-  ylab("Approval Estimate") +
+  ylab("Percent of Concerned") +
   labs(title = "Linear Relationship Between Economic \n Concern and Positive Case Increase", 
        subtitle = "March - October 2020", 
        caption = "Data: FiveThirtyEight and CDC")+
@@ -156,10 +157,11 @@ plot2 <- ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
   geom_point() +
   xlim(c(0,81000)) +
+  ylim(c(30, 100)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
-  ylab("Approval Estimate") +
+  ylab("Percent of Concerned") +
   labs(title = "Linear Relationship Between Infection \n Concern and Positive Case Increase", 
        subtitle = "March - October 2020", 
        caption = "Data: FiveThirtyEight and CDC")+
