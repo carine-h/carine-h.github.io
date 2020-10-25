@@ -207,12 +207,18 @@ summary(bg)
 ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
   geom_line() +
   facet_wrap(~state) +
-  my_pretty_theme
+  labs(title = "Daily New Cases: Battleground States", 
+       y = "New Cases", 
+       x = "Date") +
+  my_pretty_theme +
+  theme(legend.position = "none") 
 
 predict <- bg %>%
-  filter(date == "2020-10-21") %>%
-  select(new_case) %>%
-  rename("positiveIncrease" = "new_case") %>%
+  filter(date >= "2020-10-1") %>%
+  group_by(state) %>%
+  summarise(mean_case = round(mean(new_case, na.rm = TRUE), digit = 2)) %>%
+  rename("positiveIncrease" = "mean_case") %>%
+  select(state, positiveIncrease) %>%
   as.data.frame()
 # ONLY HAD OCTOBER 21
 
@@ -224,15 +230,16 @@ preds <- as.data.frame(predict(fit_pos_inc, new = predict)) %>%
   select(State, 'Predicted Approval') %>%
   mutate("Predicted Approval" = round(`Predicted Approval`, 2))
 
-gt(preds)
+gt(preds) %>%
+tab_header(title = md("**Predict Approval of Trump's Covid Response in Battle Ground States**")) %>%
+  tab_source_note(md("*Data: Politico*"))
 
 
-
-# what would it be in TN? in MA? 
-controls <- state_covid %>%
-  filter(date == "2020-10-21") %>%
-  filter(state %in% c("TN", "MA")) %>%
-  group_by(state, date)
+## average approval in October
+nat_app %>%
+  filter(date >= 2020-10-1) %>%
+  summarise(mean(approve_estimate))
+  ## 42.2% 
 ```
 So what would approval look like in battle ground states? If Covid has an electoral effect, these are the states where candidates should be the most attentive. According to Politico, Arizona, Florida, Georgial, Michigan, Minnesota, North Carolina, Pennsylvania, and Wisconsin are 2020's key battleground states. Using the national correlation between case increases and approval, this is what I predict approvaal (about Trump's Covid handling) to be in each state using the most recent case increase numbers in each state. While this is not totally acurate, as it uses national correlations (since there are not state-by-state approval numbers), it does show that Trump could be in trouble in these key states. None of them show a more-than-half approval of his handling of Covid. 
 
