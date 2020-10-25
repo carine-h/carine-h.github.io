@@ -18,6 +18,7 @@ library(ggplot2)
 library(dplyr)
 library(lubridate)
 library(gt)
+library(cowplot)
 
 my_pretty_theme <- theme_bw() + 
   theme(panel.border = element_blank(),
@@ -87,10 +88,11 @@ summary(fit_pos_inc)
 plot(nat_app$positiveIncrease, nat_app$approve_estimate)
 abline(fit_pos_inc)
 
-ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) + 
+plot_approval <- ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
   geom_point() +
+  xlim(c(0, 81000)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -99,6 +101,8 @@ ggplot(data = nat_app, aes(x= positiveIncrease, y= approve_estimate)) +
        subtitle = "March - October 2020", 
        caption = "Data: Covid Tracking Project and CDC")+
   my_pretty_theme
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/plot_approval.png", plot_approval)
 
 ```
 What we see here is a very slight negative correlation between the daily increase in Covid cases and the approval rating of the president's handling of the pandemic. While the outcome is technically statistically significant, it appears that approval drops by less than 1% with a positive change of 1 extra case. 
@@ -129,10 +133,11 @@ con_inf <- con %>%
 # economy concern and case increase
 fit_con_ec <- lm(concern ~ positiveIncrease, data = con_ec)
 
-ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) + 
+plot1 <- ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
   geom_point() +
+  xlim(c(0,81000)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -145,10 +150,11 @@ ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
 fit_con_inf <- lm(concern ~ positiveIncrease, data = con_inf)
 
 
-ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) + 
+plot2 <- ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) + 
 # inserts error and lm
   geom_smooth(method="lm", formula = y ~ x, alpha = 0.15) +
   geom_point() +
+  xlim(c(0,81000)) +
   geom_hline(yintercept=50, lty=2) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
@@ -157,6 +163,10 @@ ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
        subtitle = "March - October 2020", 
        caption = "Data: FiveThirtyEight and CDC")+
   my_pretty_theme
+
+plot_concern <- plot_grid(plot1, plot2)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/plot_concern.png", plot_concern)
 
 # cases and party approval rating 
 ```
@@ -176,7 +186,7 @@ Finally, in weeks past, I have discussed the powerful predictive properties of e
 p <- c(all = "All", D = "Democrats", I = "Independents", R = "Republicans")
 colors <- c("Approval" = "darkgrey", "Disapproval" = "indianred")
 # how to democrats and republicans perceive approval differently 
-ggplot(app, aes(x=date)) + 
+case_app_plot <- ggplot(app, aes(x=date)) + 
   geom_line(aes(y = approve_estimate, color = "Approval")) + 
   geom_line(aes(y = disapprove_estimate, color = "Disapproval"))+
   facet_wrap(~party,  labeller = labeller(party = p)) +
@@ -190,8 +200,7 @@ ggplot(app, aes(x=date)) +
   theme(legend.title=element_blank())
 
 
-
-  
+ggsave("~/Desktop/R studio/carine-h.github.io/images/case__app_plot.png", case_app_plot)
 ```
 To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock."
 
@@ -207,7 +216,7 @@ bg <- state_covid %>%
 
 summary(bg)
 
-ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
+case_plot <- ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
   geom_line() +
   facet_wrap(~state) +
   labs(title = "Daily New Cases: Battleground States", 
@@ -217,6 +226,8 @@ ggplot(bg, aes(x = date, y = new_case, color = "indianred")) +
   my_pretty_theme +
   theme(legend.position = "none") 
 
+ggsave("~/Desktop/R studio/carine-h.github.io/images/case_plot.png", case_plot)
+
 predict <- bg %>%
   filter(date >= "2020-10-1") %>%
   group_by(state) %>%
@@ -224,7 +235,7 @@ predict <- bg %>%
   rename("positiveIncrease" = "mean_case") %>%
   select(state, positiveIncrease) %>%
   as.data.frame()
-# ONLY HAD OCTOBER 21
+
 
 # try to use NATIONAL approval regression to predict approval in each state 
 
