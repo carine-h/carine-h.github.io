@@ -136,7 +136,7 @@ ggplot(data = con_ec, aes(x= positiveIncrease, y= concern)) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
   ylab("Approval Estimate") +
-  labs(title = "Linear Relationship Between Economic Conern and \n Positive Case Increase", 
+  labs(title = "Linear Relationship Between Economic Concern and \n Positive Case Increase", 
        subtitle = "March - October 2020")+
   my_pretty_theme
 
@@ -152,7 +152,7 @@ ggplot(data = con_inf, aes(x= positiveIncrease, y= concern)) +
   geom_vline(xintercept=0.01, lty=2) + # median
   xlab("Positive Case Increase") +
   ylab("Approval Estimate") +
-  labs(title = "Linear Relationship Between Infection Conern and \n Positive Case Increase", 
+  labs(title = "Linear Relationship Between Infection Concern and \n Positive Case Increase", 
        subtitle = "March - October 2020")+
   my_pretty_theme
 
