@@ -12,13 +12,12 @@ I'll be considering the following questions:
 ### Trump's Handling of Covid: Americans' Take 
 To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock" among non-Republicans. The question is whether or not this negative effect is enough to lose him the election. 
 
-PARTISAN GRAPH 
-
+![](../images/case__app_plot.png)
 
 ## Accountability: Case Increase and Approval
 On the national level we see a clear relationship between case increase and approval of Trump's Covid response. 
 
-GRAPH: Linear Relationship Between Trump Covid Approval and Positive Case Increase
+![](../images/plot_approval.png)
 
 What we see here is a very slight negative correlation between the daily increase in Covid cases and the approval rating of the president's handling of the pandemic. While the outcome is technically statistically significant, it appears that approval drops by less than 1% with a positive change of 1 extra case. 
 
@@ -33,7 +32,7 @@ What about American's concern? Will this concern impact the way citizens vote in
 
 I wanted to know what kinds of concern emerged from rising cases. By looking at a linear regression with economic concerns as the dependent variable and positive case increases as the independent variable, I found that there is a positive relationship between the two variables. The same is true when I swapped economic concern with concern about the infection. This intuitively makes sense: Covid has been attack both the health of American citizens and the American economy. 
 
-CONCERN GRAPHS
+![](../images/plot_concern.png)
 
 The graphs, however, tell a different story: cases and concern to not have a linear relationship. Though both variable have an overall positive correlation, it is not completely fit to my linear model. 
 
@@ -45,11 +44,11 @@ Finally, in weeks past, I have discussed the powerful predictive properties of e
 
 ## Battleground Approval Ratings 
 
-TABLE 
+![](../images/gt_blog7.png)
 
 If Covid has an electoral effect, these are the states where candidates should be the most attentive. According to Politico, Arizona, Florida, Georgia, Michigan, Minnesota, North Carolina, Pennsylvania, and Wisconsin are 2020's key battleground states. Here are their daily case increases: 
 
-CASE INCREASE GRAPH
+![](../images/case_plot.png)
 
 Using the national correlation between case increases and Trump response approval, this is what I predict Trump response approval to be in each state using October's average daily increase in each battelground state. While this is not totally accurate, as it uses national correlations (since there are not state-by-state approval numbers), it does show that Trump could be in trouble in these key states. None of them show a more-than-half approval of his handling of Covid. 
 
