@@ -1,4 +1,4 @@
-# 2020: Election Shocks 
+# 2020: The Covid Shock
 How do unexpected events before an election impact votes? Do these "shocks" hurt candidates? There's seeminly no better time to consider these questions than 2020. With a pandemic, subsequent economic shock, and the infection of the President himself, the months leading up to November have been abundant with "shocks." 
 
 Today I want to consider the possible impact that these shocks may have on the 2020 election outcome. Unfortunately, shocks cannot be convincingly predicted with prior data because each shock is different. There's never been anything quite like the Covid-19 pandemic - its timing, its economic impact, its emotional impact are all unprecendented. So modeling vote share with prior elections could be rather tricky. What I can do, however, is look at the impact the pandemic is having **now** on the American people and what these impacts **could** mean for the 2020 electoral outcome. 
