@@ -21,3 +21,4 @@ If you have any questions or comments, feel free to reach out to me at **cmhajja
 
 # [6. Demographics: Race and Votes](posts/blog_6.md)
 
+# [7. 2020: The Covid Shock](posts/blog_7.md)
