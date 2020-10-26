@@ -10,7 +10,7 @@ I'll be considering the following questions:
 4. What can national approval ratings tell us about performance in battelground states? 
 
 ### Trump's Handling of Covid: Americans' Take 
-To no one's surprise, approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock" among non-Republicans. The question is whether or not this negative effect is enough to lose him the election. 
+To no one's surprise, I find that approval and disapproval are partisan issues, meaning that any "shock" to the electoral outcome would have polarized effects. More specifically, Republicans are more approving (and less disapproving) of Trump's handling of Covid while democrats are more disapproving (and less approving). Nationally and among independents, many of which are "swing voters," disapproval eclipsed approval back in March, leaving an under-twenty-point gap between approval and disapproval on the national level. Nevertheless, as long as disapproval is on average higher than approval, Trump should face overall negative effects from this "shock" among non-Republicans. The question is whether or not this negative effect is enough to lose him the election and how many votes it could cost. 
 
 ![](../images/case__app_plot.png)
 
@@ -19,13 +19,13 @@ On the national level we see a clear relationship between case increase and appr
 
 ![](../images/plot_approval.png)
 
-What we see here is a very slight negative correlation between the daily increase in Covid cases and the approval rating of the president's handling of the pandemic. While the outcome is technically statistically significant, it appears that approval drops by less than 1% with a positive change of 1 extra case. 
+There is a slight negative correlation between the daily increase in Covid cases and the approval rating of the president's handling of the pandemic. While the outcome is statistically significant, it appears that approval drops by less than 1% with a positive change of 1 extra case. 
 
-This response is counterintuitive: shouldn't presidential approval drop with more Covid cases? At first, that is what I suspected, but zooming out, it's important to remember that these are national numbers. The US has been hit by Covid in different places at different times, so perhaps, any negative effect of a case spike in one area is cancelled out by another region that has not experienced the negative impacts of Covid. 
+Is this surprising? Shouldn't Covid response approval drop more noticeably case Covid cases rise? At first, that is what I suspected, but zooming out, it's important to remember that these are national numbers. The US has been hit by Covid in different places at different times, so perhaps, any negative effect of a case spike in one area is cancelled out by another region that has not experienced the negative impacts of Covid. 
 
-More likely, what we are seeing is merely a relationship with plenty of confounders. Polarization, the economy, Trump's policy responses outside of Covid, and campaign tactics may all be shifting measures of the president's approval on Covid.
+There are also plenty of confounders. Polarization, the economy, Trump's policy responses outside of Covid, and campaign tactics may all be shifting measures of the president's approval on Covid.
 
-Overall, however, I would predict that a continual increase of cases will have an overall **negative** effect on Trump's reelection campaign, especially given that most Americans disapprove of this Covid response. 
+Overall, however, I would predict that a continual increase of daily case increases will have an overall **negative** effect on Trump's reelection campaign, especially given that most Americans disapprove of this Covid response. 
 
 ## Concern: Americans' Reaction to Covid 
 What about American's concern? Will this concern impact the way citizens vote in November?
