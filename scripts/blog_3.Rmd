@@ -95,8 +95,8 @@ download.file(url = "https://raw.githubusercontent.com/fivethirtyeight/data/mast
 poll2020_rate <- read_csv("~/Desktop/R studio/carine-h.github.io/data/ratings_2020.csv") %>%
                   rename(pollster = Pollster)
 
-polls_2016 <- read_csv("data/polls_2016.csv")
-polls_2020 <- read_csv("data/polls_2020.csv")
+polls_2016 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/polls_2016.csv")
+polls_2020 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/polls_2020.csv")
 
 data_2016 <- left_join(poll2016_rate, polls_2016, by = c("pollster")) %>%
   select(pollster, "538 Grade", state, samplesize, rawpoll_clinton, rawpoll_trump, adjpoll_clinton, adjpoll_trump, createddate) %>%
@@ -104,7 +104,7 @@ data_2016 <- left_join(poll2016_rate, polls_2016, by = c("pollster")) %>%
 
 
 data_2020 <- left_join(poll2020_rate, polls_2020, by = c("pollster")) %>%
-  select(pollster, "538 Grade", state, sample_size, answer, candidate_party, pct) %>%
+  select(start_date, pollster, "538 Grade", state, sample_size, answer, candidate_party, pct) %>%
   rename(grade_538 = "538 Grade")
 ```
 

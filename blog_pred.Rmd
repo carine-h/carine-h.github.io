@@ -1,0 +1,488 @@
+---
+title: "blog_pred"
+author: "Carine Hajjar"
+date: "10/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(tidyverse)
+library(ggplot2)
+library(statebins)
+library(stargazer)
+library(cowplot)
+library(gt)
+library(readr)
+library(reshape2)
+library(statebins)
+
+
+knitr::opts_chunk$set(echo = TRUE)
+popvote_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
+# 538
+pvstate_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+economy_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/econ.csv")
+approval_df   <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
+# 538
+pollstate_df  <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+state_pv_df<- read_csv("pred_data/popvote_bystate_1948-2016 copy 2.csv")
+app <- read_csv("data/approval_gallup_1941-2020.csv")
+# 538: 2020 poll averages per state 
+poll_2020_state <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/presidential_poll_averages_2020.csv")
+econ_update <- read_csv("pred_data/econ_update.csv")
+```
+
+
+# Time-For-Change Model: NATIONAL
+```{r}
+# cleaning and joining data 
+tfc_df <- popvote_df %>%
+  filter(incumbent_party) %>%
+  select(year, candidate, party, pv, pv2p, incumbent) %>%
+  inner_join(
+    approval_df %>% 
+      group_by(year, president) %>% 
+      slice(1) %>% 
+      # this is a NET APPROVAL
+      mutate(net_approve=approve-disapprove) %>% 
+      select(year, incumbent_pres=president, net_approve, poll_enddate),
+    by="year"
+  ) %>%
+  inner_join(
+    economy_df %>%
+      # SECOND QUARTER GDP
+      filter(quarter == 2) %>%
+      select(GDP_growth_qt, year, RDI_growth, quarter),
+    by="year"
+  )
+
+
+fit_tfc <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, data = tfc_df)
+summary(fit_tfc)
+
+approval_df
+
+export_summs(fit_tfc, model.names = "Time-for-Change Model: \n Relationship Between Popular Vote, \n GDP Growth, Net Approval, and Incumbency")
+```
+```{r}
+# 2020 second-quarter GDP
+economy_df %>%
+  select(year, quarter, GDP_growth_qt, RDI_growth) %>%
+  filter(year == 2020, 
+         quarter == 3)
+# 2020 second quarter approval
+approval_df %>%
+  filter(year == 2020) %>%
+  unique() %>%
+  filter(poll_startdate >= as.POSIXct("2020-04-01"), 
+         poll_enddate <= as.POSIXct("2020-06-30")) %>%
+  mutate(net_approval = approve - disapprove) %>%
+  summarise(net = mean(net_approval))
+
+
+# Time for Change Prediction 
+a <- -9.494716	
+b <- -8.5 # according to Gallup in 2nd quarter
+c <- TRUE
+
+new_data <- data.frame(GDP_growth_qt = a, net_approve = b, incumbent = c)
+  # - 31.4 decline 
+  # net approval: -10.2
+
+predict(fit_tfc, newdata = new_data)
+
+# Model Predicts Trump will get 32.43% of the vote share which is almost certainly a loss 
+```
+# Models for my weighted ensemble: 
+  - polls/approval: polls AND approval rating  
+  - economic: jobs, UE, GDP
+  - demographic: already done
+  - something for COVID?
+  - incumbent
+
+## Poll predictions 
+Using polls from 3 weeks out and predicted with 2020 average polls in each state from 10/8 to today (also three weeks)
+```{r}
+dat <- state_pv_df %>% 
+  full_join(poll_state_df %>% 
+              filter(weeks_left == 3) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) 
+## model 
+fit_state_poll <- lm(D_pv2p ~ avg_poll + state, data = dat)
+
+## prediction : take the average for each state
+    # average of three weeks ago: October 8
+new_data_poll <- poll_2020_state %>%
+  mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
+  filter(date >= as.Date("2020-10-08")) %>%
+  rename(year = cycle) %>%
+  group_by(state) %>%
+  summarize(avg_poll = mean(pct_estimate)) %>%
+  filter(state != "ME-1", 
+         state != "ME-2",
+         state != "NE-1", 
+         state != "NE-2", 
+         state != "National")
+
+poll_pred_2020 <- as.data.frame(predict(poll_fit, newdata = new_data_poll))
+rownames(poll_pred_2020) <- new_data_poll$state
+poll_pred_2020
+# if it's greater than 50, it's Biden, if it's less, it's Trump 
+
+```
+
+
+
+```{r}
+## DEMOGRAPHIC PREDICTION
+# Data
+demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
+race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+
+# tidyinig electoral votes for my purposes 
+electoral <- electoral_votes %>%
+  select(X1, '2020') %>%
+  rename(state = X1) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() 
+
+# each data set 
+demog # age, race, state, year, and count
+pvstate_df # state by state popular vote 
+pollstate_df # poll numbers 
+
+# state names and abbreviations
+pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
+pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
+
+dat <- pvstate_df %>% 
+  full_join(pollstate_df %>% 
+              filter(weeks_left == 3) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) %>%
+  left_join(demog %>%
+              select(-c("total")),
+            by = c("year" ,"state"))
+# demographics, poll numbers, and popular vote 
+
+dat$region <- state.division[match(dat$state, state.abb)]
+demog$region <- state.division[match(demog$state, state.abb)]
+
+dat_change <- dat %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year),
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  )
+
+# new data for 2020
+demog_2020 <- subset(demog, year == 2018)
+demog_2020 <- as.data.frame(demog_2020)
+rownames(demog_2020) <- demog_2020$state
+demog_2020 <- demog_2020[state.abb, ] # prints regions of the US 
+
+# calculating demographic changes from 2016-2018
+demog_2020_change <- demog %>%
+  filter(year %in% c(2016, 2018)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  ) %>%
+  filter(year == 2018)
+
+demog_2020_change <- as.data.frame(demog_2020_change)
+rownames(demog_2020_change) <- demog_2020_change$state
+demog_2020_change <- demog_2020_change[state.abb, ]
+
+
+#####------------------------------------------------------#
+#####  Proposed models ####
+#####------------------------------------------------------#
+
+mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         Female_change +
+                         age3045_change + age4565_change + age65_change +
+                         as.factor(region), data = dat_change)
+# updated demographics
+dat_2020 <- race_2020 %>%
+  left_join(hispanic_2020, by = "State") %>%
+  mutate(Hispanic = 100*HispanicPerc, 
+         state = State, 
+         White = 100*WhitePerc, 
+         Asian = 100*AsianPerc, 
+         Black = 100*BlackPerc, 
+         Indigenous = 100*NativePerc) %>%
+  select(state, Hispanic, White, Asian, Black, Indigenous) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() %>%
+  mutate(year = 2020)
+
+# 2018 demographics
+dat_2018 <- demog %>%
+  filter(year == 2018) 
+
+# joining demographics
+real_2020_change <- bind_rows(dat_2018, dat_2020)
+
+
+# calculating percent changes in available demographic groups
+## I used 0 percent change with populations that lacked demographic data (age and gender)
+real_2020 <- real_2020_change %>%
+  filter(year %in% c(2018, 2020)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = 0,
+         Male_change = 0,
+         age20_change = 0,
+         age3045_change = 0,
+         age4565_change = 0,
+         age65_change = 0) %>%
+  filter(year == 2020)
+
+real_2020 <- as.data.frame(real_2020)
+rownames(real_2020) <- real_2020$state
+real_2020 <- real_2020[state.abb, ]
+real_2020$region <- state.division[match(real_2020$state, state.abb)]
+
+# prediction using actual 2020 data
+demo_pred_2020 <- as.data.frame(predict(mod_demog_change, newdata = real_2020))
+
+demo_pred_2020 <- demo_pred_2020 %>%
+  mutate(state = rownames(demo_pred_2020))
+```
+
+# Fundamentals Model: Modified time for change
+- I'm going to use 2nd and 3rd quarter data from 
+```{r}
+tfc_df <- popvote_df %>%
+  filter(incumbent_party) %>%
+  select(year, candidate, party, pv, pv2p, incumbent) %>%
+  inner_join(
+    approval_df %>% 
+      group_by(year, president) %>% 
+      slice(1) %>% 
+      # this is a NET APPROVAL
+      mutate(net_approve=approve-disapprove) %>% 
+      select(year, incumbent_pres=president, net_approve, poll_enddate),
+    by="year"
+  ) %>%
+  inner_join(
+    econ_update %>%
+      # THIRD QUARTER GDP
+      filter(quarter == 3) %>%
+      mutate(stock_change = stock_close - stock_open) %>%
+      select(GDP_growth_qt, year, RDI_growth, quarter, unemployment, stock_change),
+    by="year") 
+
+modi_tfc_fit <- lm(pv2p ~ GDP_growth_qt + RDI_growth + unemployment + incumbent + net_approve, data = tfc_df)
+summary(econ_fit)
+
+
+# prediction data
+econ_2020 <- econ_update %>%
+  filter(year == 2020, 
+         quarter == 3) %>%
+  select(year, GDP_growth_qt, RDI_growth, unemployment) %>%
+  mutate(incumbent = TRUE, 
+         net_approve = -8.8) # got from 538, latest
+
+predict(modi_tfc_fit, new_data = econ_2020)
+
+# how can I split this up to be Dpv2p and Rpv2p ???
+# what are all these values??/
+tfc_df
+```
+
+WHY do many values, WHAT about states?
+
+
+# COMPARINIG MODELS
+```{r}
+# ELECTORALS
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+# tidyinig electoral votes for my purposes 
+electoral <- electoral_votes %>%
+  select(X1, '2020') %>%
+  rename(state = X1) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() 
+
+
+#################
+# compare models
+#################  
+# POLL MODEL
+export_summs(fit_state_poll)
+
+poll_pred_2020 %>%
+  rename("pred" = "predict(poll_fit, newdata = new_data_poll)") %>%
+  mutate(state = rownames(poll_pred_2020), 
+         state = state.abb[match(state,state.name)])%>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()%>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 3 Week Poll Model**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
+
+# DEMOG MODEL
+export_summs(mod_demog_change)
+
+demo_pred_2020 %>%
+  rename("pred" = "predict(mod_demog_change, newdata = real_2020)") %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()%>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographic Model**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
+
+# MODIFIED TFC
+export_summs(econ_fit)
+
+```
+
+
+
+# Weighted Ensemble
+- I am placing the most weight on polls, then modified TFC, then demog
+
+
+
+
+# Modified Time-For-Change
+- economic approval rating 
+- state AND national approval
+- GDP/RDI Growth 
+- Incumbency
+- Jobs 
+- 2020 demographics 
+- predict national pop_vote
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#####------------------------------------------------------#
+#####  Describe data ####
+#####------------------------------------------------------#
+
+## Bivariate correlations:
+## do unemployment increases correlate with incumbent punishment?
+cor(pvstate_local$Unemployed_up, pvstate_local$state_incwin, use="pairwise")
+cor(pvstate_local$Unemployed_up, pvstate_local$state_incpv2p, use="pairwise")
+
+## Bivariate correlations *by party*:
+## is the above stronger for incumbents of one party than another?
+{
+par(mfrow=c(2,1))
+plot(pvstate_local$Unemployed_up[pvstate_local$incparty == "republican"], 
+     pvstate_local$state_incpv2p[pvstate_local$incparty == "republican"],
+     main = "When Republicans Are\nthe Incumbent Party...",
+     xlab="unemployment % increase", ylab="two-party vote-share")
+plot(pvstate_local$Unemployed_up[pvstate_local$incparty == "democrat"], 
+     pvstate_local$state_incpv2p[pvstate_local$incparty == "democrat"],
+     main = "When Democrats Are\nthe Incumbent Party...",
+     xlab="unemployment % increase", ylab="two-party vote-share")
+}
+
+cor(pvstate_local$Unemployed_up[pvstate_local$incparty == "republican"], 
+    pvstate_local$state_incpv2p[pvstate_local$incparty == "republican"], use="pairwise")
+cor(pvstate_local$Unemployed_up[pvstate_local$incparty == "democrat"], 
+    pvstate_local$state_incpv2p[pvstate_local$incparty == "democrat"], use="pairwise")
+```
+
+
+```{r}
+#####------------------------------------------------------#
+#####  New option: Weighted Ensemble ####
+#####------------------------------------------------------#
+
+## Ensemble 1: polls and fundamentals matter equally as much
+pwt <- 0.5; ewt <- 0.5;
+pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc)
+pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl)
+
+## Ensemble 2: polls matter closer to November 
+## (what Nate Silver thinks)
+days_left <- 40
+pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left));
+plot(100:1, 1/sqrt(100:1), xlim=c(100, 0), type="l", 
+     ylab="poll model weight", xlab="days til elxn")
+
+pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc) # adjusted poll
+pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl) # adjusted poll
+
+pwt*dat_2020_inc$avg_support + ewt*predict(mod_econ_inc, dat_2020_inc) # raw poll
+pwt*dat_2020_chl$avg_support + ewt*predict(mod_econ_chl, dat_2020_chl) # raw poll
+
+## Ensemble 3: fundamentals matter closer to November 
+## (what Gelman & King (1993) think)
+days_left <- 42
+pwt <- 1-(1/sqrt(days_left)); ewt <- 1/sqrt(days_left);
+pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc)
+pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl)
+
+## Ensemble 4: weight models based on their historical performance
+pwt <- colMeans(outsamp_df,na.rm=T)["poll_winner_correct"]; 
+ewt <- colMeans(outsamp_df, na.rm=T)["econ_winner_correct"];
+(pwt/(pwt+ewt))*predict(mod_poll_inc, dat_2020_inc) + (ewt/(pwt+ewt))*predict(mod_econ_inc, dat_2020_inc)
+(pwt/(pwt+ewt))*predict(mod_poll_chl, dat_2020_chl) + (ewt/(pwt+ewt))*predict(mod_econ_chl, dat_2020_chl)
+
+```
+
