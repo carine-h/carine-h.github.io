@@ -138,7 +138,6 @@ dat_2018 <- demog %>%
 # joining demographics
 real_2020_change <- bind_rows(dat_2018, dat_2020)
 
-
 # calculating percent changes in available demographic groups
 ## I used 0 percent change with populations that lacked demographic data (age and gender)
 real_2020 <- real_2020_change %>%
