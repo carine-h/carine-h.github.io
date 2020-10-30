@@ -16,6 +16,7 @@ library(gt)
 library(readr)
 library(reshape2)
 library(statebins)
+library(jtools)
 
 
 knitr::opts_chunk$set(echo = TRUE)
@@ -31,6 +32,19 @@ app <- read_csv("data/approval_gallup_1941-2020.csv")
 # 538: 2020 poll averages per state 
 poll_2020_state <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/presidential_poll_averages_2020.csv")
 econ_update <- read_csv("pred_data/econ_update.csv")
+demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
+race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+
+# tidyinig electoral votes for my purposes 
+electoral <- electoral_votes %>%
+  select(X1, '2020') %>%
+  rename(state = X1) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() 
 ```
 
 
@@ -64,8 +78,7 @@ summary(fit_tfc)
 approval_df
 
 export_summs(fit_tfc, model.names = "Time-for-Change Model: \n Relationship Between Popular Vote, \n GDP Growth, Net Approval, and Incumbency")
-```
-```{r}
+
 # 2020 second-quarter GDP
 economy_df %>%
   select(year, quarter, GDP_growth_qt, RDI_growth) %>%
@@ -86,13 +99,69 @@ a <- -9.494716
 b <- -8.5 # according to Gallup in 2nd quarter
 c <- TRUE
 
-new_data <- data.frame(GDP_growth_qt = a, net_approve = b, incumbent = c)
+new_data <- data.frame(year = 2020, candidate = "Donald J. Trump", party = "republican", pv = NA, pv2p = NA, incumbent = TRUE, incumbent_pres = NA, net_approve = b, poll_enddate = NA, GDP_growth_qt = a, RDI_growth = NA, quarter = 2, color = "red")
   # - 31.4 decline 
   # net approval: -10.2
 
-predict(fit_tfc, newdata = new_data)
+new <- rbind(tfc_df, new_data)
+
+n <- new %>%
+  filter(year == 2020)
+
+predict(fit_tfc, newdata = new)
 
 # Model Predicts Trump will get 32.43% of the vote share which is almost certainly a loss 
+
+
+# IN SAMPLE: adjusted R squared is 0.62: 62% of variance is explained by the model 
+
+# OUT OF SAMPLE: 
+# creating color vector for party id 
+tfc_df$color[tfc_df$party== "republican"]="red"
+tfc_df$color[tfc_df$party== "democrat"]="blue"
+
+# plotting residuals of TFC
+plot(tfc_df$year, tfc_df$pv2p, type = "l", 
+     main = "Time-For-Change Model: \n True Popular Vote vs. Predicted Popular Vote", 
+     xlab = "Year", 
+     ylab = "Popular Vote Share",
+     ylim = c(40, 65), 
+     xlim = c(1950, 2020))
+# predicted points
+points(tfc_df$year, predict(fit_tfc, tfc_df), 
+       col = tfc_df$color)
+# legend formatting
+legend("topright", 
+       legend = c("Actual Outcomes", "Predicted Outcomes", "   Republican", "   Democrat"), 
+       col = c("black", "black", "red", "blue"), 
+       lwd=1, 
+       lty=c(1,NA,NA,NA), 
+       pch=c(NA,1,1,1), 
+       merge=FALSE, 
+       cex = 0.7)
+
+# outsample errors for tfc model
+outsamp_errors <- sapply(1:1000, function(i){
+years_outsamp <- sample(tfc_df$year, 8)
+outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
+outsamp_pred <- predict(outsamp_mod, 
+                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
+outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
+mean(outsamp_pred - outsamp_true)
+})
+
+# visualize in histogram
+hist(outsamp_errors,
+     xlab = "Out-of-Sample Residual",
+     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
+     xlim = c(-15, 15), 
+     ylim = c(0, 270))
+
+# quantify by taking the means of the outsample errors 
+mean(abs(outsamp_errors))
+```
+```{r}
+
 ```
 # Models for my weighted ensemble: 
   - polls/approval: polls AND approval rating  
@@ -127,37 +196,32 @@ new_data_poll <- poll_2020_state %>%
          state != "NE-2", 
          state != "National")
 
-poll_pred_2020 <- as.data.frame(predict(poll_fit, newdata = new_data_poll))
-rownames(poll_pred_2020) <- new_data_poll$state
-poll_pred_2020
+poll_pred_2020 <- predict(poll_fit, newdata = new_data_poll)
 # if it's greater than 50, it's Biden, if it's less, it's Trump 
+his <- tibble(state = new_data_poll$state, pred = poll_pred_2020)
+his%>%  ##`statebins` needs state to be character, not factor!
+  mutate(state = as.character(state)) %>%
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "Original 2020 Popular Vote Prediction",
+       subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
+
+his %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()
 ```
 
 
-
+# DEMOGRAPHICS
 ```{r}
 ## DEMOGRAPHIC PREDICTION
-# Data
-demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
-pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
-pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
-hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
-race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
-electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
-
-# tidyinig electoral votes for my purposes 
-electoral <- electoral_votes %>%
-  select(X1, '2020') %>%
-  rename(state = X1) %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  na.omit() 
-
-# each data set 
-demog # age, race, state, year, and count
-pvstate_df # state by state popular vote 
-pollstate_df # poll numbers 
-
 # state names and abbreviations
 pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
 pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
@@ -220,14 +284,69 @@ rownames(demog_2020_change) <- demog_2020_change$state
 demog_2020_change <- demog_2020_change[state.abb, ]
 
 
-#####------------------------------------------------------#
-#####  Proposed models ####
-#####------------------------------------------------------#
-
 mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
-                         Female_change +
-                         age3045_change + age4565_change + age65_change +
-                         as.factor(region), data = dat_change)
+                         as.factor(state), data = dat_change)
+summary(mod_demog_change)
+```
+
+```{r}
+# IN SAMPLE CHECK
+  # adjusted R2 is 0.83
+
+# OUT OF SAMPLE CHECK
+# plotting residuals --- how do I do this with this model ???
+plot(dat_change$year, dat_change$D_pv2p, 
+     main = "Demographic Model: \n True Democratic Popular Vote vs. Predicted Democratic Popular Vote", 
+     xlab = "Year", 
+     ylab = "Popular Vote Share",
+     ylim = c(0, 100), 
+     xlim = c(1950, 2020))
+
+by_state <- dat_change %>%
+  group_by(year, state)
+
+predict <- do(by_state, 
+   as.data.frame(predict(mod_demog_change, dat_change))) %>%
+  ungroup()
+
+predict <- group_by(state) %>%
+  summarise(pred = mean('predict(mod_demog_change, dat_change)'))
+
+as.data.frame(predict(mod_demog_change, dat_change))
+# predicted points
+points(dat_change$year, predict(mod_demog_change, dat_change))
+# legend formatting
+legend("topright", 
+       legend = c("Actual Outcomes", "Predicted Outcomes", "   Republican", "   Democrat"), 
+       col = c("black", "black", "red", "blue"), 
+       lwd=1, 
+       lty=c(1,NA,NA,NA), 
+       pch=c(NA,1,1,1), 
+       merge=FALSE, 
+       cex = 0.7)
+
+# outsample errors for tfc model
+outsamp_errors <- sapply(1:1000, function(i){
+years_outsamp <- sample(tfc_df$year, 8)
+outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
+outsamp_pred <- predict(outsamp_mod, 
+                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
+outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
+mean(outsamp_pred - outsamp_true)
+})
+
+# visualize in histogram
+hist(outsamp_errors,
+     xlab = "Out-of-Sample Residual",
+     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
+     xlim = c(-15, 15), 
+     ylim = c(0, 270))
+
+# quantify by taking the means of the outsample errors 
+mean(abs(outsamp_errors))
+
+
+# PREDICTION
 # updated demographics
 dat_2020 <- race_2020 %>%
   left_join(hispanic_2020, by = "State") %>%
@@ -274,15 +393,25 @@ real_2020 <- real_2020[state.abb, ]
 real_2020$region <- state.division[match(real_2020$state, state.abb)]
 
 # prediction using actual 2020 data
-demo_pred_2020 <- as.data.frame(predict(mod_demog_change, newdata = real_2020))
+demo_pred_2020 <- tibble(pred= predict(mod_demog_change, newdata = real_2020), state = real_2020$state)
 
-demo_pred_2020 <- demo_pred_2020 %>%
-  mutate(state = rownames(demo_pred_2020))
+demo_pred_2020 %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()
 ```
+
+
+
+
+
 
 # Fundamentals Model: Modified time for change
 - I'm going to use 2nd and 3rd quarter data from 
 ```{r}
+# HOW DO I APPLY TO STATE?
+
+
 tfc_df <- popvote_df %>%
   filter(incumbent_party) %>%
   select(year, candidate, party, pv, pv2p, incumbent) %>%
