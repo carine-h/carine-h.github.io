@@ -18,8 +18,8 @@ library(reshape2)
 library(statebins)
 library(jtools)
 
-
 knitr::opts_chunk$set(echo = TRUE)
+
 popvote_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
 # 538
 pvstate_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
@@ -157,42 +157,52 @@ hist(outsamp_errors,
 # quantify by taking the means of the outsample errors 
 mean(abs(outsamp_errors))
 ```
-# Models for my weighted ensemble: 
-  - polls/approval: polls AND approval rating  
-  - economic: jobs, UE, GDP
+
+# MY MODELS
+#@ Models for my weighted ensemble: 
+  - polls
+  - economy/incumbency
   - demographic: already done
-  - something for COVID?
-  - incumbent
 
 ## POLLS 
 Using polls from 3 weeks out and predicted with 2020 average polls in each state from 10/8 to today (also three weeks)
 ```{r}
-dat <- state_pv_df %>% 
+dat <- state_pv_df %>%
+  filter(state != "District of Columbia") %>% 
   full_join(poll_state_df %>% 
-              filter(weeks_left == 3) %>% 
+              filter(weeks_left <= 10) %>% 
               group_by(year,party,state) %>% 
               summarise(avg_poll=mean(avg_poll)),
-            by = c("year" ,"state")) 
+            by = c("year" ,"state")) %>%
+   filter(state != "District of Columbia", 
+         state != "ME-1", 
+         state != "ME-2",
+         state != "NE-1", 
+         state != "NE-2",
+         state != "NE-3",
+         state != "National") 
+
 ## model 
 fit_state_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat)
 
 ## prediction : take the average for each state
     # average of three weeks ago: October 8
 new_data_poll <- poll_2020_state %>%
+  filter(state != "District of Columbia", 
+         state != "ME-1", 
+         state != "ME-2",
+         state != "NE-1", 
+         state != "NE-2", 
+         state != "National") %>%
   mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
   filter(date >= as.Date("2020-10-08")) %>%
   rename(year = cycle) %>%
   group_by(state) %>%
-  summarize(avg_poll = mean(pct_estimate)) %>%
-  filter(state != "ME-1", 
-         state != "ME-2",
-         state != "NE-1", 
-         state != "NE-2", 
-         state != "National") 
+  summarize(avg_poll = mean(pct_estimate)) 
 
-pred_2020 <- predict(poll_fit, newdata = new_data_poll)
+pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
 # if it's greater than 50, it's Biden, if it's less, it's Trump 
-poll_pred_2020 <- tibble(state = new_data_poll$state, pred = poll_pred_2020)
+poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
 his%>%  ##`statebins` needs state to be character, not factor!
   mutate(state = as.character(state)) %>%
   ggplot(aes(state = state, fill = (pred >= 50))) +
@@ -204,7 +214,6 @@ his%>%  ##`statebins` needs state to be character, not factor!
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
-
 
 his %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
@@ -281,8 +290,6 @@ mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
                          as.factor(state), data = dat_change)
 
 summary(mod_demog_change)
-
-
 
 # 2020 NEW DATA
 # updated demographics
@@ -373,18 +380,109 @@ econ_pred <- predict(econ_fit, newdata = new_data_econ)
 ```
 
 
+# ENSEMBLE
 ```{r}
+ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
+ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state)
 
-  # - 31.4 decline 
-  # net approval: -10.2
+ensemble_tibble %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographics**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
 
-
-
-0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
  # now make equal lengths 
  # change state names
  # do predictions and fits
+
+
+# diff weights
+ensemble <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
+ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state)
+
+ensemble_tibble %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographics**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
+
 ```
+
+# CHECKING FIT
+```{r}
+library(modelr)
+summary(dat)
+summary(dat_change)
+summary(q3_econ)
+# predict using up to 2016 data
+in_sample_poll <- predict(fit_state_poll, newdata = dat)
+in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
+in_sample_econ <- predict(econ_fit, newdata = q3_econ)
+
+# predictions
+df_poll <- dat %>%
+  select(state, year, avg_poll)%>% 
+  add_predictions(fit_state_poll) %>%
+  mutate(state = state.abb[match(state,state.name)])%>%
+  mutate(pollpred = 0.5*pred)
+df_demo <- dat_change %>%
+  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
+  add_predictions(mod_demog_change) %>%
+  mutate(demopred = 0.25*pred)
+df_econ <- q3_econ %>%
+  select(state, year, gdp_growth, incumbent)%>% 
+  add_predictions(econ_fit) %>%
+  mutate(econpred = 0.25*pred)
+
+df_demo%>%
+left_join(df_poll, by = c("state", "year")) %>%
+left_join(df_econ, by = c("state", "year")) %>%
+mutate(weighted_pred = pollpred + demopred + econpred) %>%
+select(state, year, weighted_pred) %>%
+left_join(pvstate_df, c("state", "year")) %>%
+mutate(residual = D_pv2p - weighted_pred) %>%
+select(state, year, weighted_pred, D_pv2p, residual)
+
+
+pvstate_df
+
+# multiply the predictions by their weights 
+# add them up
+# subtract from actual 
+
+```
+
+
+Model elements:
+fit_state_poll: original poll model 
+	uses dat
+pred_2020: poll prediction 
+	uses new_data_poll
+mod_demog_change: original demo model 
+	uses dat_change 
+demog_pred: demography model prediction
+	uses real_2020
+
+
+
 
 
 
@@ -500,38 +598,6 @@ polls model and demographic will have popular vote share from state
 
 
 
-
-
-
-```{r}
-#####------------------------------------------------------#
-#####  Describe data ####
-#####------------------------------------------------------#
-
-## Bivariate correlations:
-## do unemployment increases correlate with incumbent punishment?
-cor(pvstate_local$Unemployed_up, pvstate_local$state_incwin, use="pairwise")
-cor(pvstate_local$Unemployed_up, pvstate_local$state_incpv2p, use="pairwise")
-
-## Bivariate correlations *by party*:
-## is the above stronger for incumbents of one party than another?
-{
-par(mfrow=c(2,1))
-plot(pvstate_local$Unemployed_up[pvstate_local$incparty == "republican"], 
-     pvstate_local$state_incpv2p[pvstate_local$incparty == "republican"],
-     main = "When Republicans Are\nthe Incumbent Party...",
-     xlab="unemployment % increase", ylab="two-party vote-share")
-plot(pvstate_local$Unemployed_up[pvstate_local$incparty == "democrat"], 
-     pvstate_local$state_incpv2p[pvstate_local$incparty == "democrat"],
-     main = "When Democrats Are\nthe Incumbent Party...",
-     xlab="unemployment % increase", ylab="two-party vote-share")
-}
-
-cor(pvstate_local$Unemployed_up[pvstate_local$incparty == "republican"], 
-    pvstate_local$state_incpv2p[pvstate_local$incparty == "republican"], use="pairwise")
-cor(pvstate_local$Unemployed_up[pvstate_local$incparty == "democrat"], 
-    pvstate_local$state_incpv2p[pvstate_local$incparty == "democrat"], use="pairwise")
-```
 
 
 ```{r}
