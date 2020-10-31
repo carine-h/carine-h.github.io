@@ -103,12 +103,9 @@ new_data <- data.frame(year = 2020, candidate = "Donald J. Trump", party = "repu
   # - 31.4 decline 
   # net approval: -10.2
 
-new <- rbind(tfc_df, new_data)
 
-n <- new %>%
-  filter(year == 2020)
 
-predict(fit_tfc, newdata = new)
+predict(fit_tfc, newdata = new_data)
 
 # Model Predicts Trump will get 32.43% of the vote share which is almost certainly a loss 
 
@@ -160,9 +157,6 @@ hist(outsamp_errors,
 # quantify by taking the means of the outsample errors 
 mean(abs(outsamp_errors))
 ```
-```{r}
-
-```
 # Models for my weighted ensemble: 
   - polls/approval: polls AND approval rating  
   - economic: jobs, UE, GDP
@@ -170,7 +164,7 @@ mean(abs(outsamp_errors))
   - something for COVID?
   - incumbent
 
-## Poll predictions 
+## POLLS 
 Using polls from 3 weeks out and predicted with 2020 average polls in each state from 10/8 to today (also three weeks)
 ```{r}
 dat <- state_pv_df %>% 
@@ -180,7 +174,7 @@ dat <- state_pv_df %>%
               summarise(avg_poll=mean(avg_poll)),
             by = c("year" ,"state")) 
 ## model 
-fit_state_poll <- lm(D_pv2p ~ avg_poll + state, data = dat)
+fit_state_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat)
 
 ## prediction : take the average for each state
     # average of three weeks ago: October 8
@@ -194,11 +188,11 @@ new_data_poll <- poll_2020_state %>%
          state != "ME-2",
          state != "NE-1", 
          state != "NE-2", 
-         state != "National")
+         state != "National") 
 
-poll_pred_2020 <- predict(poll_fit, newdata = new_data_poll)
+pred_2020 <- predict(poll_fit, newdata = new_data_poll)
 # if it's greater than 50, it's Biden, if it's less, it's Trump 
-his <- tibble(state = new_data_poll$state, pred = poll_pred_2020)
+poll_pred_2020 <- tibble(state = new_data_poll$state, pred = poll_pred_2020)
 his%>%  ##`statebins` needs state to be character, not factor!
   mutate(state = as.character(state)) %>%
   ggplot(aes(state = state, fill = (pred >= 50))) +
@@ -221,7 +215,6 @@ his %>%
 
 # DEMOGRAPHICS
 ```{r}
-## DEMOGRAPHIC PREDICTION
 # state names and abbreviations
 pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
 pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
@@ -286,67 +279,12 @@ demog_2020_change <- demog_2020_change[state.abb, ]
 
 mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
                          as.factor(state), data = dat_change)
+
 summary(mod_demog_change)
-```
-
-```{r}
-# IN SAMPLE CHECK
-  # adjusted R2 is 0.83
-
-# OUT OF SAMPLE CHECK
-# plotting residuals --- how do I do this with this model ???
-plot(dat_change$year, dat_change$D_pv2p, 
-     main = "Demographic Model: \n True Democratic Popular Vote vs. Predicted Democratic Popular Vote", 
-     xlab = "Year", 
-     ylab = "Popular Vote Share",
-     ylim = c(0, 100), 
-     xlim = c(1950, 2020))
-
-by_state <- dat_change %>%
-  group_by(year, state)
-
-predict <- do(by_state, 
-   as.data.frame(predict(mod_demog_change, dat_change))) %>%
-  ungroup()
-
-predict <- group_by(state) %>%
-  summarise(pred = mean('predict(mod_demog_change, dat_change)'))
-
-as.data.frame(predict(mod_demog_change, dat_change))
-# predicted points
-points(dat_change$year, predict(mod_demog_change, dat_change))
-# legend formatting
-legend("topright", 
-       legend = c("Actual Outcomes", "Predicted Outcomes", "   Republican", "   Democrat"), 
-       col = c("black", "black", "red", "blue"), 
-       lwd=1, 
-       lty=c(1,NA,NA,NA), 
-       pch=c(NA,1,1,1), 
-       merge=FALSE, 
-       cex = 0.7)
-
-# outsample errors for tfc model
-outsamp_errors <- sapply(1:1000, function(i){
-years_outsamp <- sample(tfc_df$year, 8)
-outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
-outsamp_pred <- predict(outsamp_mod, 
-                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
-outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
-mean(outsamp_pred - outsamp_true)
-})
-
-# visualize in histogram
-hist(outsamp_errors,
-     xlab = "Out-of-Sample Residual",
-     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
-     xlim = c(-15, 15), 
-     ylim = c(0, 270))
-
-# quantify by taking the means of the outsample errors 
-mean(abs(outsamp_errors))
 
 
-# PREDICTION
+
+# 2020 NEW DATA
 # updated demographics
 dat_2020 <- race_2020 %>%
   left_join(hispanic_2020, by = "State") %>%
@@ -354,9 +292,8 @@ dat_2020 <- race_2020 %>%
          state = State, 
          White = 100*WhitePerc, 
          Asian = 100*AsianPerc, 
-         Black = 100*BlackPerc, 
-         Indigenous = 100*NativePerc) %>%
-  select(state, Hispanic, White, Asian, Black, Indigenous) %>%
+         Black = 100*BlackPerc) %>%
+  select(state, Hispanic, White, Asian, Black) %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   na.omit() %>%
   mutate(year = 2020)
@@ -368,7 +305,6 @@ dat_2018 <- demog %>%
 # joining demographics
 real_2020_change <- bind_rows(dat_2018, dat_2020)
 
-
 # calculating percent changes in available demographic groups
 ## I used 0 percent change with populations that lacked demographic data (age and gender)
 real_2020 <- real_2020_change %>%
@@ -377,7 +313,7 @@ real_2020 <- real_2020_change %>%
   mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
          Black_change = Black - lag(Black, order_by = year),
          Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         Indigenous_change = 0,
          White_change = White - lag(White, order_by = year),
          Female_change = 0,
          Male_change = 0,
@@ -392,66 +328,64 @@ rownames(real_2020) <- real_2020$state
 real_2020 <- real_2020[state.abb, ]
 real_2020$region <- state.division[match(real_2020$state, state.abb)]
 
-# prediction using actual 2020 data
-demo_pred_2020 <- tibble(pred= predict(mod_demog_change, newdata = real_2020), state = real_2020$state)
+# predict
+demog_pred <- predict(mod_demog_change, newdata = real_2020)
 
-demo_pred_2020 %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  na.omit()
 ```
 
-
-
-
-
-
-# Fundamentals Model: Modified time for change
-- I'm going to use 2nd and 3rd quarter data from 
+# ECONOMICS
 ```{r}
-# HOW DO I APPLY TO STATE?
+state_gdp <- read_csv("pred_data/state_gdp_quarter.csv")
 
+# going to have to use yearly growth
+state_econ <- state_gdp %>%
+  select(GeoName, LineCode, '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
+  melt(c("GeoName", "LineCode"), value.name = "GDP") %>%
+  mutate(year = as.numeric(as.character(variable))) %>%
+  rename(state = GeoName) %>%
+  group_by(state, year) %>%
+  mutate(gdp_growth= (GDP - lag(GDP, order_by = c(year)))/lag(GDP, order_by = c(year))) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(year, LineCode, state, gdp_growth) %>%
+  filter(year %in% c(2008, 2012, 2016))
 
-tfc_df <- popvote_df %>%
-  filter(incumbent_party) %>%
-  select(year, candidate, party, pv, pv2p, incumbent) %>%
-  inner_join(
-    approval_df %>% 
-      group_by(year, president) %>% 
-      slice(1) %>% 
-      # this is a NET APPROVAL
-      mutate(net_approve=approve-disapprove) %>% 
-      select(year, incumbent_pres=president, net_approve, poll_enddate),
-    by="year"
-  ) %>%
-  inner_join(
-    econ_update %>%
-      # THIRD QUARTER GDP
-      filter(quarter == 3) %>%
-      mutate(stock_change = stock_close - stock_open) %>%
-      select(GDP_growth_qt, year, RDI_growth, quarter, unemployment, stock_change),
-    by="year") 
-
-modi_tfc_fit <- lm(pv2p ~ GDP_growth_qt + RDI_growth + unemployment + incumbent + net_approve, data = tfc_df)
+q3_econ <- pvstate_df %>%
+  left_join(state_econ, by = c("year", "state")) %>%
+  left_join(pv, by = c("year")) %>%
+  filter(LineCode == 3) %>%
+  rename("quarter" = "LineCode") %>%
+  na.omit()
+  
+econ_fit <- lm(D_pv2p ~ gdp_growth + incumbent + as.factor(state), data = q3_econ)
 summary(econ_fit)
 
+# new data
+new_data_econ <- state_econ %>%
+  select(state) %>%
+  mutate(year = 2020) %>%
+  na.omit()%>%
+  distinct(state) %>%
+  mutate(gdp_growth = 0.38, 
+         quarter = 3,
+         incumbent = TRUE)
 
-# prediction data
-econ_2020 <- econ_update %>%
-  filter(year == 2020, 
-         quarter == 3) %>%
-  select(year, GDP_growth_qt, RDI_growth, unemployment) %>%
-  mutate(incumbent = TRUE, 
-         net_approve = -8.8) # got from 538, latest
-
-predict(modi_tfc_fit, new_data = econ_2020)
-
-# how can I split this up to be Dpv2p and Rpv2p ???
-# what are all these values??/
-tfc_df
+econ_pred <- predict(econ_fit, newdata = new_data_econ)
 ```
 
-WHY do many values, WHAT about states?
+
+```{r}
+
+  # - 31.4 decline 
+  # net approval: -10.2
+
+
+
+0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
+ # now make equal lengths 
+ # change state names
+ # do predictions and fits
+```
+
 
 
 # COMPARINIG MODELS
@@ -517,8 +451,25 @@ export_summs(econ_fit)
 
 
 # Weighted Ensemble
-- I am placing the most weight on polls, then modified TFC, then demog
+- I am placing the most weight on polls, 
+- have as.factor state for each poll 
 
+in sample fit: 
+.5(poll)+.25(econ)+.25(demo)
+true value - (.5(poll)+.25(econ)+.25(demo))
+0.5predict() + 0.25predict() + .25predict()
+
+out of sample fit: 
+- exclude 2016 and then do whole process and do regression parameter without 2016
+  - predict with ensemble fit (without 2016) and make new data = 2016 data  
+- make sure new data has a column named state and states listed 
+
+There should be a column named “state”
+And ex. PA? Then your new data should have “state” column with “PA” in that column
+True value - (0.5x51 + 0.25x49 + 0.25x50)
+
+
+you could do ensemble at the electoral college level (0.5x400 + 0.25x390 + 0.25x380)
 
 
 
@@ -530,6 +481,12 @@ export_summs(econ_fit)
 - Jobs 
 - 2020 demographics 
 - predict national pop_vote
+
+polls model and demographic will have popular vote share from state 
+
+- state poll, demo, AND economic model
+- maybe add incumbency indicator to either poll or economy 
+  - find link on slack 
 
 
 
