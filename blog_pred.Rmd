@@ -26,7 +26,6 @@ library(ggplot2)
 library(statebins)
 library(stargazer)
 library(cowplot)
-library(gt)
 library(readr)
 library(reshape2)
 library(statebins)
@@ -53,6 +52,9 @@ pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_by
 hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
 race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
 electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+econ_update <- read_csv("~/Desktop/R studio/carine-h.github.io/pred_data/SAGDP1__ALL_AREAS_1997_2019.csv")
+
+
 
 # tidyinig electoral votes for my purposes 
 electoral <- electoral_votes %>%
@@ -61,6 +63,731 @@ electoral <- electoral_votes %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   na.omit() 
 ```
+
+
+# MY MODELS
+## Models for my weighted ensemble: 
+  - polls
+  - economy/incumbency
+  - demographic: already done
+
+## POLLS 
+Using polls from 3 weeks out and predicted with 2020 average polls in each state from 10/8 to today (also three weeks)
+```{r}
+dat <- state_pv_df %>%
+  filter(state != "District of Columbia") %>% 
+  full_join(poll_state_df %>% 
+              filter(weeks_left <= 10) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) %>%
+   filter(state != "District of Columbia", 
+         state != "ME-1", 
+         state != "ME-2",
+         state != "NE-1", 
+         state != "NE-2",
+         state != "NE-3",
+         state != "National", 
+         party == "democrat") 
+
+# MODEL
+fit_state_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat)
+summary(fit_state_poll)
+## prediction : take the average for each state
+    # average of three weeks ago: October 8
+new_data_poll <- poll_2020_state %>%
+  filter(candidate_name %in% c("Joseph R. Biden Jr.",  "Convention Bounce for Joseph R. Biden Jr.")) %>%
+  filter(state != "District of Columbia", 
+         state != "ME-1", 
+         state != "ME-2",
+         state != "NE-1", 
+         state != "NE-2", 
+         state != "National") %>%
+  mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
+  filter(date >= as.Date("2020-10-08")) %>%
+  rename(year = cycle) %>%
+  group_by(state) %>%
+  summarize(avg_poll = mean(pct_estimate))  ## average poll since 10/8 per state for joe biden
+
+# 2020 PREDICTION
+pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
+poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
+
+his%>%  ##`statebins` needs state to be character, not factor!
+  mutate(state = as.character(state)) %>%
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "Original 2020 Popular Vote Prediction",
+       subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+his %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()
+```
+
+
+
+# DEMOGRAPHICS
+```{r}
+demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
+race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+
+# state names and abbreviations
+pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
+pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
+
+dat <- pvstate_df %>% 
+  full_join(pollstate_df %>% 
+              filter(weeks_left == 10) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) %>%
+  left_join(demog %>%
+              select(-c("total")),
+            by = c("year" ,"state"))
+# demographics, poll numbers, and popular vote 
+
+dat$region <- state.division[match(dat$state, state.abb)]
+demog$region <- state.division[match(demog$state, state.abb)]
+
+dat_change <- dat %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year),
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  )
+
+demog_2020_change <- as.data.frame(demog_2020_change)
+rownames(demog_2020_change) <- demog_2020_change$state
+demog_2020_change <- demog_2020_change[state.abb, ]
+
+
+## MODEL
+mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         as.factor(state), data = dat_change)
+summary(mod_demog_change)
+
+# UPDATED 2020
+dat_2020 <- race_2020 %>%
+  left_join(hispanic_2020, by = "State") %>%
+  mutate(Hispanic = 100*HispanicPerc, 
+         state = State, 
+         White = 100*WhitePerc, 
+         Asian = 100*AsianPerc, 
+         Black = 100*BlackPerc) %>%
+  select(state, Hispanic, White, Asian, Black) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() %>%
+  mutate(year = 2020)
+
+# 2018 demographics
+dat_2018 <- demog %>%
+  filter(year == 2018) 
+
+# joining demographics
+real_2020_change <- bind_rows(dat_2018, dat_2020)
+
+# calculating percent changes in available demographic groups
+## I used 0 percent change with populations that lacked demographic data (age and gender)
+real_2020 <- real_2020_change %>%
+  filter(year %in% c(2018, 2020)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = 0,
+         White_change = White - lag(White, order_by = year),
+         Female_change = 0,
+         Male_change = 0,
+         age20_change = 0,
+         age3045_change = 0,
+         age4565_change = 0,
+         age65_change = 0) %>%
+  filter(year == 2020)
+
+real_2020 <- as.data.frame(real_2020)
+rownames(real_2020) <- real_2020$state
+real_2020 <- real_2020[state.abb, ]
+real_2020$region <- state.division[match(real_2020$state, state.abb)]
+
+#  2020 PREDICTION
+demog_pred <- predict(mod_demog_change, newdata = real_2020) 
+
+```
+
+
+# ECONOMICS
+```{r}
+library(readxl)
+q2_2020 <- read_excel("pred_data/q2_2020.xlsx") %>%
+  na.omit()%>%
+  mutate(state = state.abb[match(state,state.name)])
+state_gdp <- read_csv("pred_data/state_gdp_quarter.csv")
+
+econ_update
+
+# going to have to use yearly growth
+state_econ <- econ_update %>%
+  filter(Description == "Real GDP (millions of chained 2012 dollars)") %>%
+  select(GeoName, '1997', '1998', '1999','2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
+  melt(c("GeoName"), value.name = "GDP") %>%
+  mutate(year = as.numeric(as.character(variable))) %>%
+  rename(state = GeoName) %>%
+  group_by(state) %>%
+  mutate(gdp_growth= (GDP - lag(GDP, order_by = year))/lag(GDP, order_by = year)) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(year, state, gdp_growth) %>%
+  na.omit()
+  
+
+
+q3_econ <- pvstate_df %>%
+  left_join(state_econ, by = c("year", "state")) %>%
+  left_join(popvote_df, by = c("year")) %>%
+  na.omit() %>%
+  filter(party == "democrat")
+
+# MODEL
+econ_fit <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = q3_econ)
+summary(econ_fit)
+
+
+e <- econ_update %>%
+  filter(Description == "Real GDP (millions of chained 2012 dollars)") %>%
+  select(GeoName, '1997', '1998', '1999','2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
+  melt(c("GeoName"), value.name = "GDP") %>%
+  mutate(year = as.numeric(as.character(variable))) %>%
+  rename(state = GeoName) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(state, year, GDP) %>%
+  filter(year == 2018)
+
+
+gdp_2019 <- read_excel("pred_data/state_2019_gdp.xlsx")%>%
+  na.omit()%>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  mutate(year = 2019)
+
+# new data: ASSUMING SAME GDP GROWTH ACROSS STATES AS IS NATIONALLY 
+data_econ <- q2_2020 %>%
+  mutate(year = 2020) 
+
+new_data_econ <- rbind(data_econ, gdp_2019) %>%
+  mutate(incumbent = FALSE) %>%
+  group_by(state) %>%
+  mutate(gdp_growth = (GDP - lag(GDP, order_by = year))/lag(GDP, order_by = year)) %>%
+  na.omit()
+  
+
+
+
+
+# 2020 PREDICTION
+econ_pred <- predict(econ_fit, newdata = new_data_econ)
+```
+
+
+
+
+
+# PLOT of ALL MODELS
+in_sample_poll <- predict(fit_state_poll, newdata = dat)
+in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
+in_sample_econ <- predict(econ_fit, newdata = q3_econ)
+
+
+# ENSEMBLE
+```{r}
+# ensemble PREDICTION for 2020
+ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
+ensemble_tibble <- tibble(pred = ensemble, state = new_data_econ$state)
+
+# electoral vote table:
+ensemble_tibble %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**Poll-Heavy Ensemble: 2020 Electoral Vote Outcome Prediction**"), 
+               subtitle = "TRUMP Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: FiveThirtyEight*"))
+
+# electoral map table:
+plot_1 <- ensemble_tibble %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 State Prediction",
+       subtitle = "Poll-Heavy Ensemble Model",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+#Predictive Intervals: POLL Ensemble
+in_sample_poll <- predict(fit_state_poll, newdata = new_data_poll, interval = "predict") 
+in_sample_demo <- predict(mod_demog_change, newdata = real_2020, interval = "predict")
+in_sample_econ <- predict(econ_fit, newdata = new_data_econ, interval = "predict")
+
+predict_intervals <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
+  mutate(state = new_data_poll$state) %>%
+  select(state, lwr, fit, upr) %>%
+  mutate(lwr = round(lwr,  digits = 2)/100, 
+         fit = round(fit, digits = 2)/100, 
+         upr = round(upr, digits = 2)/100)%>%
+  mutate(winner =  case_when(fit > .50 ~ "Biden",
+                            fit < .50 ~ "Trump")) %>%
+  gt() %>%
+   tab_header(title = md("**Poll-Heavy Ensemble: Projected State Winners and Predictive Intervals for Democratic Vote Share Prediction**"), 
+               subtitle = "95% Confidence Intervals") %>%
+   fmt_percent(columns = c("lwr", "fit", "upr"), decimals = 1) %>%
+   cols_label(lwr = md("**Lower Bound**"),
+              fit = md("**Predicted Democratic Vote Share**"),
+              upr = md("**Upper Bound**"), 
+              state = md("**State**"), 
+              winner = md("**Predicted Winner**")) %>%
+  tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*")) 
+
+
+
+
+
+# diff weights - emphasis on fundamentals
+ensemble2 <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
+ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state)
+
+ensemble_tibble2 %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**Fundamentals-Heavy Ensemble: 2020 Electoral Vote Outcome Prediction**"), 
+               subtitle = "BIDEN Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: BEA*"))
+
+# electoral map table:
+plot_2 <- ensemble_tibble2 %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 State Prediction",
+       subtitle = "Fundamentals-Heavy Ensemble Model",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+# fundamentals predictive intervals:
+predict_intervals2 <- as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_econ) %>%
+  mutate(state = new_data_poll$state) %>%
+  select(state, lwr, fit, upr) %>%
+  mutate(lwr = round(lwr,  digits = 2)/100, 
+         fit = round(fit, digits = 2)/100, 
+         upr = round(upr, digits = 2)/100)%>%
+  mutate(winner =  case_when(fit > .50 ~ "Biden",
+                            fit < .50 ~ "Trump")) %>%
+  gt() %>%
+   tab_header(title = md("**Fundamentals-Heavy Ensemble: Projected State Winners and Predictive Intervals for Democratic Vote Share Prediction**"), 
+               subtitle = "95% Confidence Intervals") %>%
+   fmt_percent(columns = c("lwr", "fit", "upr"), decimals = 1) %>%
+   cols_label(lwr = md("**Lower Bound**"),
+              fit = md("**Predicted Democratic Vote Share**"),
+              upr = md("**Upper Bound**"), 
+              state = md("**State**"), 
+              winner = md("**Predicted Winner**")) %>%
+  tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*"))
+
+
+
+
+
+plot_ensemble <- plot_grid(plot_1, plot_2)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/ensemble_plot.png", plot_ensemble)
+
+```
+- difference when weighing fundamentals (econ and incumbency) versus polls: 
+    - Ohio, Virginia, North Carolina RED with poll-heavy
+
+
+# CHECKING FIT : can you even do this if it's different years and there are some NAs?
+## In Sample
+```{r}
+summary(dat)
+summary(dat_change)
+summary(q3_econ)
+
+# predictions
+df_poll <- dat %>%
+  select(state, year, avg_poll)%>% 
+  add_predictions(fit_state_poll) %>%
+  mutate(state = state.abb[match(state,state.name)])%>%
+  mutate(pollpred = 0.5*pred)
+df_demo <- dat_change %>%
+  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
+  add_predictions(mod_demog_change) %>%
+  mutate(demopred = 0.25*pred)
+df_econ <- q3_econ %>%
+  select(state, year, gdp_growth, incumbent)%>% 
+  add_predictions(econ_fit) %>%
+  mutate(econpred = 0.25*pred)
+
+resid <- df_demo%>%
+left_join(df_poll, by = c("state", "year")) %>%
+left_join(df_econ, by = c("state", "year")) %>%
+mutate(weighted_pred = pollpred + demopred + econpred) %>%
+select(state, year, weighted_pred) %>%
+left_join(pvstate_df, c("state", "year")) %>%
+mutate(residual = D_pv2p - weighted_pred) %>%
+select(state, year, weighted_pred, D_pv2p, residual) %>%
+mutate(numerator = residual^2,
+       denominator = (D_pv2p - mean(resid$D_pv2p, na.rm = TRUE))^2) %>%
+  filter(year >= 2008)
+
+1- (sum(resid$numerator, na.rm = TRUE)/sum(resid$denominator, na.rm = TRUE))
+
+# R-square is: 0.936
+
+
+# ALTERNATIVE MODEL PREDICTION
+
+df_poll <- dat %>%
+  select(state, year, avg_poll)%>% 
+  add_predictions(fit_state_poll) %>%
+  mutate(state = state.abb[match(state,state.name)])%>%
+  mutate(pollpred = 0.25*pred)
+df_demo <- dat_change %>%
+  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
+  add_predictions(mod_demog_change) %>%
+  mutate(demopred = 0.25*pred)
+df_econ <- q3_econ %>%
+  select(state, year, gdp_growth, incumbent)%>% 
+  add_predictions(econ_fit) %>%
+  mutate(econpred = 0.5*pred)
+
+resid <- df_demo%>%
+left_join(df_poll, by = c("state", "year")) %>%
+left_join(df_econ, by = c("state", "year")) %>%
+mutate(weighted_pred = pollpred + demopred + econpred) %>%
+select(state, year, weighted_pred) %>%
+left_join(pvstate_df, c("state", "year")) %>%
+mutate(residual = D_pv2p - weighted_pred) %>%
+select(state, year, weighted_pred, D_pv2p, residual) %>%
+mutate(numerator = residual^2,
+       denominator = (D_pv2p - mean(resid$D_pv2p, na.rm = TRUE))^2) %>%
+  filter(year >= 2008)
+
+1- (sum(resid$numerator, na.rm = TRUE)/sum(resid$denominator, na.rm = TRUE))
+
+# R squared is 0.926
+
+```
+
+
+Model elements:
+fit_state_poll: original poll model 
+	uses dat
+pred_2020: poll prediction 
+	uses new_data_poll
+mod_demog_change: original demo model 
+	uses dat_change 
+demog_pred: demography model prediction
+	uses real_2020
+	
+	
+	
+You simply have to (1) subset out the data to leave one observation out (ex. 2016)  when you estimate the regression coefficients of each model, (2) run regression and estimate the coefficients for each model, (3) do the prediction using each model with the left out data (ex. 2016) as newdata, (4) do ensemble of that prediction, and (5) compare it with the true value for ex. 2016.
+	
+## Out of Sample -- can you even do this if it's different years????
+```{r}
+
+
+true <- dat_change %>%
+  left_join(df_econ, by = c("state", "year")) %>%
+  filter(year == 2016) %>%
+  select(year, state, D_pv2p) %>%
+  distinct() %>%
+  na.omit()
+
+
+all_years <- seq(from=1998, to=2016, by=4)
+outsamp_dflist <- lapply(all_years, function(year){
+ 
+  true_inc <- true
+
+  ##fundamental model out-of-sample prediction
+  fit_out_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat[dat$year != 2016,])
+  fit_out_demo <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         as.factor(state), data = dat_change[dat_change$year != 2016,])
+  fit_out_econ <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = q3_econ[q3_econ$year != 2016,])
+
+  mod_poll <- 0.5*predict(fit_out_poll, dat[dat$year == 2016,])
+  mod_demog <- 0.25*predict(fit_out_demo, dat_change[dat_change$year == 2016,])
+  mod_econ <- 0.25*predict(fit_out_econ, q3_econ[q3_econ$year == 2016,])
+
+  cbind.data.frame(2016,
+        poll_margin_error = mod_poll - true$D_pv2p,
+        demo_margin_error = mod_demog - true$D_pv2p,
+        econ_margin_error = mod_econ - true$D_pv2p,
+        
+        poll_winner_correct = (mod_poll > 50) == (true$D_pv2p > 50),
+        demo_winner_correct = (mod_demog > 50) == (true$D_pv2p > 50),
+        econ_winner_correct = (mod_econ > 50) == (true$D_pv2p > 50)
+  )
+})
+outsamp_df <- do.call(rbind, outsamp_dflist) #
+colMeans(abs(outsamp_df[2:4]), na.rm=T) #
+colMeans(outsamp_df[5:7], na.rm=T) ### classification accuracy
+
+outsamp_df[,c("year","econ_winner_correct","poll_winner_correct","plus_winner_correct")] #
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+summary(dat)
+summary(dat_change)
+summary(q3_econ)
+
+# took 2016 out of the data: 
+out_poll <- dat %>%
+  filter(year != 2016)
+out_demo <- dat_change %>%
+  filter(year != 2016)
+out_econ <- q3_econ %>%
+  filter(year != 2016)
+
+# running regressions without 2016: 
+fit_out_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = out_poll)
+fit_out_demo <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         as.factor(state), data = out_demo)
+fit_out_econ <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = out_econ)
+
+# predict without 2016
+predict(fit_out_poll, newdata = out_poll)
+predict(fit_out_demo, newdata = out_demo)
+predict(fit_out_econ, newdata = out_econ)
+
+
+
+
+
+
+
+outsamp_errors <- sapply(1:1000, function(i){
+years_outsamp <- sample(tfc_df$year, 8)
+outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
+outsamp_pred <- predict(outsamp_mod, 
+                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
+outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
+mean(outsamp_pred - outsamp_true)
+})
+
+# visualize in histogram
+hist(outsamp_errors,
+     xlab = "Out-of-Sample Residual",
+     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
+     xlim = c(-15, 15), 
+     ylim = c(0, 270))
+
+# quantify by taking the means of the outsample errors 
+mean(abs(outsamp_errors))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+outsamp_errors <- sapply(1:1000, function(i){
+  # years to omit
+years_outsamp <- seq(from=2008, to=2016, by=4)
+omit_data <- data[!(data$year %in% years_outsamp),]
+
+# outsample years in each model
+outsamp_mod_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), omit_data)
+outsamp_mod_demog <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change + 
+    as.factor(state), omit_data)
+outsamp_mod_econ <- lm(D_pv2p ~ gdp_growth + incumbent, omit_data)
+
+# draw predictions from each model
+outsamp_pred_poll <- omit_data %>%
+  select(state, year, avg_poll)%>% 
+  add_predictions(outsamp_mod_poll)%>%
+  mutate(pollpred = 0.5*pred)
+outsamp_pred_demog <- omit_data %>%
+  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
+  add_predictions(outsamp_mod_demog) %>%
+  mutate(demopred = 0.25*pred)
+outsamp_pred_econ <- omit_data %>%
+  select(state, year, gdp_growth, incumbent)%>% 
+  add_predictions(outsamp_mod_econ) %>%
+  mutate(econpred = 0.25*pred)
+
+
+outsamp_pred <- 0.5*outsamp_pred_poll$pollpred + 0.25*outsamp_pred_demog$demopred + 0.25*outsamp_pred_econ$econpred
+
+# extract true value
+outsamp_true <- omit_data$D_pv2p[omit_data$year %in% years_outsamp]
+
+mean(outsamp_pred - outsamp_true, na.rm = TRUE)
+})
+
+```
+
+
+
+
+
+
+
+
+
+
+# Weighted Ensemble
+- I am placing the most weight on polls, 
+- have as.factor state for each poll 
+
+in sample fit: 
+.5(poll)+.25(econ)+.25(demo)
+true value - (.5(poll)+.25(econ)+.25(demo))
+0.5predict() + 0.25predict() + .25predict()
+
+out of sample fit: 
+- exclude 2016 and then do whole process and do regression parameter without 2016
+  - predict with ensemble fit (without 2016) and make new data = 2016 data  
+- make sure new data has a column named state and states listed 
+
+There should be a column named “state”
+And ex. PA? Then your new data should have “state” column with “PA” in that column
+True value - (0.5x51 + 0.25x49 + 0.25x50)
+
+you could do ensemble at the electoral college level (0.5x400 + 0.25x390 + 0.25x380)
+
+# Modified Time-For-Change
+- economic approval rating 
+- state AND national approval
+- GDP/RDI Growth 
+- Incumbency
+- Jobs 
+- 2020 demographics 
+- predict national pop_vote
+
+polls model and demographic will have popular vote share from state 
+
+- state poll, demo, AND economic model
+- maybe add incumbency indicator to either poll or economy 
+  - find link on slack 
+
+# DOES THIS ENSEMBLE EVEN WORK IF THERE ARE TONS OF NAs in some predictions and none in others?
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+pop <- popvote_df %>%
+  select(year, party, incumbent)
+
+summary(dat)
+
+poll_demo_model <- dat %>%
+  left_join(dat_change, by = c("year", "state")) %>%
+  filter(year >= 1992) %>%
+  select(state, year, party.x, D_pv2p.x, avg_poll.x, Asian_change, Black_change, Hispanic_change, Indigenous_change, White_change) %>%
+  rename(D_pv2p = D_pv2p.x, 
+         party = party.x, 
+         avg_poll = avg_poll.x)%>%
+  left_join(pop, by = c("year", "party")) %>%
+  select(state, year, D_pv2p,  party, incumbent, avg_poll, Asian_change, Black_change, Hispanic_change, White_change) %>%
+  filter(party == "democrat")
+
+df2<-poll_demo_model[!(poll_demo_model$Asian_change == 0.0000000),]
+
+
+model <- lm(D_pv2p ~ incumbent + avg_poll + Asian_change + Black_change + Hispanic_change + as.factor(state), data = df2)
+summary(model) 
+
+# data frame with new poll and state predictions 
+real_2020
+
+new_data_poll %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  left_join(real_2020) %>%
+  mutate(incumbent = FALSE)
+
+main_model_prediction <- predict()
+```
+
+
+
+
+
+
+
+
+
+
 
 
 # Time-For-Change Model: NATIONAL
@@ -172,527 +899,3 @@ hist(outsamp_errors,
 # quantify by taking the means of the outsample errors 
 mean(abs(outsamp_errors))
 ```
-
-# MY MODELS
-#@ Models for my weighted ensemble: 
-  - polls
-  - economy/incumbency
-  - demographic: already done
-
-## POLLS 
-Using polls from 3 weeks out and predicted with 2020 average polls in each state from 10/8 to today (also three weeks)
-```{r}
-dat <- state_pv_df %>%
-  filter(state != "District of Columbia") %>% 
-  full_join(poll_state_df %>% 
-              filter(weeks_left <= 10) %>% 
-              group_by(year,party,state) %>% 
-              summarise(avg_poll=mean(avg_poll)),
-            by = c("year" ,"state")) %>%
-   filter(state != "District of Columbia", 
-         state != "ME-1", 
-         state != "ME-2",
-         state != "NE-1", 
-         state != "NE-2",
-         state != "NE-3",
-         state != "National") 
-
-## model 
-fit_state_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat)
-
-## prediction : take the average for each state
-    # average of three weeks ago: October 8
-new_data_poll <- poll_2020_state %>%
-  filter(state != "District of Columbia", 
-         state != "ME-1", 
-         state != "ME-2",
-         state != "NE-1", 
-         state != "NE-2", 
-         state != "National") %>%
-  mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
-  filter(date >= as.Date("2020-10-08")) %>%
-  rename(year = cycle) %>%
-  group_by(state) %>%
-  summarize(avg_poll = mean(pct_estimate)) 
-
-pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
-# if it's greater than 50, it's Biden, if it's less, it's Trump 
-poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
-his%>%  ##`statebins` needs state to be character, not factor!
-  mutate(state = as.character(state)) %>%
-  ggplot(aes(state = state, fill = (pred >= 50))) +
-  geom_statebins() +
-  theme_statebins() +
-  labs(title = "Original 2020 Popular Vote Prediction",
-       subtitle = "Demographic Change Effect \n Using 2016-2018 Demographic Shifts",
-       fill = "") +
-  theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
-
-his %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  na.omit()
-```
-
-
-# DEMOGRAPHICS
-```{r}
-# state names and abbreviations
-pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
-pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
-
-dat <- pvstate_df %>% 
-  full_join(pollstate_df %>% 
-              filter(weeks_left == 10) %>% 
-              group_by(year,party,state) %>% 
-              summarise(avg_poll=mean(avg_poll)),
-            by = c("year" ,"state")) %>%
-  left_join(demog %>%
-              select(-c("total")),
-            by = c("year" ,"state"))
-# demographics, poll numbers, and popular vote 
-
-dat$region <- state.division[match(dat$state, state.abb)]
-demog$region <- state.division[match(demog$state, state.abb)]
-
-dat_change <- dat %>%
-  group_by(state) %>%
-  mutate(Asian_change = Asian - lag(Asian, order_by = year),
-         Black_change = Black - lag(Black, order_by = year),
-         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
-         White_change = White - lag(White, order_by = year),
-         Female_change = Female - lag(Female, order_by = year),
-         Male_change = Male - lag(Male, order_by = year),
-         age20_change = age20 - lag(age20, order_by = year),
-         age3045_change = age3045 - lag(age3045, order_by = year),
-         age4565_change = age4565 - lag(age4565, order_by = year),
-         age65_change = age65 - lag(age65, order_by = year)
-  )
-
-# new data for 2020
-demog_2020 <- subset(demog, year == 2018)
-demog_2020 <- as.data.frame(demog_2020)
-rownames(demog_2020) <- demog_2020$state
-demog_2020 <- demog_2020[state.abb, ] # prints regions of the US 
-
-# calculating demographic changes from 2016-2018
-demog_2020_change <- demog %>%
-  filter(year %in% c(2016, 2018)) %>%
-  group_by(state) %>%
-  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
-         Black_change = Black - lag(Black, order_by = year),
-         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
-         White_change = White - lag(White, order_by = year),
-         Female_change = Female - lag(Female, order_by = year),
-         Male_change = Male - lag(Male, order_by = year),
-         age20_change = age20 - lag(age20, order_by = year),
-         age3045_change = age3045 - lag(age3045, order_by = year),
-         age4565_change = age4565 - lag(age4565, order_by = year),
-         age65_change = age65 - lag(age65, order_by = year)
-  ) %>%
-  filter(year == 2018)
-
-demog_2020_change <- as.data.frame(demog_2020_change)
-rownames(demog_2020_change) <- demog_2020_change$state
-demog_2020_change <- demog_2020_change[state.abb, ]
-
-
-mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
-                         as.factor(state), data = dat_change)
-
-summary(mod_demog_change)
-
-# 2020 NEW DATA
-# updated demographics
-dat_2020 <- race_2020 %>%
-  left_join(hispanic_2020, by = "State") %>%
-  mutate(Hispanic = 100*HispanicPerc, 
-         state = State, 
-         White = 100*WhitePerc, 
-         Asian = 100*AsianPerc, 
-         Black = 100*BlackPerc) %>%
-  select(state, Hispanic, White, Asian, Black) %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  na.omit() %>%
-  mutate(year = 2020)
-
-# 2018 demographics
-dat_2018 <- demog %>%
-  filter(year == 2018) 
-
-# joining demographics
-real_2020_change <- bind_rows(dat_2018, dat_2020)
-
-# calculating percent changes in available demographic groups
-## I used 0 percent change with populations that lacked demographic data (age and gender)
-real_2020 <- real_2020_change %>%
-  filter(year %in% c(2018, 2020)) %>%
-  group_by(state) %>%
-  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
-         Black_change = Black - lag(Black, order_by = year),
-         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = 0,
-         White_change = White - lag(White, order_by = year),
-         Female_change = 0,
-         Male_change = 0,
-         age20_change = 0,
-         age3045_change = 0,
-         age4565_change = 0,
-         age65_change = 0) %>%
-  filter(year == 2020)
-
-real_2020 <- as.data.frame(real_2020)
-rownames(real_2020) <- real_2020$state
-real_2020 <- real_2020[state.abb, ]
-real_2020$region <- state.division[match(real_2020$state, state.abb)]
-
-# predict
-demog_pred <- predict(mod_demog_change, newdata = real_2020)
-
-`
-```
-
-
-# ECONOMICS
-```{r}
-state_gdp <- read_csv("pred_data/state_gdp_quarter.csv")
-
-# going to have to use yearly growth
-state_econ <- state_gdp %>%
-  select(GeoName, LineCode, '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
-  melt(c("GeoName", "LineCode"), value.name = "GDP") %>%
-  mutate(year = as.numeric(as.character(variable))) %>%
-  rename(state = GeoName) %>%
-  group_by(state, year) %>%
-  mutate(gdp_growth= (GDP - lag(GDP, order_by = c(year)))/lag(GDP, order_by = c(year))) %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  select(year, LineCode, state, gdp_growth) %>%
-  filter(year %in% c(2008, 2012, 2016))
-
-q3_econ <- pvstate_df %>%
-  left_join(state_econ, by = c("year", "state")) %>%
-  left_join(pv, by = c("year")) %>%
-  filter(LineCode == 3) %>%
-  rename("quarter" = "LineCode") %>%
-  na.omit()
-  
-econ_fit <- lm(D_pv2p ~ gdp_growth + incumbent + as.factor(state), data = q3_econ)
-summary(econ_fit)
-
-# new data: ASSUMING SAME GDP GROWTH ACROSS STATES AS IS NATIONALLY 
-new_data_econ <- state_econ %>%
-  select(state) %>%
-  mutate(year = 2020) %>%
-  na.omit()%>%
-  distinct(state) %>%
-  mutate(gdp_growth = 0.38, 
-         quarter = 3,
-         incumbent = TRUE)
-
-econ_pred <- predict(econ_fit, newdata = new_data_econ)
-```
-
-# PLOT of ALL MODELS
-in_sample_poll <- predict(fit_state_poll, newdata = dat)
-in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
-in_sample_econ <- predict(econ_fit, newdata = q3_econ)
-
-
-# ENSEMBLE
-```{r}
-# ensemble
-ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
-ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state)
-
-# electoral vote table:
-ensemble_tibble %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  select(state, pred) %>%
-  left_join(electoral, by = "state") %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  group_by(state_win) %>%
-  summarise(electoral_votes = sum(`2020`)) %>%
-  gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using Poll-Heavy Ensemble Prediction**"), 
-               subtitle = "Biden Wins") %>%
-   cols_label(state_win = md("**Candidate**"),
-               electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: FiveThirtyEight*"))
-
-# electoral map table:
-plot_1 <- ensemble_tibble %>% 
-  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
-  ggplot(aes(state = state, fill = (pred >= 50))) +
-  geom_statebins() +
-  theme_statebins() +
-  labs(title = "2020 State Prediction",
-       subtitle = "Poll-Heavy Ensemble Model",
-       fill = "") +
-  theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
-
-
-
-# diff weights - emphasis on fundamentals
-ensemble2 <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
-ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state)
-
-ensemble_tibble2 %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  select(state, pred) %>%
-  left_join(electoral, by = "state") %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  group_by(state_win) %>%
-  summarise(electoral_votes = sum(`2020`)) %>%
-  gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using Fundamentals-Heavy Ensemble Prediction**"), 
-               subtitle = "Biden Wins") %>%
-   cols_label(state_win = md("**Candidate**"),
-               electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: BEA*"))
-
-# electoral map table:
-plot_2 <- ensemble_tibble2 %>% 
-  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
-  ggplot(aes(state = state, fill = (pred >= 50))) +
-  geom_statebins() +
-  theme_statebins() +
-  labs(title = "2020 State Prediction",
-       subtitle = "Fundamentals-Heavy Ensemble Model",
-       fill = "") +
-  theme(legend.position = "none", 
-        plot.subtitle = element_text(size = 10, hjust = 0.5),
-        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
-
-plot_ensemble <- plot_grid(plot_1, plot_2)
-
-ggsave("~/Desktop/R studio/carine-h.github.io/images/ensemble_plot.png", plot_ensemble)
-
-```
-- difference when weighing fundamentals (econ and incumbency) versus polls: 
-    - Ohio, Virginia, North Carolina RED with poll-heavy
-
-
-# Predictive intervals
-- do you take the average of each???
-```{r}
-in_sample_poll <- predict(fit_state_poll, newdata = dat, interval = "predict")
-
-
-in_sample_demo <- predict(mod_demog_change, newdata = dat_change, interval = "predict")
-in_sample_econ <- predict(econ_fit, newdata = q3_econ, interval = "predict")
-```
-
-
-
-
-# CHECKING FIT : can you even do this if it's different years and there are some NAs?
-## In Sample
-```{r}
-summary(dat)
-summary(dat_change)
-summary(q3_econ)
-# predict using up to 2016 data
-in_sample_poll <- predict(fit_state_poll, newdata = dat)
-in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
-in_sample_econ <- predict(econ_fit, newdata = q3_econ)
-
-# predictions
-df_poll <- dat %>%
-  select(state, year, avg_poll)%>% 
-  add_predictions(fit_state_poll) %>%
-  mutate(state = state.abb[match(state,state.name)])%>%
-  mutate(pollpred = 0.5*pred)
-df_demo <- dat_change %>%
-  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
-  add_predictions(mod_demog_change) %>%
-  mutate(demopred = 0.25*pred)
-df_econ <- q3_econ %>%
-  select(state, year, gdp_growth, incumbent)%>% 
-  add_predictions(econ_fit) %>%
-  mutate(econpred = 0.25*pred)
-
-resid <- df_demo%>%
-left_join(df_poll, by = c("state", "year")) %>%
-left_join(df_econ, by = c("state", "year")) %>%
-mutate(weighted_pred = pollpred + demopred + econpred) %>%
-select(state, year, weighted_pred) %>%
-left_join(pvstate_df, c("state", "year")) %>%
-mutate(residual = D_pv2p - weighted_pred) %>%
-select(state, year, weighted_pred, D_pv2p, residual) %>%
-mutate(numerator = residual^2,
-       denominator = (D_pv2p - mean(resid$D_pv2p, na.rm = TRUE))^2)
-
-1- (sum(resid$numerator, na.rm = TRUE)/sum(resid$denominator, na.rm = TRUE))
-
-# R-square is: 0.9358748
-```
-
-
-Model elements:
-fit_state_poll: original poll model 
-	uses dat
-pred_2020: poll prediction 
-	uses new_data_poll
-mod_demog_change: original demo model 
-	uses dat_change 
-demog_pred: demography model prediction
-	uses real_2020
-	
-## Out of Sample -- can you even do this if it's different years????
-```{r}
-pv <- pvstate_df %>%
- mutate(state = state.abb[match(state,state.name)])
-  
-data <- df_poll %>%
-  left_join(df_demo, by = c("state", "year")) %>%
-  left_join(df_econ, by = c("state", "year")) %>%
-  left_join(pv, c("state", "year"))
-
-outsamp_errors <- sapply(1:1000, function(i){
-  # years to omit
-years_outsamp <- 2016
-omit_data <- data[!(data$year %in% years_outsamp),]
-
-# outsample years in each model
-outsamp_mod_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), omit_data)
-outsamp_mod_demog <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change + 
-    as.factor(state), omit_data)
-outsamp_mod_econ <- lm(D_pv2p ~ gdp_growth + incumbent, omit_data)
-
-
-# draw predictions from each model
-outsamp_pred_poll <- omit_data %>%
-  select(state, year, avg_poll)%>% 
-  add_predictions(outsamp_mod_poll)%>%
-  mutate(pollpred = 0.5*pred)
-outsamp_pred_demog <- omit_data %>%
-  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
-  add_predictions(outsamp_mod_demog) %>%
-  mutate(demopred = 0.25*pred)
-outsamp_pred_econ <- omit_data %>%
-  select(state, year, gdp_growth, incumbent)%>% 
-  add_predictions(outsamp_mod_econ) %>%
-  mutate(econpred = 0.25*pred)
-
-
-outsamp_pred <- 0.5*outsamp_pred_poll$pollpred + 0.25*outsamp_pred_demog$demopred + 0.25*outsamp_pred_econ$econpred
-
-# extract true value
-outsamp_true <- omit_data$D_pv2p[omit_data$year %in% years_outsamp]
-
-mean(outsamp_pred - outsamp_true, na.rm = TRUE)
-})
-
-```
-
-
-
-
-
-
-# COMPARINIG MODELS 
-```{r}
-# ELECTORALS
-electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
-# tidyinig electoral votes for my purposes 
-electoral <- electoral_votes %>%
-  select(X1, '2020') %>%
-  rename(state = X1) %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  na.omit() 
-
-
-#################
-# compare models
-#################  
-# POLL MODEL
-export_summs(fit_state_poll)
-
-poll_pred_2020 %>%
-  rename("pred" = "predict(poll_fit, newdata = new_data_poll)") %>%
-  mutate(state = rownames(poll_pred_2020), 
-         state = state.abb[match(state,state.name)])%>%
-  select(state, pred) %>%
-  left_join(electoral, by = "state") %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  na.omit()%>%
-  group_by(state_win) %>%
-  summarise(electoral_votes = sum(`2020`)) %>%
-  gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 3 Week Poll Model**"), 
-               subtitle = "Biden Wins") %>%
-   cols_label(state_win = md("**Candidate**"),
-               electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: World Population Review*"))
-
-# DEMOG MODEL
-export_summs(mod_demog_change)
-
-demo_pred_2020 %>%
-  rename("pred" = "predict(mod_demog_change, newdata = real_2020)") %>%
-  select(state, pred) %>%
-  left_join(electoral, by = "state") %>%
-  mutate(state_win = case_when(pred > 50 ~ "Biden",
-                            pred < 50 ~ "Trump")) %>%
-  na.omit()%>%
-  group_by(state_win) %>%
-  summarise(electoral_votes = sum(`2020`)) %>%
-  gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographic Model**"), 
-               subtitle = "Biden Wins") %>%
-   cols_label(state_win = md("**Candidate**"),
-               electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: World Population Review*"))
-
-# MODIFIED TFC
-export_summs(econ_fit)
-
-```
-
-
-
-# Weighted Ensemble
-- I am placing the most weight on polls, 
-- have as.factor state for each poll 
-
-in sample fit: 
-.5(poll)+.25(econ)+.25(demo)
-true value - (.5(poll)+.25(econ)+.25(demo))
-0.5predict() + 0.25predict() + .25predict()
-
-out of sample fit: 
-- exclude 2016 and then do whole process and do regression parameter without 2016
-  - predict with ensemble fit (without 2016) and make new data = 2016 data  
-- make sure new data has a column named state and states listed 
-
-There should be a column named “state”
-And ex. PA? Then your new data should have “state” column with “PA” in that column
-True value - (0.5x51 + 0.25x49 + 0.25x50)
-
-you could do ensemble at the electoral college level (0.5x400 + 0.25x390 + 0.25x380)
-
-# Modified Time-For-Change
-- economic approval rating 
-- state AND national approval
-- GDP/RDI Growth 
-- Incumbency
-- Jobs 
-- 2020 demographics 
-- predict national pop_vote
-
-polls model and demographic will have popular vote share from state 
-
-- state poll, demo, AND economic model
-- maybe add incumbency indicator to either poll or economy 
-  - find link on slack 
-
-# DOES THIS ENSEMBLE EVEN WORK IF THERE ARE TONS OF NAs in some predictions and none in others?
