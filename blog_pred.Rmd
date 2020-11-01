@@ -4,6 +4,20 @@ author: "Carine Hajjar"
 date: "10/28/2020"
 output: html_document
 ---
+# Assignment
+
+You should report your prediction for the national result (total Electoral College votes and, if you generated it, the national popular vote) and state-level winners and include a description of how you arrived at your prediction.  
+
+Your entry should also include the following elements (not necessarily in this order):
+(1) model formula (or procedure for obtaining prediction), 
+(2) model description and justification, 
+(3) coefficients (if using regression) and/or weights (if using ensemble), 
+(4) interpretation of coefficients and/or justification of weights, 
+(5) model validation (recommended to include both in-sample and out-of-sample performance unless it is impossible due to the characteristics of model and related data availability), 
+(6) uncertainty around prediction (e.g. predictive interval)
+(7) graphic(s) showing your prediction
+
+
 
 ```{r setup, include=FALSE}
 
@@ -17,6 +31,7 @@ library(readr)
 library(reshape2)
 library(statebins)
 library(jtools)
+library(modelr)
 
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -230,7 +245,7 @@ pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
 
 dat <- pvstate_df %>% 
   full_join(pollstate_df %>% 
-              filter(weeks_left == 3) %>% 
+              filter(weeks_left == 10) %>% 
               group_by(year,party,state) %>% 
               summarise(avg_poll=mean(avg_poll)),
             by = c("year" ,"state")) %>%
@@ -338,7 +353,9 @@ real_2020$region <- state.division[match(real_2020$state, state.abb)]
 # predict
 demog_pred <- predict(mod_demog_change, newdata = real_2020)
 
+`
 ```
+
 
 # ECONOMICS
 ```{r}
@@ -366,7 +383,7 @@ q3_econ <- pvstate_df %>%
 econ_fit <- lm(D_pv2p ~ gdp_growth + incumbent + as.factor(state), data = q3_econ)
 summary(econ_fit)
 
-# new data
+# new data: ASSUMING SAME GDP GROWTH ACROSS STATES AS IS NATIONALLY 
 new_data_econ <- state_econ %>%
   select(state) %>%
   mutate(year = 2020) %>%
@@ -379,12 +396,19 @@ new_data_econ <- state_econ %>%
 econ_pred <- predict(econ_fit, newdata = new_data_econ)
 ```
 
+# PLOT of ALL MODELS
+in_sample_poll <- predict(fit_state_poll, newdata = dat)
+in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
+in_sample_econ <- predict(econ_fit, newdata = q3_econ)
+
 
 # ENSEMBLE
 ```{r}
+# ensemble
 ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
 ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state)
 
+# electoral vote table:
 ensemble_tibble %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   select(state, pred) %>%
@@ -394,22 +418,32 @@ ensemble_tibble %>%
   group_by(state_win) %>%
   summarise(electoral_votes = sum(`2020`)) %>%
   gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographics**"), 
+  tab_header(title = md("**2020 Electoral Vote Outcome Using Poll-Heavy Ensemble Prediction**"), 
                subtitle = "Biden Wins") %>%
    cols_label(state_win = md("**Candidate**"),
                electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: World Population Review*"))
+  tab_source_note(md("*Data: FiveThirtyEight*"))
 
- # now make equal lengths 
- # change state names
- # do predictions and fits
+# electoral map table:
+plot_1 <- ensemble_tibble %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 State Prediction",
+       subtitle = "Poll-Heavy Ensemble Model",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 
-# diff weights
-ensemble <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
-ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state)
 
-ensemble_tibble %>%
+# diff weights - emphasis on fundamentals
+ensemble2 <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
+ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state)
+
+ensemble_tibble2 %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   select(state, pred) %>%
   left_join(electoral, by = "state") %>%
@@ -418,17 +452,50 @@ ensemble_tibble %>%
   group_by(state_win) %>%
   summarise(electoral_votes = sum(`2020`)) %>%
   gt() %>%
-  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographics**"), 
+  tab_header(title = md("**2020 Electoral Vote Outcome Using Fundamentals-Heavy Ensemble Prediction**"), 
                subtitle = "Biden Wins") %>%
    cols_label(state_win = md("**Candidate**"),
                electoral_votes = md("**Total Electoral Votes**")) %>%
-  tab_source_note(md("*Data: World Population Review*"))
+  tab_source_note(md("*Data: BEA*"))
+
+# electoral map table:
+plot_2 <- ensemble_tibble2 %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 State Prediction",
+       subtitle = "Fundamentals-Heavy Ensemble Model",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+plot_ensemble <- plot_grid(plot_1, plot_2)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/ensemble_plot.png", plot_ensemble)
 
 ```
+- difference when weighing fundamentals (econ and incumbency) versus polls: 
+    - Ohio, Virginia, North Carolina RED with poll-heavy
 
-# CHECKING FIT
+
+# Predictive intervals
+- do you take the average of each???
 ```{r}
-library(modelr)
+in_sample_poll <- predict(fit_state_poll, newdata = dat, interval = "predict")
+
+
+in_sample_demo <- predict(mod_demog_change, newdata = dat_change, interval = "predict")
+in_sample_econ <- predict(econ_fit, newdata = q3_econ, interval = "predict")
+```
+
+
+
+
+# CHECKING FIT : can you even do this if it's different years and there are some NAs?
+## In Sample
+```{r}
 summary(dat)
 summary(dat_change)
 summary(q3_econ)
@@ -452,22 +519,20 @@ df_econ <- q3_econ %>%
   add_predictions(econ_fit) %>%
   mutate(econpred = 0.25*pred)
 
-df_demo%>%
+resid <- df_demo%>%
 left_join(df_poll, by = c("state", "year")) %>%
 left_join(df_econ, by = c("state", "year")) %>%
 mutate(weighted_pred = pollpred + demopred + econpred) %>%
 select(state, year, weighted_pred) %>%
 left_join(pvstate_df, c("state", "year")) %>%
 mutate(residual = D_pv2p - weighted_pred) %>%
-select(state, year, weighted_pred, D_pv2p, residual)
+select(state, year, weighted_pred, D_pv2p, residual) %>%
+mutate(numerator = residual^2,
+       denominator = (D_pv2p - mean(resid$D_pv2p, na.rm = TRUE))^2)
 
+1- (sum(resid$numerator, na.rm = TRUE)/sum(resid$denominator, na.rm = TRUE))
 
-pvstate_df
-
-# multiply the predictions by their weights 
-# add them up
-# subtract from actual 
-
+# R-square is: 0.9358748
 ```
 
 
@@ -480,13 +545,60 @@ mod_demog_change: original demo model
 	uses dat_change 
 demog_pred: demography model prediction
 	uses real_2020
+	
+## Out of Sample -- can you even do this if it's different years????
+```{r}
+pv <- pvstate_df %>%
+ mutate(state = state.abb[match(state,state.name)])
+  
+data <- df_poll %>%
+  left_join(df_demo, by = c("state", "year")) %>%
+  left_join(df_econ, by = c("state", "year")) %>%
+  left_join(pv, c("state", "year"))
+
+outsamp_errors <- sapply(1:1000, function(i){
+  # years to omit
+years_outsamp <- 2016
+omit_data <- data[!(data$year %in% years_outsamp),]
+
+# outsample years in each model
+outsamp_mod_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), omit_data)
+outsamp_mod_demog <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change + 
+    as.factor(state), omit_data)
+outsamp_mod_econ <- lm(D_pv2p ~ gdp_growth + incumbent, omit_data)
+
+
+# draw predictions from each model
+outsamp_pred_poll <- omit_data %>%
+  select(state, year, avg_poll)%>% 
+  add_predictions(outsamp_mod_poll)%>%
+  mutate(pollpred = 0.5*pred)
+outsamp_pred_demog <- omit_data %>%
+  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
+  add_predictions(outsamp_mod_demog) %>%
+  mutate(demopred = 0.25*pred)
+outsamp_pred_econ <- omit_data %>%
+  select(state, year, gdp_growth, incumbent)%>% 
+  add_predictions(outsamp_mod_econ) %>%
+  mutate(econpred = 0.25*pred)
+
+
+outsamp_pred <- 0.5*outsamp_pred_poll$pollpred + 0.25*outsamp_pred_demog$demopred + 0.25*outsamp_pred_econ$econpred
+
+# extract true value
+outsamp_true <- omit_data$D_pv2p[omit_data$year %in% years_outsamp]
+
+mean(outsamp_pred - outsamp_true, na.rm = TRUE)
+})
+
+```
 
 
 
 
 
 
-# COMPARINIG MODELS
+# COMPARINIG MODELS 
 ```{r}
 # ELECTORALS
 electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
@@ -566,10 +678,7 @@ There should be a column named “state”
 And ex. PA? Then your new data should have “state” column with “PA” in that column
 True value - (0.5x51 + 0.25x49 + 0.25x50)
 
-
 you could do ensemble at the electoral college level (0.5x400 + 0.25x390 + 0.25x380)
-
-
 
 # Modified Time-For-Change
 - economic approval rating 
@@ -586,55 +695,4 @@ polls model and demographic will have popular vote share from state
 - maybe add incumbency indicator to either poll or economy 
   - find link on slack 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-#####------------------------------------------------------#
-#####  New option: Weighted Ensemble ####
-#####------------------------------------------------------#
-
-## Ensemble 1: polls and fundamentals matter equally as much
-pwt <- 0.5; ewt <- 0.5;
-pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc)
-pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl)
-
-## Ensemble 2: polls matter closer to November 
-## (what Nate Silver thinks)
-days_left <- 40
-pwt <- 1/sqrt(days_left); ewt <- 1-(1/sqrt(days_left));
-plot(100:1, 1/sqrt(100:1), xlim=c(100, 0), type="l", 
-     ylab="poll model weight", xlab="days til elxn")
-
-pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc) # adjusted poll
-pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl) # adjusted poll
-
-pwt*dat_2020_inc$avg_support + ewt*predict(mod_econ_inc, dat_2020_inc) # raw poll
-pwt*dat_2020_chl$avg_support + ewt*predict(mod_econ_chl, dat_2020_chl) # raw poll
-
-## Ensemble 3: fundamentals matter closer to November 
-## (what Gelman & King (1993) think)
-days_left <- 42
-pwt <- 1-(1/sqrt(days_left)); ewt <- 1/sqrt(days_left);
-pwt*predict(mod_poll_inc, dat_2020_inc) + ewt*predict(mod_econ_inc, dat_2020_inc)
-pwt*predict(mod_poll_chl, dat_2020_chl) + ewt*predict(mod_econ_chl, dat_2020_chl)
-
-## Ensemble 4: weight models based on their historical performance
-pwt <- colMeans(outsamp_df,na.rm=T)["poll_winner_correct"]; 
-ewt <- colMeans(outsamp_df, na.rm=T)["econ_winner_correct"];
-(pwt/(pwt+ewt))*predict(mod_poll_inc, dat_2020_inc) + (ewt/(pwt+ewt))*predict(mod_econ_inc, dat_2020_inc)
-(pwt/(pwt+ewt))*predict(mod_poll_chl, dat_2020_chl) + (ewt/(pwt+ewt))*predict(mod_econ_chl, dat_2020_chl)
-
-```
-
+# DOES THIS ENSEMBLE EVEN WORK IF THERE ARE TONS OF NAs in some predictions and none in others?
