@@ -65,23 +65,12 @@ poll <- dem_poll %>%
 
 
 
-
-
-
-
 filter(data, year == 1996 & party == “” |year == 2000 & party == “” | …)
 |
 OR
 data_inc <- filter(~~)
 mutate(data, inc = ~~~)
 filter(data, inc == TRUE)
-
-
-
-
-
-
-
 
 # Fundamentals Model: Modified time for change
 - I'm going to use 2nd and 3rd quarter data from 
