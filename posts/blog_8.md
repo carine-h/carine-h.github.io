@@ -32,15 +32,15 @@ This model uses state-by-state polls from 1972 onward to predict Democratic vote
 
 The model outcome shows that there is a positive relationship between Democratic poll numbers and the Democratic vote share across all states. Each point on the plot below represents one state and shows the overall positive relationship between the variables: 
 
-PLOT
+![](../images/one.png)
 
 When you break the model down by state and predict the 2020 electoral outcome using state poll averages since 10/8/2020, this is the predicted outcome: 
 
-MAP PLOT
+![](../images/two.png)
 
 This comes out to a Biden win with 282 electoral votes: 
 
-ELECTORALS
+![](../images/three.png)
 
 
 ### The Demographic Model 
@@ -48,11 +48,11 @@ This model uses state-by-state demographic changes in the Black, Hispanic, Asian
 
 My model predicts Democratic vote share using the annual changes in the Black, Hispanic, Asian, and White populations in each state. Using 2020 demographics, my model predicts the following outcome for 2020: 
 
-MAP PLOT 
+![](../images/four.png)
 
 In this case, Biden would win with 289 electoral votes:
 
-ELECTORALS
+![](../images/five.png)
 
 I don't want to put too much emphasis on this model, however, because demographic groups do not vote as a monolith and have changing tendencies. For instance, many have noted the Hispanics are voting more conservatively than in the past. While the model accounts for any state-based confounders by taking in to account trends in each state, it also lacks all demographic groups in the country. I just chose the major 3. Finally, there model doesn't have much data before the early 90s. While it is certainly informative, there are a few key shortcomings that make me hesitant to rely heavily on its outcomes. 
 
@@ -61,11 +61,11 @@ This model predicts state-by-state Democratic vote share using annual GDP growth
 
 This is the electoral outcome by state using GDP growth from the 2019 state-by-state average and quarter 2 state-by-state data for 2020 (could not find a year-long average): 
 
-MAP PLOT
+![](../images/six.png)
 
 With this model, Biden smokes Trump with 390 electoral votes:
 
-ELECTORALS
+![](../images/seven.png)
 
 However, like I said, it is unclear how American voters will perceive the economy in this election and how much they will blame Trump for poor outcomes due to the Covid crisis. My guess going forward is that economic matters are less of a predictive factor than in the past. 
 
@@ -76,11 +76,11 @@ I am leaning on the polls because given the uncertainty of the political moment,
 
 Using this ensemble, the predicted state outcomes map for 2020 is the following: 
 
-ELECTORAL MAP
+![](../images/eight.png)
 
 **Biden is projected to win** with **291** electoral votes. 
 
-ELECTORALS
+![](../images/nine.png)
 
 There is always, of course, some variance in the models used to predict election outcomes. This table captures the upper and lower bounds of my democratic vote share predictions for each state using a 95% confidence interval: 
 
