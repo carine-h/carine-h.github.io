@@ -458,8 +458,9 @@ tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_
               state = md("**State**"), 
               winner = md("**Predicted Winner**")) %>%
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*")) 
-
-
+             # convert to gt table
+gt::gtsave(tab1,
+    filename = "images/my_table_image.png")
 
 
 
@@ -498,7 +499,7 @@ ensemble_tibble2 %>%
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 # fundamentals predictive intervals:
-as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_econ) %>%
+tab2 <- as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_econ) %>%
   mutate(state = new_data_poll$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
@@ -517,12 +518,8 @@ as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_econ) %>
               winner = md("**Predicted Winner**")) %>%
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*"))
 
-
-
-
-
-
-
+gt::gtsave(tab2,
+    filename = "images/my_table_image2.png")
 
 ```
 - difference when weighing fundamentals (econ and incumbency) versus polls: 
@@ -542,7 +539,6 @@ summary(q3_econ)
 
 
 # ALTERNATIVE MODEL PREDICTION
-
 df_poll2 <- dat %>%
   select(state, year, avg_poll)%>% 
   add_predictions(fit_state_poll) %>%
@@ -604,8 +600,7 @@ d <- dat_change[!(dat_change$Asian_change == 0.0000000),] %>%
   na.omit()
 
 all_years <- seq(from=1998, to=2016, by=4)
-outsamp_dflist <- lapply(all_years, function(year){
- 
+
   true_inc <- true %>%
     filter(state == "FL")
 
@@ -619,154 +614,35 @@ outsamp_dflist <- lapply(all_years, function(year){
   mod_demog <- 0.25*predict(fit_out_demo, d[d$year == 2004 & d$state == "FL",])
   mod_econ <- 0.25*predict(fit_out_econ, q3_econ[q3_econ$year == 2004 & q3_econ$state == "FL",])
   
-  mod <- mod_poll + mod_demog + mod_econ
+  mod_fl <- mod_poll + mod_demog + mod_econ
   
 
-  fl_margin_error = mod - true_inc$D_pv2p
+  fl_margin_error = mod_fl - true_inc$D_pv2p
+
+  mod_poll2 <- 0.5* mean(predict(fit_out_poll, dat[dat$year == 2004 & dat$state == "AZ",]), na.rm = TRUE)
+  mod_demog2 <- 0.25*predict(fit_out_demo, d[d$year == 2004 & d$state == "AZ",])
+  mod_econ2 <- 0.25*predict(fit_out_econ, q3_econ[q3_econ$year == 2004 & q3_econ$state == "AZ",])
         
-        
-       
-        cbind(poll_winner_correct = (mod_poll > 50) == (true_inc$D_pv2p > 50),
-        demo_winner_correct = (mod_demog > 50) == (true_inc$D_pv2p > 50),
-        econ_winner_correct = (mod_econ > 50) == (true_inc$D_pv2p > 50))
+
+ true_inc_az <- true %>%
+    filter(state == "AZ")        
+mod_az <- mod_poll2 + mod_demog2 + mod_econ2
+az_margin_error = mod_az - true_inc_az$D_pv2p
   
-})
+
+  mod_poll3 <- 0.5* mean(predict(fit_out_poll, dat[dat$year == 2004 & dat$state == "AL",]), na.rm = TRUE)
+  mod_demog3 <- 0.25*predict(fit_out_demo, d[d$year == 2004 & d$state == "AL",])
+  mod_econ3 <- 0.25*predict(fit_out_econ, q3_econ[q3_econ$year == 2004 & q3_econ$state == "AL",])
+
+ true_inc_al <- true %>%
+    filter(state == "AL")  
+mod_al <- mod_poll3 + mod_demog3 + mod_econ3
+al_margin_error = mod_al - true_inc_al$D_pv2p
 
 
-
-
-sum(poll_margin_error, demo_margin_error, econ_margin_error, na.rm = T)
-
-
-outsamp_df <- do.call(rbind, outsamp_dflist) #
-colMeans(abs(outsamp_df[2:4]), na.rm=T) #
-colMeans(outsamp_df[5:7], na.rm=T) ### classification accuracy
-
-outsamp_df[,c("year","econ_winner_correct","poll_winner_correct","plus_winner_correct")] #
-
+mean(fl_margin_error, az_margin_error, al_margin_error)
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```{r, eval=FALSE}
-summary(dat)
-summary(dat_change)
-summary(q3_econ)
-
-# took 2016 out of the data: 
-out_poll <- dat %>%
-  filter(year != 2016)
-out_demo <- dat_change %>%
-  filter(year != 2016)
-out_econ <- q3_econ %>%
-  filter(year != 2016)
-
-# running regressions without 2016: 
-fit_out_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = out_poll)
-fit_out_demo <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
-                         as.factor(state), data = out_demo)
-fit_out_econ <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = out_econ)
-
-# predict without 2016
-predict(fit_out_poll, newdata = out_poll)
-predict(fit_out_demo, newdata = out_demo)
-predict(fit_out_econ, newdata = out_econ)
-
-
-
-
-
-
-
-outsamp_errors <- sapply(1:1000, function(i){
-years_outsamp <- sample(tfc_df$year, 8)
-outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
-outsamp_pred <- predict(outsamp_mod, 
-                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
-outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
-mean(outsamp_pred - outsamp_true)
-})
-
-# visualize in histogram
-hist(outsamp_errors,
-     xlab = "Out-of-Sample Residual",
-     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
-     xlim = c(-15, 15), 
-     ylim = c(0, 270))
-
-# quantify by taking the means of the outsample errors 
-mean(abs(outsamp_errors))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-outsamp_errors <- sapply(1:1000, function(i){
-  # years to omit
-years_outsamp <- seq(from=2008, to=2016, by=4)
-omit_data <- data[!(data$year %in% years_outsamp),]
-
-# outsample years in each model
-outsamp_mod_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), omit_data)
-outsamp_mod_demog <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change + 
-    as.factor(state), omit_data)
-outsamp_mod_econ <- lm(D_pv2p ~ gdp_growth + incumbent, omit_data)
-
-# draw predictions from each model
-outsamp_pred_poll <- omit_data %>%
-  select(state, year, avg_poll)%>% 
-  add_predictions(outsamp_mod_poll)%>%
-  mutate(pollpred = 0.5*pred)
-outsamp_pred_demog <- omit_data %>%
-  select(state, year, Black_change, Hispanic_change, Asian_change)%>% 
-  add_predictions(outsamp_mod_demog) %>%
-  mutate(demopred = 0.25*pred)
-outsamp_pred_econ <- omit_data %>%
-  select(state, year, gdp_growth, incumbent)%>% 
-  add_predictions(outsamp_mod_econ) %>%
-  mutate(econpred = 0.25*pred)
-
-
-outsamp_pred <- 0.5*outsamp_pred_poll$pollpred + 0.25*outsamp_pred_demog$demopred + 0.25*outsamp_pred_econ$econpred
-
-# extract true value
-outsamp_true <- omit_data$D_pv2p[omit_data$year %in% years_outsamp]
-
-mean(outsamp_pred - outsamp_true, na.rm = TRUE)
-})
-
-```
-
-
-
-
-
-
-
 
 
 
@@ -804,18 +680,6 @@ polls model and demographic will have popular vote share from state
 - state poll, demo, AND economic model
 - maybe add incumbency indicator to either poll or economy 
   - find link on slack 
-
-# DOES THIS ENSEMBLE EVEN WORK IF THERE ARE TONS OF NAs in some predictions and none in others?
-
-
-
-
-
-
-
-
-
-
 
 
 ```{r, eval = FALSE}
@@ -955,8 +819,8 @@ legend("topright",
 # outsample errors for tfc model
 outsamp_errors <- sapply(1:1000, function(i){
 years_outsamp <- sample(tfc_df$year, 8)
-outsamp_mod <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
-outsamp_pred <- predict(outsamp_mod, 
+ <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
+outsamp_pred <- predict(, 
                         newdata = tfc_df[tfc_df$year %in% years_outsamp,])
 outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
 mean(outsamp_pred - outsamp_true)
@@ -971,4 +835,5 @@ hist(outsamp_errors,
 
 # quantify by taking the means of the outsample errors 
 mean(abs(outsamp_errors))
+
 ```
