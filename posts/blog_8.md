@@ -13,7 +13,7 @@ In the end, I create two models:
 But first, a quick look at Abramowitz's famous time-for-change model and my reasons for why it will not work in 2020. 
 
 ## Time-For-Change
-Back in blog X I assessed TFC predictive power for national elections. Usually it does quite well:
+Back in blog 4 I assessed TFC predictive power for national elections. Usually it does quite well:
 
 It even successfully predicted 2016!
 
@@ -39,7 +39,6 @@ When you break the model down by state and predict the 2020 electoral outcome us
 ![](../images/two.png)
 
 This comes out to a Biden win with 338 electoral votes: 
-
 
 ![](../images/three.png)
 
@@ -79,7 +78,9 @@ Using this ensemble, the predicted state outcomes map for 2020 is the following:
 
 ![](../images/eight.png)
 
-**Biden is projected to win** with **275** electoral votes. 
+Biden takes home most key battleground states: Pennsylvania, Georgia, Iowa, North Carolina, Florida, and Arizona. Democrats also win Texas (however there is quite a bit of variance on this outcome, see the intervals table below). I would suspect that the major growth in Hispanic voters in Texas is driving this prediction in the ensemble, drawing on the demographic model.
+
+**Biden is projected to win** with **372** electoral votes. 
 
 ![](../images/nine.png)
 
@@ -87,6 +88,7 @@ There is always, of course, some variance in the models used to predict election
 
 ![](../images/my_table_image.png)
 
+### Checking my Model
 I also wanted to consider the in-sample fit of the model. Essentially, how well does this model account for variance? I find the R-squared value to be **94.5%** which means the model describes 93.6% of the error. The other ~6% is random error that the model does not account for. Of course, over-fitting is a possibility, but overall, this high R-squared indicates that the model is a close fit to reality (it's predicted outcomes in the past fit the actual outcomes quite closely). 
 
 I went on to consider the out of sample fit of my ensemble. Since I am using data across states over multiple years, it was tricky to find states that had consistent data each year in each state to compare out of sample predictions across models. What I ended up doing was starting with Florida, a swing state and key 2020 battleground state. I omitted 2004 from my ensemble, ran the model, and used the model outcome to predict Florida's outcome in 2004. When I compared this to the actual outcome, the out of sample prediction was only 0.77 democratic vote share points off. 
@@ -120,10 +122,10 @@ The second ensemble also has a slightly lower R-squared value (93.6%). Again, wi
 
 ## What to Expect on November 3rd
 According to my ensemble of choice, look for the following on election day: 
-- Biden wins with 275 electoral votes 
-- Trump gets 260
-- Biden bags Pennsylvania, Ohia, Iowa, and Arizona - all critical batteleground states
-- Trump takes home Florida and North Carolina
+- Biden wins with 372 electoral votes 
+- Trump gets 163
+- Biden bags Pennsylvania, Georgia, Iowa, North Carolina, Florida, and Arizona - all critical [battleground states](https://www.cbsnews.com/news/2020-presidential-election-battleground-states-to-watch/). 
+- Republicans could lose Texas 
 
 
 
