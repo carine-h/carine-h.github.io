@@ -2,7 +2,9 @@
 title: "blog_pred"
 author: "Carine Hajjar"
 date: "10/28/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 # Assignment
 
@@ -438,7 +440,7 @@ in_sample_poll <- predict(fit_state_poll, newdata = new_data_poll, interval = "p
 in_sample_demo <- predict(mod_demog_change, newdata = real_2020, interval = "predict")
 in_sample_econ <- predict(econ_fit, newdata = new_data_econ, interval = "predict")
 
-as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
+tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
   mutate(state = new_data_poll$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
@@ -456,6 +458,8 @@ as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>
               state = md("**State**"), 
               winner = md("**Predicted Winner**")) %>%
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*")) 
+
+
 
 
 

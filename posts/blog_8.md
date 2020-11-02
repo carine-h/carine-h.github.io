@@ -84,7 +84,7 @@ Using this ensemble, the predicted state outcomes map for 2020 is the following:
 
 There is always, of course, some variance in the models used to predict election outcomes. This table captures the upper and lower bounds of my democratic vote share predictions for each state using a 95% confidence interval: 
 
-TABLE
+![](../images/my_table_image.png)
 
 I also wanted to consider the in-sample fit of the model. Essentially, how well does this model account for variance? I find the R-squared value to be **94.5%** which means the model describes 93.6% of the error. The other ~6% is random error that the model does not account for. Of course, over-fitting is a possibility, but overall, this high R-squared indicates that the model is a close fit to reality (it's predicted outcomes in the past fit the actual outcomes quite closely). 
 
@@ -95,15 +95,15 @@ This ensemble will especially take into accound the economic downturn caused by 
 
 The fundamentals-heavy ensemble predicts the following state-to-state outcome: 
 
-MAP
+![](../images/twelve.png)
 
 Biden wins with a whopping **421 electoral votes**. 
 
-ELECTORALS
+![](../images/thirteen.png)
 
 This table breaks down the projected state-by-state democratic vote share and it's upper and lower bound (95% confidence interval) prediction: 
 
-TABLE 
+![](../images/my_table_image2.png)
 
 Interestingly, some states, like Idaho, Nevada, and Utah go from blue in the poll-heavy ensemble to red in the economic-heavy ensemble. Perhaps these states have not been as impacted by the Covid economic downturn and have better economic outcomes than the rest of the country. This would make sense given that they did not have major state-wide shut downs like Massachussetts or New York, allowing their economy to avoid massive shocks. 
 
