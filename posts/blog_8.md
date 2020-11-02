@@ -38,7 +38,7 @@ When you break the model down by state and predict the 2020 electoral outcome us
 
 ![](../images/two.png)
 
-This comes out to a Biden win with 282 electoral votes: 
+This comes out to a Biden win with 338 electoral votes: 
 
 
 ![](../images/three.png)
@@ -51,7 +51,7 @@ My model predicts Democratic vote share using the annual changes in the Black, H
 
 ![](../images/four.png)
 
-In this case, Biden would win with 289 electoral votes:
+In this case, Biden would win with 292 electoral votes:
 
 ![](../images/five.png)
 
@@ -102,7 +102,7 @@ The fundamentals-heavy ensemble predicts the following state-to-state outcome:
 
 ![](../images/ten.png)
 
-Biden wins with a whopping **421 electoral votes**. 
+Biden wins with a whopping **403 electoral votes**. 
 
 ![](../images/eleven.png)
 
