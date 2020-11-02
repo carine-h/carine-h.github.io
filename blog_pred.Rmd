@@ -1,7 +1,6 @@
 ---
 title: "blog_pred"
 author: "Carine Hajjar"
-date: "10/28/2020"
 output:
   pdf_document: default
   html_document: default
@@ -114,16 +113,13 @@ new_data_poll <- poll_2020_state %>%
 plot(dat$avg_poll, dat$D_pv2p,
          main="Overall Relationship Between Vote Share and Polls", xlab="Average Poll for Democratic Candidate", ylab="Democratic Vote Share")
     abline(lm(dat$D_pv2p ~ dat$avg_poll, data = dat)) 
-    
-
-
 
 
 # 2020 PREDICTION
 pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
 poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
 
-poll_pred_2020 %>%  ##`statebins` needs state to be character, not factor!
+p2 <- poll_pred_2020 %>%  ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
   theme_statebins() +
@@ -135,8 +131,10 @@ poll_pred_2020 %>%  ##`statebins` needs state to be character, not factor!
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
+ggsave("~/Desktop/R studio/carine-h.github.io/images/two.png", p2)
 
-poll_pred_2020  %>%
+
+p3 <- poll_pred_2020  %>%
   select(state, pred) %>%
   mutate(state =  state.abb[match(state,state.name)]) %>%
   left_join(electoral, by = "state") %>%
@@ -151,8 +149,8 @@ poll_pred_2020  %>%
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: FiveThirtyEight*")) 
 
-
-
+gt::gtsave(p3,
+    filename = "images/three.png")
 
 ```
 
@@ -258,7 +256,7 @@ d <- tibble(demog_pred) %>%
   mutate(state = real_2020$state)
 
 
- d%>%  ##`statebins` needs state to be character, not factor!
+ p4 <- d%>%  ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (demog_pred >= 50))) +
   geom_statebins() +
   theme_statebins() +
@@ -269,9 +267,11 @@ d <- tibble(demog_pred) %>%
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+ 
+ ggsave("~/Desktop/R studio/carine-h.github.io/images/four.png", p4)
 
  
-d %>%
+p5 <- d %>%
   select(state, demog_pred) %>%
   left_join(electoral, by = "state") %>%
   mutate(state_win = case_when(demog_pred > 50 ~ "Biden",
@@ -284,6 +284,9 @@ d %>%
    cols_label(state_win = md("**Candidate**"),
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: World Population Review*")) 
+
+p5 <- gt::gtsave(p5,
+    filename = "images/five.png")
  
 
 ```
@@ -357,7 +360,7 @@ econ_pred <- predict(econ_fit, newdata = new_data_econ)
 
 e2 <- tibble(pred = predict(econ_fit, newdata = new_data_econ), state = new_data_econ$state)
 
-e2 %>%  ##`statebins` needs state to be character, not factor!
+p6 <- e2 %>%  ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
   theme_statebins() +
@@ -369,10 +372,11 @@ e2 %>%  ##`statebins` needs state to be character, not factor!
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
+ ggsave("~/Desktop/R studio/carine-h.github.io/images/six.png", p6)
 
 
 
-e2  %>%
+p7 <- e2  %>%
   select(state, pred) %>%
   left_join(electoral, by = "state") %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
@@ -386,6 +390,8 @@ e2  %>%
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: FiveThirtyEight, BEA*")) 
 
+ gt::gtsave(p7,
+    filename = "images/seven.png")
 
 
 
@@ -408,7 +414,7 @@ ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
 ensemble_tibble <- tibble(pred = ensemble, state = new_data_econ$state)
 
 # electoral vote table:
-ensemble_tibble %>%
+p8 <- ensemble_tibble %>%
   left_join(electoral, by = "state") %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
                             pred < 50 ~ "Trump")) %>%
@@ -421,8 +427,11 @@ ensemble_tibble %>%
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: FiveThirtyEight*"))
 
+p8 <- gt::gtsave(p8,
+    filename = "images/eight.png")
+
 # electoral map table:
-ensemble_tibble %>% 
+p9 <- ensemble_tibble %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
@@ -433,6 +442,8 @@ ensemble_tibble %>%
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+ ggsave("~/Desktop/R studio/carine-h.github.io/images/nine.png", p9)
 
 #Predictive Intervals: POLL Ensemble
 in_sample_poll <- predict(fit_state_poll, newdata = new_data_poll, interval = "predict") 
@@ -469,7 +480,7 @@ gt::gtsave(tab1,
 ensemble2 <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
 ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state)
 
-ensemble_tibble2 %>%
+p10 <- ensemble_tibble2 %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   select(state, pred) %>%
   left_join(electoral, by = "state") %>%
@@ -484,8 +495,11 @@ ensemble_tibble2 %>%
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: BEA*"))
 
+gt::gtsave(p10,
+    filename = "images/ten.png")
+
 # electoral map table:
-ensemble_tibble2 %>% 
+p11 <- ensemble_tibble2 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
@@ -496,6 +510,8 @@ ensemble_tibble2 %>%
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+ ggsave("~/Desktop/R studio/carine-h.github.io/images/eleven.png", p11)
 
 # fundamentals predictive intervals:
 tab2 <- as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_econ) %>%

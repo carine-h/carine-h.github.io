@@ -277,3 +277,68 @@ hist(outsamp_errors,
 # quantify by taking the means of the outsample errors 
 mean(abs(outsamp_errors))
 ```
+
+
+
+
+
+
+# COMPARINIG MODELS 
+```{r}
+# ELECTORALS
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+# tidyinig electoral votes for my purposes 
+electoral <- electoral_votes %>%
+  select(X1, '2020') %>%
+  rename(state = X1) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() 
+
+
+#################
+# compare models
+#################  
+# POLL MODEL
+export_summs(fit_state_poll)
+
+poll_pred_2020 %>%
+  rename("pred" = "predict(poll_fit, newdata = new_data_poll)") %>%
+  mutate(state = rownames(poll_pred_2020), 
+         state = state.abb[match(state,state.name)])%>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()%>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 3 Week Poll Model**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
+
+# DEMOG MODEL
+export_summs(mod_demog_change)
+
+demo_pred_2020 %>%
+  rename("pred" = "predict(mod_demog_change, newdata = real_2020)") %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) %>%
+  na.omit()%>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**2020 Electoral Vote Outcome Using 2020 Demographic Model**"), 
+               subtitle = "Biden Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: World Population Review*"))
+
+# MODIFIED TFC
+export_summs(econ_fit)
+
+```
