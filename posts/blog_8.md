@@ -88,6 +88,10 @@ There is always, of course, some variance in the models used to predict election
 
 I also wanted to consider the in-sample fit of the model. Essentially, how well does this model account for variance? I find the R-squared value to be **94.5%** which means the model describes 93.6% of the error. The other ~6% is random error that the model does not account for. Of course, over-fitting is a possibility, but overall, this high R-squared indicates that the model is a close fit to reality (it's predicted outcomes in the past fit the actual outcomes quite closely). 
 
+I went on to consider the out of sample fit of my ensemble. Since I am using data across states over multiple years, it was tricky to find states that had consistent data each year in each state to compare out of sample predictions across models. What I ended up doing was starting with Florida, a swing state and key 2020 battleground state. I omitted 2004 from my ensemble, ran the model, and used the model outcome to predict Florida's outcome in 2004. When I compared this to the actual outcome, the out of sample prediction was only 0.77 democratic vote share points off. 
+
+I went on to find two more states that had 2004 data in each model within the ensemble. I went ahead and did an out of sample prediction (omitting 2004 again) to predict the 2004 outcome in Alabama, Arizona, *and* Florida. I then found the difference with the true outcomes for each of these states in 2004 and found that the average difference from the true outcome was only 0.77 points. I take these small variations to be a good sign that my model is accurately predicting democratic vote share outcomes. 
+
 ### An Alternative Ensemble
 To check my ensemble above and to compare to other potential outcomes, I changed the weights to reflect a more traditional fundamentals-heavy ensemble. In this iteration, the models are weighted like this: 25% for the poll model prediction, 25%, for the demographics prediction, and **50%** for the fundamentals prediction. 
 
