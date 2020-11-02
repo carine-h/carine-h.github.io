@@ -107,10 +107,9 @@ new_data_poll <- poll_2020_state %>%
          state != "NE-2", 
          state != "National") %>%
   mutate(date = as.Date(modeldate, format = "%m/%d/%Y")) %>%
-  filter(date >= as.Date("2020-10-08")) %>%
   rename(year = cycle) %>%
   group_by(state) %>%
-  summarize(avg_poll = mean(pct_estimate))  ## average poll since 10/8 per state for joe biden
+  summarize(avg_poll = mean(pct_estimate))## average poll since 10/8 per state for joe biden
 
 plot(dat$avg_poll, dat$D_pv2p,
          main="Overall Relationship Between Vote Share and Polls", xlab="Average Poll for Democratic Candidate", ylab="Democratic Vote Share")
@@ -713,7 +712,7 @@ new_data_poll %>%
   left_join(real_2020) %>%
   mutate(incumbent = FALSE)
 
-main_model_prediction <- predict()
+
 ```
 
 
