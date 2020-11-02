@@ -5,6 +5,7 @@ output:
   pdf_document: default
   html_document: default
 ---
+
 # Assignment
 
 You should report your prediction for the national result (total Electoral College votes and, if you generated it, the national popular vote) and state-level winners and include a description of how you arrived at your prediction.  
