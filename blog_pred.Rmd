@@ -394,6 +394,7 @@ p7 <- e2  %>%
  gt::gtsave(p7,
     filename = "images/seven.png")
 
+ 
 
 
 ```
