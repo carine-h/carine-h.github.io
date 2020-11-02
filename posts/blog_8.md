@@ -36,9 +36,10 @@ The model outcome shows that there is a positive relationship between Democratic
 
 When you break the model down by state and predict the 2020 electoral outcome using state poll averages since 10/8/2020, this is the predicted outcome: 
 
-![](../images/two.png)
+![](../images/one.png)
 
 This comes out to a Biden win with 282 electoral votes: 
+
 
 ![](../images/three.png)
 
@@ -99,11 +100,11 @@ This ensemble will especially take into accound the economic downturn caused by 
 
 The fundamentals-heavy ensemble predicts the following state-to-state outcome: 
 
-![](../images/twelve.png)
+![](../images/ten.png)
 
 Biden wins with a whopping **421 electoral votes**. 
 
-![](../images/thirteen.png)
+![](../images/eleven.png)
 
 This table breaks down the projected state-by-state democratic vote share and it's upper and lower bound (95% confidence interval) prediction: 
 
