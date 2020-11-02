@@ -61,7 +61,7 @@ This model predicts state-by-state Democratic vote share using annual GDP growth
 
 This is the electoral outcome by state using GDP growth from the 2019 state-by-state average and quarter 2 state-by-state data for 2020 (could not find a year-long average): 
 
-![](../images/six.png)
+![](../images/six.png) 
 
 With this model, Biden smokes Trump with 390 electoral votes:
 
