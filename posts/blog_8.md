@@ -36,7 +36,7 @@ The model outcome shows that there is a positive relationship between Democratic
 
 When you break the model down by state and predict the 2020 electoral outcome using state poll averages since 10/8/2020, this is the predicted outcome: 
 
-![](../images/one.png)
+![](../images/two.png)
 
 This comes out to a Biden win with 282 electoral votes: 
 
@@ -79,7 +79,7 @@ Using this ensemble, the predicted state outcomes map for 2020 is the following:
 
 ![](../images/eight.png)
 
-**Biden is projected to win** with **291** electoral votes. 
+**Biden is projected to win** with **275** electoral votes. 
 
 ![](../images/nine.png)
 
@@ -120,8 +120,8 @@ The second ensemble also has a slightly lower R-squared value (93.6%). Again, wi
 
 ## What to Expect on November 3rd
 According to my ensemble of choice, look for the following on election day: 
-- Biden wins with 291 electoral votes 
-- Trump gets 244
+- Biden wins with 275 electoral votes 
+- Trump gets 260
 - Biden bags Pennsylvania, Ohia, Iowa, and Arizona - all critical batteleground states
 - Trump takes home Florida and North Carolina
 
