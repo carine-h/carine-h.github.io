@@ -73,7 +73,7 @@ mutate(data, inc = ~~~)
 filter(data, inc == TRUE)
 
 # Fundamentals Model: Modified time for change
-- I'm going to use 2nd and 3rd quarter data from 
+# I'm going to use 2nd and 3rd quarter data from 
 ```{r}
 # HOW DO I APPLY TO STATE?
 tfc_df <- popvote_df %>%
