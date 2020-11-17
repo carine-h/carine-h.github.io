@@ -45,11 +45,11 @@ economy_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.
 approval_df   <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
 # 538
 poll_state_df  <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
-state_pv_df<- read_csv("pred_data/popvote_bystate_1948-2016 copy 2.csv")
-app <- read_csv("data/approval_gallup_1941-2020.csv")
+state_pv_df<- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/popvote_bystate_1948-2016 copy 2.csv")
+app <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
 # 538: 2020 poll averages per state 
 poll_2020_state <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/presidential_poll_averages_2020.csv")
-econ_update <- read_csv("pred_data/econ_update.csv")
+econ_update <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/econ_update.csv")
 demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
 pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
 hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
@@ -297,10 +297,10 @@ p5 <- gt::gtsave(p5,
 # ECONOMICS
 ```{r}
 library(readxl)
-q2_2020 <- read_excel("pred_data/q2_2020.xlsx") %>%
+q2_2020 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/q2_2020.xlsx") %>%
   na.omit()%>%
   mutate(state = state.abb[match(state,state.name)])
-state_gdp <- read_csv("pred_data/state_gdp_quarter.csv")
+state_gdp <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_gdp_quarter.csv")
 
 econ_update
 
@@ -341,7 +341,7 @@ e <- econ_update %>%
   filter(year == 2018)
 
 
-gdp_2019 <- read_excel("pred_data/state_2019_gdp.xlsx")%>%
+gdp_2019 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_2019_gdp.xlsx")%>%
   na.omit()%>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   mutate(year = 2019)
@@ -412,9 +412,14 @@ in_sample_econ <- predict(econ_fit, newdata = q3_econ)
 
 # ENSEMBLE
 ```{r}
+in_sample_poll <- as.data.frame(predict(fit_state_poll, newdata = new_data_poll, interval = "predict"))
+in_sample_demo <- as.data.frame(predict(mod_demog_change, newdata = real_2020, interval = "predict"))
+in_sample_econ <- as.data.frame(predict(econ_fit, newdata = new_data_econ, interval = "predict"))
+
 # ensemble PREDICTION for 2020
-ensemble <- 0.25*econ_pred + 0.25*demog_pred + 0.5*poll_pred_2020$pred
-ensemble_tibble <- tibble(pred = ensemble, state = new_data_econ$state)
+ensemble <- 0.25*in_sample_econ$fit + 0.25*in_sample_demo$fit + 0.5*in_sample_poll$fit
+ensemble_tibble <- tibble(pred = ensemble, state = new_data_poll$state) %>%
+  mutate(state = state.abb[match(state,state.name)])
 
 # electoral vote table:
 p8 <- ensemble_tibble %>%
@@ -449,11 +454,11 @@ p9 <- ensemble_tibble %>%
  ggsave("~/Desktop/R studio/carine-h.github.io/images/nine.png", p9)
 
 #Predictive Intervals: POLL Ensemble
-in_sample_poll <- predict(fit_state_poll, newdata = new_data_poll, interval = "predict") 
-in_sample_demo <- predict(mod_demog_change, newdata = real_2020, interval = "predict")
-in_sample_econ <- predict(econ_fit, newdata = new_data_econ, interval = "predict")
+in_sample_polls <- predict(fit_state_poll, newdata = new_data_poll, interval = "predict") 
+in_sample_demos <- predict(mod_demog_change, newdata = real_2020, interval = "predict")
+in_sample_econs <- predict(econ_fit, newdata = new_data_econ, interval = "predict")
 
-tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
+tab1 <- as.data.frame(0.5*in_sample_polls + 0.25*in_sample_demos + 0.25*in_sample_econs) %>%
   mutate(state = new_data_poll$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
@@ -480,11 +485,12 @@ gt::gtsave(tab1,
 
 
 # diff weights - emphasis on fundamentals
-ensemble2 <- 0.5*econ_pred + 0.25*demog_pred + 0.25*poll_pred_2020$pred
-ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state)
+ensemble2 <- 0.5*in_sample_econ$fit + 0.25*in_sample_demo$fit + 0.25*in_sample_poll$fit
+ensemble_tibble2 <- tibble(pred = ensemble2, state = new_data_poll$state) %>%
+  mutate(state = state.abb[match(state,state.name)])
+
 
 p10 <- ensemble_tibble2 %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
   select(state, pred) %>%
   left_join(electoral, by = "state") %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
@@ -833,25 +839,6 @@ legend("topright",
        pch=c(NA,1,1,1), 
        merge=FALSE, 
        cex = 0.7)
-
-# outsample errors for tfc model
-outsamp_errors <- sapply(1:1000, function(i){
-years_outsamp <- sample(tfc_df$year, 8)
- <- lm(pv2p ~ GDP_growth_qt + net_approve + incumbent, tfc_df[!(tfc_df$year %in% years_outsamp),])
-outsamp_pred <- predict(, 
-                        newdata = tfc_df[tfc_df$year %in% years_outsamp,])
-outsamp_true <- tfc_df$pv2p[tfc_df$year %in% years_outsamp]
-mean(outsamp_pred - outsamp_true)
-})
-
-# visualize in histogram
-hist(outsamp_errors,
-     xlab = "Out-of-Sample Residual",
-     main = "Time-for-Change Model: \n Mean Out-of-Sample Residual (1000 Runs)",
-     xlim = c(-15, 15), 
-     ylim = c(0, 270))
-
-# quantify by taking the means of the outsample errors 
-mean(abs(outsamp_errors))
+w
 
 ```
