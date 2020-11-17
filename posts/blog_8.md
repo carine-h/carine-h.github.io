@@ -13,9 +13,7 @@ In the end, I create two models:
 But first, a quick look at Abramowitz's famous time-for-change model and my reasons for why it will not work in 2020. 
 
 ## Time-For-Change
-Back in blog 4 I assessed TFC predictive power for national elections. Usually it does quite well:
-
-It even successfully predicted 2016!
+Back in blog 4 I assessed TFC predictive power for national elections. Usually it does quite well - it even successfully predicted 2016!
 
 The model depends on fundamentals (GDP growth and incumbency) as well as polls. 
 
