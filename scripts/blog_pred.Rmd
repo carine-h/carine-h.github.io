@@ -403,7 +403,6 @@ p7 <- e2  %>%
 
 
 
-
 # PLOT of ALL MODELS
 in_sample_poll <- predict(fit_state_poll, newdata = dat)
 in_sample_demo <- predict(mod_demog_change, newdata = dat_change)
@@ -839,6 +838,6 @@ legend("topright",
        pch=c(NA,1,1,1), 
        merge=FALSE, 
        cex = 0.7)
-w
+
 
 ```

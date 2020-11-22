@@ -40,6 +40,9 @@ hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.cs
 race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
 electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
 econ_update <- read_csv("~/Desktop/R studio/carine-h.github.io/pred_data/SAGDP1__ALL_AREAS_1997_2019.csv")
+outcome_2020 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2020.csv") %>%
+  filter(year == 2020) %>%
+  na.omit()
 
 
 
@@ -106,6 +109,106 @@ pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
 poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
 
 #############################
+#### DEMO MODEL AND PRED ####
+#############################
+demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
+pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
+hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
+race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
+electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
+
+# state names and abbreviations
+pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
+pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
+
+dat <- pvstate_df %>% 
+  full_join(pollstate_df %>% 
+              filter(weeks_left == 10) %>% 
+              group_by(year,party,state) %>% 
+              summarise(avg_poll=mean(avg_poll)),
+            by = c("year" ,"state")) %>%
+  left_join(demog %>%
+              select(-c("total")),
+            by = c("year" ,"state"))
+# demographics, poll numbers, and popular vote 
+
+dat$region <- state.division[match(dat$state, state.abb)]
+demog$region <- state.division[match(demog$state, state.abb)]
+
+dat_change <- dat %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year),
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
+         White_change = White - lag(White, order_by = year),
+         Female_change = Female - lag(Female, order_by = year),
+         Male_change = Male - lag(Male, order_by = year),
+         age20_change = age20 - lag(age20, order_by = year),
+         age3045_change = age3045 - lag(age3045, order_by = year),
+         age4565_change = age4565 - lag(age4565, order_by = year),
+         age65_change = age65 - lag(age65, order_by = year)
+  )
+
+
+
+## MODEL
+mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         as.factor(state), data = dat_change)
+
+
+# UPDATED 2020
+dat_2020 <- race_2020 %>%
+  left_join(hispanic_2020, by = "State") %>%
+  mutate(Hispanic = 100*HispanicPerc, 
+         state = State, 
+         White = 100*WhitePerc, 
+         Asian = 100*AsianPerc, 
+         Black = 100*BlackPerc) %>%
+  select(state, Hispanic, White, Asian, Black) %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() %>%
+  mutate(year = 2020)
+
+# 2018 demographics
+dat_2018 <- demog %>%
+  filter(year == 2018) 
+
+# joining demographics
+real_2020_change <- bind_rows(dat_2018, dat_2020)
+
+# calculating percent changes in available demographic groups
+## I used 0 percent change with populations that lacked demographic data (age and gender)
+real_2020 <- real_2020_change %>%
+  filter(year %in% c(2018, 2020)) %>%
+  group_by(state) %>%
+  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
+         Black_change = Black - lag(Black, order_by = year),
+         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
+         Indigenous_change = 0,
+         White_change = White - lag(White, order_by = year),
+         Female_change = 0,
+         Male_change = 0,
+         age20_change = 0,
+         age3045_change = 0,
+         age4565_change = 0,
+         age65_change = 0) %>%
+  filter(year == 2020)
+
+real_2020 <- as.data.frame(real_2020)
+rownames(real_2020) <- real_2020$state
+real_2020 <- real_2020[state.abb, ]
+real_2020$region <- state.division[match(real_2020$state, state.abb)]
+
+#  2020 PREDICTION
+demog_pred <- predict(mod_demog_change, newdata = real_2020) 
+
+d <- tibble(demog_pred) %>%
+  mutate(state = real_2020$state)
+
+
+#############################
 #### ECON MODEL AND PRED ####
 #############################
 library(readxl)
@@ -170,106 +273,6 @@ econ_pred <- predict(econ_fit, newdata = new_data_econ)
 
 e2 <- tibble(pred = predict(econ_fit, newdata = new_data_econ), state = new_data_econ$state)
 
-
-#############################
-#### DEMO MODEL AND PRED ####
-#############################
-demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
-pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv")
-pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv")
-hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
-race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
-electoral_votes <- read_csv("~/Desktop/R studio/carine-h.github.io/data/electoralcollegevotes_1948-2020.csv")
-
-# state names and abbreviations
-pvstate_df$state <- state.abb[match(pvstate_df$state, state.name)]
-pollstate_df$state <- state.abb[match(pollstate_df$state, state.name)]
-
-dat <- pvstate_df %>% 
-  full_join(pollstate_df %>% 
-              filter(weeks_left == 10) %>% 
-              group_by(year,party,state) %>% 
-              summarise(avg_poll=mean(avg_poll)),
-            by = c("year" ,"state")) %>%
-  left_join(demog %>%
-              select(-c("total")),
-            by = c("year" ,"state"))
-# demographics, poll numbers, and popular vote 
-
-dat$region <- state.division[match(dat$state, state.abb)]
-demog$region <- state.division[match(demog$state, state.abb)]
-
-dat_change <- dat %>%
-  group_by(state) %>%
-  mutate(Asian_change = Asian - lag(Asian, order_by = year),
-         Black_change = Black - lag(Black, order_by = year),
-         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = Indigenous - lag(Indigenous, order_by = year),
-         White_change = White - lag(White, order_by = year),
-         Female_change = Female - lag(Female, order_by = year),
-         Male_change = Male - lag(Male, order_by = year),
-         age20_change = age20 - lag(age20, order_by = year),
-         age3045_change = age3045 - lag(age3045, order_by = year),
-         age4565_change = age4565 - lag(age4565, order_by = year),
-         age65_change = age65 - lag(age65, order_by = year)
-  )
-
-
-
-## MODEL
-mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
-                         as.factor(state), data = dat_change)
-
-
-
-# UPDATED 2020
-dat_2020 <- race_2020 %>%
-  left_join(hispanic_2020, by = "State") %>%
-  mutate(Hispanic = 100*HispanicPerc, 
-         state = State, 
-         White = 100*WhitePerc, 
-         Asian = 100*AsianPerc, 
-         Black = 100*BlackPerc) %>%
-  select(state, Hispanic, White, Asian, Black) %>%
-  mutate(state = state.abb[match(state,state.name)]) %>%
-  na.omit() %>%
-  mutate(year = 2020)
-
-# 2018 demographics
-dat_2018 <- demog %>%
-  filter(year == 2018) 
-
-# joining demographics
-real_2020_change <- bind_rows(dat_2018, dat_2020)
-
-# calculating percent changes in available demographic groups
-## I used 0 percent change with populations that lacked demographic data (age and gender)
-real_2020 <- real_2020_change %>%
-  filter(year %in% c(2018, 2020)) %>%
-  group_by(state) %>%
-  mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
-         Black_change = Black - lag(Black, order_by = year),
-         Hispanic_change = Hispanic - lag(Hispanic, order_by = year),
-         Indigenous_change = 0,
-         White_change = White - lag(White, order_by = year),
-         Female_change = 0,
-         Male_change = 0,
-         age20_change = 0,
-         age3045_change = 0,
-         age4565_change = 0,
-         age65_change = 0) %>%
-  filter(year == 2020)
-
-real_2020 <- as.data.frame(real_2020)
-rownames(real_2020) <- real_2020$state
-real_2020 <- real_2020[state.abb, ]
-real_2020$region <- state.division[match(real_2020$state, state.abb)]
-
-#  2020 PREDICTION
-demog_pred <- predict(mod_demog_change, newdata = real_2020) 
-
-d <- tibble(demog_pred) %>%
-  mutate(state = real_2020$state)
 
 
 ```
@@ -349,6 +352,25 @@ tab1 <- as.data.frame(0.5*in_sample_polls + 0.25*in_sample_demos + 0.25*in_sampl
              # convert to gt table
 gt::gtsave(tab1,
     filename = "images/my_table_image.png")
+
+
+# RMSE
+as.data.frame(0.5*in_sample_polls + 0.25*in_sample_demos + 0.25*in_sample_econs) %>%
+  mutate(state = new_data_poll$state) %>%
+  select(state, lwr, fit, upr) %>%
+  mutate(lwr = round(lwr,  digits = 2)/100, 
+         fit = round(fit, digits = 2)/100, 
+         upr = round(upr, digits = 2)/100)%>%
+  mutate(winner =  case_when(fit > .50 ~ "Biden",
+                            fit < .50 ~ "Trump")) %>%
+  left_join(outcome_2020) %>%
+  select(state, fit, D_pv2p) %>%
+  mutate(diff = fit - D_pv2p) %>%
+  mutate(diff_sq = diff^2)%>%
+  summarise(rmse = sqrt(mean(diff_sq)))
+
+
+  
 ```
 
 
@@ -367,5 +389,63 @@ This model composition intuitively made sense  - the economy is a mess and Trump
 
 It was a huge surprise when the model produced a Biden landslide. However, I stood by the logic of my model's parameters and hoped that they'd hold some kind of truth. Though I was wrong in the end, the gap between the model and reality signaled the following rather scary reality: there is really no good indicator for presidential outcomes in an election like 2020's. I chalk this up to deeper polarization and partisanship. No matter what the polls say or how much GDP grows/shrinks, it seems that Americans have made their minds up. Fundamentals, public opinion, and even demographics fall to the wayside when Americans have already chosen their "camps."
 
+```{r}
 
+# my prediction 
+ensemble_tibble %>% 
+  mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
+  ggplot(aes(state = state, fill = (pred >= 50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 State Prediction",
+       subtitle = "Poll-Heavy Ensemble Model",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+outcome_2020 %>% 
+  mutate(state = state.abb[match(state, state.name)]) %>% 
+  na.omit() %>%
+  ggplot(aes(state = state, fill = (D_pv2p > .50))) +
+  geom_statebins() +
+  theme_statebins() +
+  labs(title = "2020 Actual State Outcomes",
+       fill = "") +
+  theme(legend.position = "none", 
+        plot.subtitle = element_text(size = 10, hjust = 0.5),
+        plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
+
+
+# meh way of doing it 
+plot(ensemble_tibble$pred, outcome_2020$D_pv2p[!outcome_2020$state == 'District of Columbia'], pch = '')
+text(ensemble_tibble$pred, outcome_2020$D_pv2p[!outcome_2020$state == 'District of Columbia'], label = ensemble_tibble$state)
+
+# better - points are yours and line is real
+
+```
+
+
+
+Notes on meeting
+- public opinion poll data over election result to measure polarization 
+  - look as shrinking of independent voters 
+  - conduct survey of reason WHY people voted the way ttehy did 
+- also look at pre-covid economy - restropesctiive hyptoehsis 
+  - public opiiniion poll 
+  
+changes 
+- interaction model iwth poalizatiiion 
+
+RMSE but asos show direction of error 
+  - reflects the size of error 
+claassificationi accuracy - divide staate you got right over total
+draw a histogram for the models 
+see how prediction error correlates with other errors 
+
+
+RMSE
+- subtract columns 
+- swuare difference of EACH value - nw column 
+- take MEAAAN of squared error column 
 
