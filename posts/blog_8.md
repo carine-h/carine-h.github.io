@@ -87,7 +87,7 @@ There is always, of course, some variance in the models used to predict election
 ![](../images/my_table_image.png)
 
 ### Checking my Model
-I also wanted to consider the in-sample fit of the model. Essentially, how well does this model account for variance? I find the R-squared value to be **94.5%** which means the model describes 93.6% of the error. The other ~6% is random error that the model does not account for. Of course, over-fitting is a possibility, but overall, this high R-squared indicates that the model is a close fit to reality (it's predicted outcomes in the past fit the actual outcomes quite closely). 
+I also wanted to consider the in-sample fit of the model. Essentially, how well does this model account for variance? I find the R-squared value to be **94.5%** which means the model describes 94.5% of the error. The other ~6% is random error that the model does not account for. Of course, over-fitting is a possibility, but overall, this high R-squared indicates that the model is a close fit to reality (it's predicted outcomes in the past fit the actual outcomes quite closely). 
 
 I went on to consider the out of sample fit of my ensemble. Since I am using data across states over multiple years, it was tricky to find states that had consistent data each year in each state to compare out of sample predictions across models. What I ended up doing was starting with Florida, a swing state and key 2020 battleground state. I omitted 2004 from my ensemble, ran the model, and used the model outcome to predict Florida's outcome in 2004. When I compared this to the actual outcome, the out of sample prediction was only 0.77 democratic vote share points off. 
 
