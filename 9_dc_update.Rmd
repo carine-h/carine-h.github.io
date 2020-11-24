@@ -296,42 +296,40 @@ ensemble <- 0.25*in_sample_econ$fit + 0.25*in_sample_demo$fit + 0.5*in_sample_po
 ensemble_tibble <- tibble(pred = ensemble, state = new_data_econ$state) 
 
 # electoral vote table:
-ensemble_tibble %>%
+pred_electoral_count <- ensemble_tibble %>%
   left_join(electoral, by = "state") %>%
+  na.omit() %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
                             pred < 50 ~ "Trump")) %>%
   group_by(state_win) %>%
   summarise(electoral_votes = sum(`2020`)) %>%
   gt() %>%
-  tab_header(title = md("**Poll-Heavy Ensemble: 2020 Electoral Vote Outcome Prediction**"), 
+  tab_header(title = md("**Corrected Poll-Heavy Ensemble: 2020 Electoral Vote Outcome Prediction**"), 
                subtitle = "Biden Wins") %>%
    cols_label(state_win = md("**Candidate**"),
                electoral_votes = md("**Total Electoral Votes**")) %>%
   tab_source_note(md("*Data: FiveThirtyEight*"))
 
-
+gt::gtsave(pred_electoral_count,
+    filename = "images/pred_electoral_count.png")
 
 # electoral map table:
-ensemble_tibble %>% 
+pred_update_map <- ensemble_tibble %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
   theme_statebins() +
   labs(title = "2020 State Prediction",
-       subtitle = "Poll-Heavy Ensemble Model",
+       subtitle = "Corrected Poll-Heavy Ensemble Model",
        fill = "") +
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
-```
-
-
-I also predicted the democratic vote share per state: 
-
-```{r}
-
-tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
+ ggsave("~/Desktop/R studio/carine-h.github.io/images/pred_update_map.png", pred_update_map)
+ 
+ # intervals table
+ pred_interval_table  <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
   mutate(state = new_data_poll$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
@@ -340,7 +338,7 @@ tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_
   mutate(winner =  case_when(fit > .50 ~ "Biden",
                             fit < .50 ~ "Trump")) %>%
   gt() %>%
-   tab_header(title = md("**Poll-Heavy Ensemble: Projected State Winners and Predictive Intervals for Democratic Vote Share Prediction**"), 
+   tab_header(title = md("**Corrected Poll-Heavy Ensemble: Projected State Winners and Predictive Intervals for Democratic Vote Share Prediction**"), 
                subtitle = "95% Confidence Intervals") %>%
    fmt_percent(columns = c("lwr", "fit", "upr"), decimals = 1) %>%
    cols_label(lwr = md("**Lower Bound**"),
@@ -350,20 +348,26 @@ tab1 <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_
               winner = md("**Predicted Winner**")) %>%
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*")) 
              # convert to gt table
+gt::gtsave(pred_interval_table,
+    filename = "images/pred_interval_table.png")
 
 
+```
+
+
+I also predicted the democratic vote share per state: 
+
+```{r}
 # RMSE
 as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
   mutate(state = new_data_poll$state) %>%
   select(state, lwr, fit, upr) %>%
-  mutate(lwr = round(lwr,  digits = 2)/100, 
-         fit = round(fit, digits = 2)/100, 
-         upr = round(upr, digits = 2)/100)%>%
-  mutate(winner =  case_when(fit > .50 ~ "Biden",
-                            fit < .50 ~ "Trump")) %>%
+  mutate(lwr = round(lwr,  digits = 2), 
+         fit = round(fit, digits = 2), 
+         upr = round(upr, digits = 2))%>%
   left_join(outcome_2020) %>%
   select(state, fit, D_pv2p) %>%
-  mutate(diff = fit - D_pv2p) %>%
+  mutate(diff = fit - (D_pv2p*100)) %>%
   mutate(diff_sq = diff^2)%>%
   summarise(rmse = sqrt(mean(diff_sq)))
 
@@ -389,6 +393,8 @@ win_2020 <- pred_winners %>%
   mutate(win = ifelse(winner == actual_winner, TRUE, FALSE))  # 46/50 were CORRECT
 46/51
 # 90% classification accuracy (iin terms of states won/lost)
+
+# comparison 
 ```
 
 
@@ -415,7 +421,7 @@ plot1 <- ensemble_tibble %>%
   geom_statebins() +
   theme_statebins() +
   labs(title = "2020 State Prediction",
-       subtitle = "Poll-Heavy Ensemble Model",
+       subtitle = "Corrected Poll-Heavy Ensemble Model",
        fill = "") +
   theme(legend.position = "none", 
         plot.subtitle = element_text(size = 10, hjust = 0.5),
@@ -448,10 +454,12 @@ ensemble_tibble %>%
 
 
 # MAP PLOTS 
-grid.arrange(plot1, plot2, ncol=2)
+map_comp <- grid.arrange(plot1, plot2, ncol=2)
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/map_comp.png", map_comp)
 
 # SCATTTER PLOT
-win_2020 %>%
+scatter_comp <- win_2020 %>%
 ggplot(aes(fit, D_pv2p, label = state)) + 
   labs(x = "Predicted Democratic Vote Share", 
        y = "Actual Democratic Vote Share", 
@@ -459,13 +467,20 @@ ggplot(aes(fit, D_pv2p, label = state)) +
   geom_text() +
   geom_abline(intercept = 0, slope = 1, col = "coral")+
   theme(plot.title = element_text(face = "bold"))
+ggsave("~/Desktop/R studio/carine-h.github.io/images/scatter_comp.png", scatter_comp)
 
 # HISTOGRAM
-hist(win_2020$fit*100 - outcome_2020$D_pv2p*100, 
+png("~/Desktop/R studio/carine-h.github.io/images/hist_comp.png", width=800, height=400)
+hist_comp <- hist(win_2020$fit*100 - win_2020$D_pv2p*100, 
      main = "Difference Between Democratic Vote Share \n Prediction and 2020 Outcome", 
-     xlab = "Prediction - Actual Outcome", 
+     xlab = "(Corrected) Prediction - Actual Outcome", 
      ylim = c(0, 30), 
+     xlim= c(-5, 15),
      col = "coral")
+abline(v = mean( win_2020$fit*100 - win_2020$D_pv2p*100), col = "dodgerblue", lty = 2)
+dev.off()
+
+
 
 # TABLE OF RIGHT OR NOT 
 

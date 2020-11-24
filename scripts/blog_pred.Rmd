@@ -564,8 +564,8 @@ summary(q3_econ)
 # ALTERNATIVE MODEL PREDICTION
 df_poll2 <- dat %>%
   select(state, year, avg_poll)%>% 
-  add_predictions(fit_state_poll) %>%
   mutate(state = state.abb[match(state,state.name)])%>%
+  add_predictions(fit_state_poll) %>%
   mutate(pollpred = 0.25*pred)
 df_demo2 <- dat_change %>%
   select(state, year, Black_change, Hispanic_change, Asian_change)%>% 

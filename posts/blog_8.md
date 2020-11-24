@@ -125,6 +125,11 @@ According to my ensemble of choice, look for the following on election day:
 - Biden bags Pennsylvania, Georgia, Iowa, North Carolina, Florida, and Arizona - all critical [battleground states](https://www.cbsnews.com/news/2020-presidential-election-battleground-states-to-watch/). 
 - Republicans could lose Texas 
 
+## CORRECTION 11/22/2020
+While I was conducting my post-election assessment of my prediction (see next blog), I found a small mistake in my code that perpetuated throughout my model. I explain this mistake in more detail here and provide access to my botched and corrected code. With the correction of my code, my model (which maintains the exact same data, variables, and structure) still predicts a Biden victory. However, Biden wins with **358** electoral votes and a Trump loses with **180** electoral votes. 
+
+If you have any more questions about my mistake, please feel free to contact me at cmhajjar@college.harvard.edu. 
+
 
 
 

@@ -1,17 +1,11 @@
+# Post-Election Analysis: How My Prediction Stacks Up
+Today I will look back at my pre-election prediction and compare it to the 2020 presidential election outcomes. In doing so, I not only correct a mistake in my prediction, but indentify the areas where my - and many other - electoral predictions are lacking. My main takeaway is that an increasingly polarized US necessitates a new approach to election forecasting and the pieces that go into predictions. 
 
-CHECK 1. A recap of your model(s) and your predictions 
-HOW 2. A description of the accuracy of the model(s), including any apparent patterns in the accuracy. Graphics should be used here.
-KINDA 3. Proposed hypotheses for why the model(s) were inaccurate in the estimates or locations where it was inaccurate.  These reasons should not simply be statements of about the quality of the components of the model, e.g., “the polls were not good” or “economic growth was not a good predictor” but should instead be grounded hypotheses on why components of the model may not have been predictive or may not have been predictive in certain cases.
-4. Proposed quantitative tests that could test these hypotheses, e.g., what data, if available, could allow you to test whether the reason proposed really did cause the inaccuracy in your model.  If there is no plausible test of the hypothesis, explain why.  You do not need to perform these tests or explain them in great detail (e.g., there is no need to write down an equation showing your exact test), just propose them.  
-5. A description of how you might change your model if you were to do it again.  
-
-
-
-
-# Recap of Model and Predictions 
-The week before the election I created a predictive model that placed Biden as the victor with **372** electoral votes and Trump with **163.*** 
+## Recap of Model and Predictions 
 
 ### CORRECTION
+The week before the election I created a predictive model that placed Biden as the victor with **372** electoral votes and Trump with **163.*** 
+
 However, this week, after assessing my prediction and comparing to the actual election outcome, *I found a mistake in my pre-election prediction* that led to the dropping of DC from the prediction as well as a misordering of the predictions by state. Once I corrected the mistake and reported it to course instructors, my model updated to Biden victory with **358** electoral votes and a Trump loss with **180** electoral votes. 
 
 ![](../images/pred_electoral_count.png)
@@ -76,7 +70,7 @@ Lastly, I created a scatter plot that plotted the predicted state democratic vot
   - Biden's vote share was especially overpredicted in traditionally red states like OK, AR, TN, etc. 
     - While Trump won these states, the overprediction indicates that polls and classical indicators in predictive models (like the economy) have fallen victim to polarization - in predominantly Republican states, there was a more favorable analysis of these factors for Trump than there would haave been in previous elections
 
-# Where I Went Wrong
+## Where I Went Wrong
 I propose three major hypotheses for my model's pitfalls: 
 1. The polls fell flat, yet again
 2. Some voters presumably considered the strength of the economy independent of the COVID shock, bringing fundamentals back into play 
@@ -122,6 +116,5 @@ Given the available information, if I could go back in time, I would change my m
 - Look at the interaction between state-by-state job approval and state-by-state polarization
 - Weigh my polls less heavily and weight the job approval interaction more heavily
 
-
-# Conclusion
+## Conclusion
 It was a huge surprise when the model produced a Biden landslide. However, I stood by the logic of my model's parameters and hoped that they'd hold some kind of truth. Though I was wrong in the end, the gap between the model and reality signaled the following rather scary reality: there is really no good indicator for presidential outcomes in an election like 2020's. I chalk this up to deeper polarization and partisanship. No matter what the polls say or how much GDP grows/shrinks, it seems that Americans have made their minds up. Fundamentals, public opinion, and even demographics fall to the wayside when Americans have already chosen their "camps."
