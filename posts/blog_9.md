@@ -4,7 +4,7 @@ Today I will look back at my pre-election prediction and compare it to the 2020 
 ## Recap of Model and Predictions 
 
 ### CORRECTION
-The week before the election I created a predictive model that placed Biden as the victor with **372** electoral votes and Trump with **163.*** 
+The week before the election I created a predictive model that placed Biden as the victor with **372** electoral votes and Trump with **163.** 
 
 However, this week, after assessing my prediction and comparing to the actual election outcome, *I found a mistake in my pre-election prediction* that led to the dropping of DC from the prediction as well as a misordering of the predictions by state. Once I corrected the mistake and reported it to course instructors, my model updated to Biden victory with **358** electoral votes and a Trump loss with **180** electoral votes. 
 
@@ -16,7 +16,7 @@ I did not, in any way, change the variable and weights in my model. Here is a ma
 
 ![](../images/pred_interval_table.png)
 
-(In the interest of being fully transparent about my mistake, I've kept my [original prediction](https://carine-h.github.io/posts/blog_8.html) post up with an updated disclaimer at the bottom. The botched code is also still available along with the corrected code used for today's assessment (see my [github](https://github.com/carine-h)). If you have any more questions about the mistake or my correction, feel free to email me at cmhajjar@college.harvard.edu. Going forward, I will only be referring to my updated prediction and will denote this in each plot using my corrected prediction data by noting it's "corrected."")
+(In the interest of being fully transparent about my mistake, I've kept my [original prediction](https://carine-h.github.io/posts/blog_8.html) post up with an updated disclaimer at the bottom. The botched code is also still available along with the corrected code used for today's assessment (see my [github](https://github.com/carine-h)). If you have any more questions about the mistake or my correction, feel free to email me at cmhajjar@college.harvard.edu. Going forward, I will only be referring to my updated prediction and will denote this in each plot using my corrected prediction data by noting it's "corrected.")
 
 ### How I Stacked Up With the Election's Outcome
 My prediction, though updated and corrected, still did not capture the true outcome of the election. As of November 22nd, 2020, President Elect Biden has **306** electoral votes with a popular vote share of 51.1% and President Trump has **232** electoral votes with a popular vote share of 47.2%, indicating a decisive Biden victory. 
