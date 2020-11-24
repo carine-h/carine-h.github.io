@@ -25,39 +25,39 @@ library(readxl)
 
 knitr::opts_chunk$set(echo = TRUE)
 
-popvote_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
+popvote_df9    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_1948-2016.csv")
 # 538
-economy_df    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/econ.csv")
-approval_df   <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
+economy_df9    <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/econ.csv")
+approval_df9   <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
 # 538
-state_pv_df<- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/popvote_bystate_1948-2016 copy 2.csv") %>%
+state_pv_df9<- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/popvote_bystate_1948-2016 copy 2.csv") %>%
   mutate(state = state.abb[match(state,state.name)]) 
-state_pv_df$state[is.na(state_pv_df$state)] <- "DC"
-app <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
+state_pv_df9$state[is.na(state_pv_df9$state)] <- "DC"
+app9 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/approval_gallup_1941-2020.csv")
 # 538: 2020 poll averages per state 
-poll_2020_state <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/presidential_poll_averages_2020.csv")
-econ_update <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/econ_update.csv")
-econ_update <- read_csv("~/Desktop/R studio/carine-h.github.io/pred_data/SAGDP1__ALL_AREAS_1997_2019.csv")
-outcome_2020 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2020.csv") %>%
+poll_2020_state9 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/presidential_poll_averages_2020.csv")
+econ_update9 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/econ_update.csv")
+econ_update9 <- read_csv("~/Desktop/R studio/carine-h.github.io/pred_data/SAGDP1__ALL_AREAS_1997_2019.csv")
+outcome_2020_9 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2020.csv") %>%
   filter(year == 2020) %>%
   mutate(state = state.abb[match(state,state.name)]) 
-outcome_2020$state[is.na(outcome_2020$state)] <- "DC"
-demog <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
-pvstate_df    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv") %>%
+outcome_2020_9$state[is.na(outcome_2020_9$state)] <- "DC"
+demog9 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demographic_1990-2018.csv")
+pvstate_df9    <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bystate_1948-2016.csv") %>%
     mutate(state = state.abb[match(state,state.name)]) 
-pvstate_df$state[is.na(pvstate_df$state)] <- "DC"
-pollstate_df  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv") %>%
+pvstate_df9$state[is.na(pvstate_df9$state)] <- "DC"
+pollstate_df9  <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pollavg_bystate_1968-2016.csv") %>%
    mutate(state = state.abb[match(state,state.name)]) 
-pollstate_df$state[is.na(pollstate_df$state)] <- "DC"
-hispanic_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
-race_2020 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
+pollstate_df9$state[is.na(pollstate_df9$state)] <- "DC"
+hispanic_2020_9 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/csvData.csv")
+race_2020_9 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/demog_race.csv")
 
 # tidyinig electoral votes for my purposes 
-electoral <- electoral_votes %>%
+electoral9 <- electoral_votes %>%
   select(X1, '2020') %>%
   rename(state = X1) %>%
   mutate(state = state.abb[match(state,state.name)]) 
-electoral$state[is.na(electoral$state)] <- "DC"
+electoral9$state[is.na(electoral9$state)] <- "DC"
 
 ```
 
@@ -78,8 +78,8 @@ MAP
 #### POLL MODEL and PRED ####
 #############################
 
-dat <- state_pv_df %>%
-  full_join(pollstate_df %>% 
+dat9 <- state_pv_df9 %>%
+  full_join(pollstate_df9 %>% 
               filter(weeks_left <= 10) %>% 
               group_by(year,party,state) %>% 
               summarise(avg_poll=mean(avg_poll)),
@@ -94,12 +94,12 @@ dat <- state_pv_df %>%
   arrange(state)
 
 # MODEL
-fit_state_poll <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat)
-summary(fit_state_poll)
-export_summs(fit_state_poll)
+fit_state_poll9 <- lm(D_pv2p ~ avg_poll + as.factor(state), data = dat9)
+summary(fit_state_poll9)
+export_summs(fit_state_poll9)
 ## prediction : take the average for each state
     # average of three weeks ago: October 8
-new_poll <- poll_2020_state %>%
+new_poll9 <- poll_2020_state9 %>%
   filter(candidate_name %in% c("Joseph R. Biden Jr.",  "Convention Bounce for Joseph R. Biden Jr.")) %>%
   filter(state != "ME-1", 
          state != "ME-2",
@@ -112,17 +112,17 @@ new_poll <- poll_2020_state %>%
   group_by(state) %>%
   summarize(avg_poll = mean(pct_estimate))
   
-  new_poll$state[is.na(new_poll$state)] <- "DC"
+  new_poll9$state[is.na(new_poll9$state)] <- "DC"
   
-  new_data_poll <- new_poll %>%
+  new_data_poll9 <- new_poll9 %>%
     arrange(state)
   
   
   ## average poll since 10/8 per state for joe biden
 
 # 2020 PREDICTION
-pred_2020 <- predict(fit_state_poll, newdata = new_data_poll)
-poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
+pred_2020_9 <- predict(fit_state_poll9, newdata = new_data_poll9)
+poll_pred_2020_9 <- tibble(state = new_data_poll9$state, pred = pred_2020_9)
 
 #############################
 #### DEMO MODEL AND PRED ####
@@ -130,19 +130,19 @@ poll_pred_2020 <- tibble(state = new_data_poll$state, pred = pred_2020)
 
 # state names and abbreviations
 
-dat_demo <- pvstate_df %>% 
-  full_join(pollstate_df %>% 
+dat_demo9 <- pvstate_df9 %>% 
+  full_join(pollstate_df9 %>% 
               filter(weeks_left == 10) %>% 
               group_by(year,party,state) %>% 
               summarise(avg_poll=mean(avg_poll)),
             by = c("year" ,"state")) %>%
-  left_join(demog %>%
+  left_join(demog9 %>%
               select(-c("total")),
             by = c("year" ,"state")) 
 # demographics, poll numbers, and popular vote 
 
 
-dat_change <- dat_demo %>%
+dat_change9 <- dat_demo9 %>%
   group_by(state) %>%
   mutate(Asian_change = Asian - lag(Asian, order_by = year),
          Black_change = Black - lag(Black, order_by = year),
@@ -158,15 +158,15 @@ dat_change <- dat_demo %>%
   arrange(state)
 
 ## MODEL
-mod_demog_change <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
-                         as.factor(state), data = dat_change)
+mod_demog_change9 <- lm(D_pv2p ~ Black_change + Hispanic_change + Asian_change +
+                         as.factor(state), data = dat_change9)
 
 
 # UPDATED 2020
-hispanic_2020$State[hispanic_2020$State == "Washington DC"] <- "District of Columbia"
-dat_2020 <- race_2020 %>%
+hispanic_2020_9$State[hispanic_2020_9$State == "Washington DC"] <- "District of Columbia"
+dat_2020_9 <- race_2020_9 %>%
   filter(!str_detect(State, 'Puerto Rico')) %>%
-  left_join(hispanic_2020, by = "State") %>%
+  left_join(hispanic_2020_9, by = "State") %>%
   mutate(Hispanic = 100*HispanicPerc, 
          state = State, 
          White = 100*WhitePerc, 
@@ -175,18 +175,18 @@ dat_2020 <- race_2020 %>%
   select(state, Hispanic, White, Asian, Black) %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   mutate(year = 2020)
-dat_2020$state[is.na(dat_2020$state)] <- "DC"
+dat_2020_9$state[is.na(dat_2020_9$state)] <- "DC"
 
 # 2018 demographics
-dat_2018 <- demog %>%
+dat_2018_9 <- demog9 %>%
   filter(year == 2018) 
 
 # joining demographics
-real_2020_change <- bind_rows(dat_2018, dat_2020)
+real_2020_change9 <- bind_rows(dat_2018_9, dat_2020_9)
 
 # calculating percent changes in available demographic groups
 ## I used 0 percent change with populations that lacked demographic data (age and gender)
-real_2020 <- real_2020_change %>%
+real_2020_9 <- real_2020_change9 %>%
   filter(year %in% c(2018, 2020)) %>%
   group_by(state) %>%
   mutate(Asian_change = Asian - lag(Asian, order_by = year), # CALCULATING CHANGES IN POPULATION
@@ -205,25 +205,25 @@ real_2020 <- real_2020_change %>%
   arrange(state)
 
 #  2020 PREDICTION
-demog_pred <- predict(mod_demog_change, newdata = real_2020) 
+demog_pred9 <- predict(mod_demog_change9, newdata = real_2020_9) 
 
-d <- tibble(demog_pred) %>%
-  mutate(state = real_2020$state) 
+d9 <- tibble(demog_pred9) %>%
+  mutate(state = real_2020_9$state) 
 
 
 #############################
 #### ECON MODEL AND PRED ####
 #############################
 library(readxl)
-q2_2020 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/q2_2020.xlsx") %>%
+q2_2020_9 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/q2_2020.xlsx") %>%
   na.omit()%>%
   mutate(state = state.abb[match(state,state.name)])
-state_gdp <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_gdp_quarter.csv")
+state_gdp9 <- read_csv("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_gdp_quarter.csv")
 
-econ_update
+econ_update9
 
 # going to have to use yearly growth
-state_econ <- econ_update %>%
+state_econ9 <- econ_update9 %>%
   filter(Description == "Real GDP (millions of chained 2012 dollars)") %>%
   select(GeoName, '1997', '1998', '1999','2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
   melt(c("GeoName"), value.name = "GDP") %>%
@@ -233,20 +233,20 @@ state_econ <- econ_update %>%
   mutate(gdp_growth= (GDP - lag(GDP, order_by = year))/lag(GDP, order_by = year)) %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   select(year, state, gdp_growth) 
-state_econ$state[is.na(state_econ$state)] <- "DC"
+state_econ9$state[is.na(state_econ9$state)] <- "DC"
 
   
-q3_econ <- pvstate_df %>%
-  left_join(state_econ, by = c("year", "state")) %>%
-  left_join(popvote_df, by = c("year")) %>%
+q3_econ9 <- pvstate_df9 %>%
+  left_join(state_econ9, by = c("year", "state")) %>%
+  left_join(popvote_df9, by = c("year")) %>%
   filter(party == "democrat") %>%
   arrange(state)
 
 # MODEL
-econ_fit <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = q3_econ)
-summary(econ_fit)
+econ_fit9 <- lm(D_pv2p ~ gdp_growth*incumbent + as.factor(state), data = q3_econ9)
+summary(econ_fit9)
 
-e <- econ_update %>%
+e9 <- econ_update9 %>%
   filter(Description == "Real GDP (millions of chained 2012 dollars)") %>%
   select(GeoName, '1997', '1998', '1999','2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')%>%
   melt(c("GeoName"), value.name = "GDP") %>%
@@ -255,22 +255,21 @@ e <- econ_update %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   select(state, year, GDP) %>%
   filter(year == 2018)
-e$state[is.na(e$state)] <- "DC"
+e9$state[is.na(e9$state)] <- "DC"
 
 
-g_2019 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_2019_gdp.xlsx")
-g_2019 <-  g_2019[-c(1:4),]
-gdp_2019 <- g_2019 %>%
+g_2019_9 <- read_excel("/Users/carinehajjar/Desktop/R studio/carine-h.github.io/pred_data/state_2019_gdp.xlsx")
+g_2019_9 <-  g_2019_9[-c(1:4),]
+gdp_2019_9 <- g_2019_9 %>%
   mutate(state = state.abb[match(state,state.name)]) %>%
   mutate(year = 2019)
-gdp_2019$state[is.na(gdp_2019$state)] <- "DC"
+gdp_2019_9$state[is.na(gdp_2019_9$state)] <- "DC"
 
-# new data: ASSUMING SAME GDP GROWTH ACROSS STATES AS IS NATIONALLY 
-data_econ <- q2_2020 %>%
+data_econ9 <- q2_2020_9 %>%
   mutate(year = 2020)
-data_econ$state[is.na(data_econ$state)] <- "DC"
+data_econ9$state[is.na(data_econ9$state)] <- "DC"
 
-new_data_econ <- rbind(data_econ, gdp_2019) %>%
+new_data_econ9 <- rbind(data_econ9, gdp_2019_9) %>%
   mutate(incumbent = FALSE) %>%
   group_by(state) %>%
   mutate(gdp_growth = (GDP - lag(GDP, order_by = year))/lag(GDP, order_by = year)) %>%
@@ -278,26 +277,26 @@ new_data_econ <- rbind(data_econ, gdp_2019) %>%
   arrange(state)
 
 # 2020 PREDICTION
-econ_pred <- predict(econ_fit, newdata = new_data_econ, na.rm = TRUE)
+econ_pred9 <- predict(econ_fit9, newdata = new_data_econ9, na.rm = TRUE)
 
-e2 <- tibble(pred = predict(econ_fit, newdata = new_data_econ), state = new_data_econ$state) %>%
+e2_9 <- tibble(pred = predict(econ_fit9, newdata = new_data_econ9), state = new_data_econ9$state) %>%
   na.omit()
 
 ```
 
 ```{r}
 #### ENSEMBLE ####
-in_sample_poll <- as.data.frame(predict(fit_state_poll, newdata = new_data_poll, interval = "predict"))
-in_sample_demo <- as.data.frame(predict(mod_demog_change, newdata = real_2020, interval = "predict"))
-in_sample_econ <- as.data.frame(predict(econ_fit, newdata = new_data_econ, interval = "predict"))
+in_sample_poll9 <- as.data.frame(predict(fit_state_poll9, newdata = new_data_poll9, interval = "predict"))
+in_sample_demo9 <- as.data.frame(predict(mod_demog_change9, newdata = real_2020_9, interval = "predict"))
+in_sample_econ9 <- as.data.frame(predict(econ_fit9, newdata = new_data_econ9, interval = "predict"))
 
 # ensemble PREDICTION for 2020
-ensemble <- 0.25*in_sample_econ$fit + 0.25*in_sample_demo$fit + 0.5*in_sample_poll$fit
-ensemble_tibble <- tibble(pred = ensemble, state = new_data_econ$state) 
+ensemble9 <- 0.25*in_sample_econ9$fit + 0.25*in_sample_demo9$fit + 0.5*in_sample_poll9$fit
+ensemble_tibble9 <- tibble(pred = ensemble9, state = new_data_econ9$state) 
 
 # electoral vote table:
-pred_electoral_count <- ensemble_tibble %>%
-  left_join(electoral, by = "state") %>%
+pred_electoral_count <- ensemble_tibble9 %>%
+  left_join(electoral9, by = "state") %>%
   na.omit() %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
                             pred < 50 ~ "Trump")) %>%
@@ -314,7 +313,7 @@ gt::gtsave(pred_electoral_count,
     filename = "images/pred_electoral_count.png")
 
 # electoral map table:
-pred_update_map <- ensemble_tibble %>% 
+pred_update_map <- ensemble_tibble9 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
@@ -329,8 +328,8 @@ pred_update_map <- ensemble_tibble %>%
  ggsave("~/Desktop/R studio/carine-h.github.io/images/pred_update_map.png", pred_update_map)
  
  # intervals table
- pred_interval_table  <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
-  mutate(state = new_data_poll$state) %>%
+ pred_interval_table  <- as.data.frame(0.5*in_sample_poll9 + 0.25*in_sample_demo9 + 0.25*in_sample_econ9) %>%
+  mutate(state = new_data_poll9$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
          fit = round(fit, digits = 2)/100, 
@@ -359,13 +358,13 @@ I also predicted the democratic vote share per state:
 
 ```{r}
 # RMSE
-as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
-  mutate(state = new_data_poll$state) %>%
+as.data.frame(0.5*in_sample_poll9 + 0.25*in_sample_demo9 + 0.25*in_sample_econ9) %>%
+  mutate(state = new_data_poll9$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2), 
          fit = round(fit, digits = 2), 
          upr = round(upr, digits = 2))%>%
-  left_join(outcome_2020) %>%
+  left_join(outcome_2020_9) %>%
   select(state, fit, D_pv2p) %>%
   mutate(diff = fit - (D_pv2p*100)) %>%
   mutate(diff_sq = diff^2)%>%
@@ -373,8 +372,8 @@ as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>
 
 # CLASSIFICATION ACCURACY 
     # states right/total
-pred_winners <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in_sample_econ) %>%
-  mutate(state = new_data_poll$state) %>%
+pred_winners9 <- as.data.frame(0.5*in_sample_poll9 + 0.25*in_sample_demo9 + 0.25*in_sample_econ9) %>%
+  mutate(state = new_data_poll9$state) %>%
   select(state, lwr, fit, upr) %>%
   mutate(lwr = round(lwr,  digits = 2)/100, 
          fit = round(fit, digits = 2)/100, 
@@ -383,13 +382,13 @@ pred_winners <- as.data.frame(0.5*in_sample_poll + 0.25*in_sample_demo + 0.25*in
                             fit < .50 ~ "Trump")) %>%
   select(state, fit, winner)
 
-winners <- outcome_2020 %>%
+winners9 <- outcome_2020_9 %>%
   select(state, D_pv2p) %>%
   mutate(actual_winner =  case_when(D_pv2p > .50 ~ "Biden",
                             D_pv2p < .50 ~ "Trump"))
 
-win_2020 <- pred_winners %>%
-  left_join(winners) %>%
+win_2020_9 <- pred_winners9 %>%
+  left_join(winners9) %>%
   mutate(win = ifelse(winner == actual_winner, TRUE, FALSE))  # 46/50 were CORRECT
 46/51
 # 90% classification accuracy (iin terms of states won/lost)
@@ -415,7 +414,7 @@ It was a huge surprise when the model produced a Biden landslide. However, I sto
 
 ```{r}
 # my prediction 
-plot1 <- ensemble_tibble %>% 
+plot1_9 <- ensemble_tibble9 %>% 
   mutate(state = as.character(state)) %>% ##`statebins` needs state to be character, not factor!
   ggplot(aes(state = state, fill = (pred >= 50))) +
   geom_statebins() +
@@ -427,7 +426,7 @@ plot1 <- ensemble_tibble %>%
         plot.subtitle = element_text(size = 10, hjust = 0.5),
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
-plot2 <- outcome_2020 %>% 
+plot2_9 <- outcome_2020_9 %>% 
   ggplot(aes(state = state, fill = (D_pv2p > .50))) +
   geom_statebins() +
   theme_statebins() +
@@ -438,8 +437,8 @@ plot2 <- outcome_2020 %>%
         plot.title   = element_text(size = 12, hjust = 0.5, face = "bold"))
 
 
-ensemble_tibble %>%
-  left_join(electoral, by = "state") %>%
+ensemble_tibble9 %>%
+  left_join(electoral9, by = "state") %>%
   na.omit() %>%
   mutate(state_win = case_when(pred > 50 ~ "Biden",
                             pred < 50 ~ "Trump")) %>%
@@ -454,12 +453,12 @@ ensemble_tibble %>%
 
 
 # MAP PLOTS 
-map_comp <- grid.arrange(plot1, plot2, ncol=2)
+map_comp <- grid.arrange(plot1_9, plot2_9, ncol=2)
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/map_comp.png", map_comp)
 
 # SCATTTER PLOT
-scatter_comp <- win_2020 %>%
+scatter_comp <- win_2020_9 %>%
 ggplot(aes(fit, D_pv2p, label = state)) + 
   labs(x = "Predicted Democratic Vote Share", 
        y = "Actual Democratic Vote Share", 
@@ -471,13 +470,13 @@ ggsave("~/Desktop/R studio/carine-h.github.io/images/scatter_comp.png", scatter_
 
 # HISTOGRAM
 png("~/Desktop/R studio/carine-h.github.io/images/hist_comp.png", width=800, height=400)
-hist_comp <- hist(win_2020$fit*100 - win_2020$D_pv2p*100, 
+hist_comp <- hist(win_2020_9$fit*100 - win_2020_9$D_pv2p*100, 
      main = "Difference Between Democratic Vote Share \n Prediction and 2020 Outcome", 
      xlab = "(Corrected) Prediction - Actual Outcome", 
      ylim = c(0, 30), 
      xlim= c(-5, 15),
      col = "coral")
-abline(v = mean( win_2020$fit*100 - win_2020$D_pv2p*100), col = "dodgerblue", lty = 2)
+abline(v = mean( win_2020_9$fit*100 - win_2020_9$D_pv2p*100), col = "dodgerblue", lty = 2)
 dev.off()
 
 

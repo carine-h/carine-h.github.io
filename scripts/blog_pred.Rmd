@@ -665,6 +665,8 @@ al_margin_error = mod_al - true_inc_al$D_pv2p
 
 mean(fl_margin_error, az_margin_error, al_margin_error)
 
+
+
 ```
 
 
