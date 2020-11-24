@@ -19,7 +19,7 @@ I did not, in any way, change the variable and weights in my model. Here is a ma
 (In the interest of being fully transparent about my mistake, I've kept my [original prediction](https://carine-h.github.io/posts/blog_8.html) post up with an updated disclaimer at the bottom. The botched code is also still available along with the corrected code used for today's assessment (see my [github](https://github.com/carine-h)). If you have any more questions about the mistake or my correction, feel free to email me at cmhajjar@college.harvard.edu. Going forward, I will only be referring to my updated prediction and will denote this in each plot using my corrected prediction data by noting it's "corrected."")
 
 ### How I Stacked Up With the Election's Outcome
-My prediction, though updated and corrected, still did not capture the true outcome of the election. As of November 22nd, 2020, President Elect Biden has ***306*** electoral votes with a popular vote share of 51.1% and President Trump has ***232*** electoral votes with a popular vote share of 47.2%, indicating a decisive Biden victory. 
+My prediction, though updated and corrected, still did not capture the true outcome of the election. As of November 22nd, 2020, President Elect Biden has **306** electoral votes with a popular vote share of 51.1% and President Trump has **232** electoral votes with a popular vote share of 47.2%, indicating a decisive Biden victory. 
 
 So how exactly did I build my prediction? 
 
@@ -68,7 +68,7 @@ Lastly, I created a scatter plot that plotted the predicted state democratic vot
 - This plot reveals the following key patterns: 
   - For most states, I overpredicted the democratic vote share 
   - Biden's vote share was especially overpredicted in traditionally red states like OK, AR, TN, etc. 
-    - While Trump won these states, the overprediction indicates that polls and classical indicators in predictive models (like the economy) have fallen victim to polarization - in predominantly Republican states, there was a more favorable analysis of these factors for Trump than there would haave been in previous elections
+    - While Trump won these states, the overprediction indicates that polls and classical indicators in predictive models (like the economy) have fallen victim to polarization - in predominantly Republican states, there was a more favorable analysis of these factors for Trump than there would have been in previous elections
 
 ## Where I Went Wrong
 I propose three major hypotheses for my model's pitfalls: 
