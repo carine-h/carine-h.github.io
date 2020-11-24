@@ -508,3 +508,33 @@ RMSE
 - subtract columns 
 - swuare difference of EACH value - nw column 
 - take MEAAAN of squared error column 
+
+
+
+# Updated alternative model in the prediction blog (blog 8)
+```{r}
+# fundamental heavy alternative
+
+ensemble2_9 <- 0.5*in_sample_econ9$fit + 0.25*in_sample_demo9$fit + 0.25*in_sample_poll9$fit
+ensemble_tibble_2_9 <- tibble(pred = ensemble2_9, state = new_data_poll9$state) 
+
+en_2_data <- ensemble_tibble_2_9 %>%
+  select(state, pred) %>%
+  left_join(electoral, by = "state") %>%
+  mutate(state_win = case_when(pred > 50 ~ "Biden",
+                            pred < 50 ~ "Trump")) 
+en_2_data$'2020'[is.na(en_2_data$'2020')] <- 3
+
+en_2_tibble <- en_2_data %>%
+  group_by(state_win) %>%
+  summarise(electoral_votes = sum(`2020`)) %>%
+  gt() %>%
+  tab_header(title = md("**Fundamentals-Heavy Ensemble: 2020 Electoral Vote Outcome Prediction**"), 
+               subtitle = "BIDEN Wins") %>%
+   cols_label(state_win = md("**Candidate**"),
+               electoral_votes = md("**Total Electoral Votes**")) %>%
+  tab_source_note(md("*Data: BEA*"))
+
+
+```
+

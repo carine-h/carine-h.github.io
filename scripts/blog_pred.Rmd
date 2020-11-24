@@ -112,9 +112,11 @@ new_data_poll <- poll_2020_state %>%
   group_by(state) %>%
   summarize(avg_poll = mean(pct_estimate))## average poll since 10/8 per state for joe biden
 
+png("~/Desktop/R studio/carine-h.github.io/images/one.png", width=800, height=400)
 plot(dat$avg_poll, dat$D_pv2p,
          main="Overall Relationship Between Vote Share and Polls", xlab="Average Poll for Democratic Candidate", ylab="Democratic Vote Share")
     abline(lm(dat$D_pv2p ~ dat$avg_poll, data = dat)) 
+dev.off()
 
 
 # 2020 PREDICTION
@@ -152,7 +154,7 @@ p3 <- poll_pred_2020  %>%
   tab_source_note(md("*Data: FiveThirtyEight*")) 
 
 gt::gtsave(p3,
-    filename = "images/three.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/three.png")
 
 ```
 
@@ -288,7 +290,7 @@ p5 <- d %>%
   tab_source_note(md("*Data: World Population Review*")) 
 
 p5 <- gt::gtsave(p5,
-    filename = "images/five.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/five.png")
  
 
 ```
@@ -393,7 +395,7 @@ p7 <- e2  %>%
   tab_source_note(md("*Data: FiveThirtyEight, BEA*")) 
 
  gt::gtsave(p7,
-    filename = "images/seven.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/seven.png")
 
  
 
@@ -435,7 +437,7 @@ p8 <- ensemble_tibble %>%
   tab_source_note(md("*Data: FiveThirtyEight*"))
 
 p8 <- gt::gtsave(p8,
-    filename = "images/eight.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/eight.png")
 
 # electoral map table:
 p9 <- ensemble_tibble %>% 
@@ -477,7 +479,7 @@ tab1 <- as.data.frame(0.5*in_sample_polls + 0.25*in_sample_demos + 0.25*in_sampl
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*")) 
              # convert to gt table
 gt::gtsave(tab1,
-    filename = "images/my_table_image.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/my_table_image.png")
 
 
 
@@ -504,7 +506,7 @@ p10 <- ensemble_tibble2 %>%
   tab_source_note(md("*Data: BEA*"))
 
 gt::gtsave(p10,
-    filename = "images/ten.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/ten.png")
 
 # electoral map table:
 p11 <- ensemble_tibble2 %>% 
@@ -542,7 +544,7 @@ tab2 <- as.data.frame(0.25*in_sample_poll + 0.25*in_sample_demo + 0.5*in_sample_
   tab_source_note(md("*Data: BEA, FiveThirtyEight, World Population Review*"))
 
 gt::gtsave(tab2,
-    filename = "images/my_table_image2.png")
+    filename = "~/Desktop/R studio/carine-h.github.io/images/my_table_image2.png")
 
 ```
 - difference when weighing fundamentals (econ and incumbency) versus polls: 
