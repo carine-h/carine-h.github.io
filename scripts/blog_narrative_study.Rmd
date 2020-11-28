@@ -1,0 +1,489 @@
+---
+title: "blog_narrative_study"
+author: "Carine Hajjar"
+date: "11/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(quanteda) ## package for analyzing text-as-data
+library(ggplot2)
+library(readxl)
+library(usmap)
+library(stringr)
+library(tidyverse)
+library(gridExtra)
+library(ggpubr)
+library(webshot)
+
+
+# loading in data 
+speech_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/campaignspeech_2019-2020.csv")
+pv_by_county_2000_2016_10 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bycounty_2000-2016.csv")
+pv_by_county_2020_10 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/popvote_bycounty_2020.csv")
+hisp_black_county_2018 <- read_xlsx("~/Desktop/R studio/carine-h.github.io/data/2018_hisp_black_counties.xlsx")
+fb_ad_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_ad.csv")
+fb_location_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_location.csv")
+
+
+state <- pv_by_county_2000_2016_10 %>%
+  select(county, state, fips)
+
+# cleaning 2020 county data to match 2000-2016
+  # will have to create a D vote margin
+pv_by_county_2020_10 = pv_by_county_2020_10[-1,]
+pv_2020 <- pv_by_county_2020_10 %>%
+  select("FIPS", "Geographic Name", "Geographic Subtype", "Total Vote", "Joseph R. Biden Jr.", "Donald J. Trump") %>%
+  rename(county = 'Geographic Name', 
+         type = 'Geographic Subtype',
+         total = 'Total Vote',
+         biden = 'Joseph R. Biden Jr.', 
+         trump = 'Donald J. Trump', 
+         fips = 'FIPS') %>%
+  mutate(total = as.numeric(total), 
+         biden = as.numeric(biden), 
+         trump = as.numeric(trump), 
+         fips = as.numeric(fips)) %>%
+  mutate(D_pv2p = biden/total, 
+         R_pv2p = trump/total, 
+         D_win_margin = 100* ((biden-trump)/total)) %>%
+  select(county, D_win_margin, fips) %>%
+  mutate(year = 2020) %>%
+  left_join(state, by = c("fips", "county")) %>%
+  unique()
+
+# pop vote 2000-2020
+pv_change <- pv_by_county_2000_2016_10 %>%
+  select(fips, year, state, county, D_win_margin) %>%
+  rbind(pv_2020) %>%
+  filter(year >= 2016) %>%
+  spread(year, D_win_margin) %>%
+  rename(d_marg_2016 = '2016', 
+         d_marge_2020 = '2020') %>%
+  mutate(d_marg_change = d_marge_2020 - d_marg_2016) 
+
+
+hb <- hisp_black_county_2018 %>%
+  mutate(county = str_remove_all(county, "County")) %>%
+  filter(!str_detect(county, "Danville city"), 
+         !str_detect(county, "Petersburg city"),
+         !str_detect(county, "Portsmouth city"),
+         !str_detect(county, "Richmond city"))
+
+# write.csv(pv_change, "~/Desktop/R studio/carine-h.github.io/data/pv_change.csv", row.names = FALSE)
+# write.csv(hb, "~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv", row.names = FALSE)
+
+vote.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/pv_change.csv")
+change.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv")
+
+
+# HISPANIC COUNTIES CHANGE IN D VOTE MARGIN 
+dat <-  left_join(change.dat,vote.dat) %>%
+  filter(largest_racial_ethnic_group == "Hispanic")
+
+
+dat %>%
+  filter(state == "California")
+  
+```
+
+- narrative: Hispanics made this race a close call for Biden (at least one factor) and reaching this demographic was a huge failure for Democrats 
+
+
+# Notes on Pew Data
+[Pew](https://www.pewresearch.org/fact-tank/2019/11/20/in-a-rising-number-of-u-s-counties-hispanic-and-black-americans-are-the-majority/) info using Census 
+- note from Pew on data: "This analysis includes only counties with 10,000 or more residents in 2018. These counties account for 77% of the nation’s 3,142 counties and 99% of the U.S. population."
+- CITATION: Pew Research Center analysis of 2000 decennial census and 2018 Census Bureau population estimates.
+- official name of table: "Population in U.S. counties where Hispanic, black, or indigenous people are a **large** share of residents"
+  - column names: "percent of population that was one racial/ethnic group other than white in 2018" AND "largest racial/ethnic group, 2018"
+- article: by Katherine Schaeffer
+  - 2018: 151 US counties where Hispanics, blacks, and American Indians/Alaska Natives made up majority of pop
+    - up from 110 in 2000 
+    - 41 of new were black or Hispanic 
+
+# Plots
+```{r}
+#####-------------------------------------------------------------------------------#
+##### Hist and Scatter ####
+#####-------------------------------------------------------------------------------#
+
+states <- c("Arizona", "California", "Florida", "Kansas", "New Mexico", "New York", "Texas", "Washington")
+
+hist(pv_change$d_marg_change, 
+     main = "Overall County-Level Change in Democratic Vote Share Maring: 2016-2020")
+abline(v = mean(pv_change$d_marg_change, na.rm = TRUE), col = 'red', lwd = 2)
+
+pv_change %>%
+  ggplot(aes(d_marge_2020, d_marg_2016))+ 
+  geom_point()+
+  geom_smooth(method = lm)
+
+# all together
+  # Q does this look good tho???
+plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = states, 
+           exclude = "New York") +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void()+
+  labs(title = "2016-2020 Change in Democratic Win Margins",
+  subtitle = "Hispanic-Majority Counties") +
+  theme(plot.title = element_text(face = "bold"))
+
+
+#####-------------------------------------------------------------------------------#
+##### USMAPS prep ####
+#####-------------------------------------------------------------------------------#
+
+# extracting just counties we want 
+fip_fl <- dat$fips[dat$state == "Florida"]
+fip_tx <- dat$fips[dat$state == "Texas"]
+fip_nm <- dat$fips[dat$state == "New Mexico"]
+fip_ks <- dat$fips[dat$state == "Kansas"]
+fip_az <- dat$fips[dat$state == "Arizona"]
+fip_cali <- dat$fips[dat$state == "California"]
+fip_ca <- sprintf("%05d", fip_cali)
+```
+
+
+```{r}
+#####-------------------------------------------------------------------------------#
+##### Florida map ####
+#####-------------------------------------------------------------------------------#
+# FLORIDA
+fl1 <- plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = c(fip_fl),
+           labels = TRUE) +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "win margin") +
+  theme_void()+
+  theme(legend.position = "none") 
+
+fl2 <- plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = "Florida") +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void() 
+
+
+fl_comp <- ggarrange(fl1, fl2, ncol=2)
+florida_comp <- annotate_figure(fl_comp,
+               top = text_grob("Florida 2016-2020: Change in Democratic \n Win Margins in Hispanic-Majority Counties", face = "bold", size = 13), 
+               bottom = text_grob("Source: Pew",
+                                  hjust = 1, x = 0.85, face = "italic", size = 10))
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_florida_comp.png", florida_comp)
+```
+annotate_figure(florida_comp,
+               top = text_grob("Florida 2016-2020: Change in Democratic Win Margins in Hispani-Majority Counties", face = "bold", size = 14),
+               bottom = text_grob("Data source: \n ToothGrowth data set", color = "blue",
+                                  hjust = 1, x = 1, face = "italic", size = 10),
+               left = text_grob("Figure arranged using ggpubr", color = "green", rot = 90),
+               right = text_grob(bquote("Superscript: ("*kg~NH[3]~ha^-1~yr^-1*")"), rot = 90),
+               fig.lab = "Figure 1", fig.lab.face = "bold"
+)
+```{r}
+#####-------------------------------------------------------------------------------#
+##### Texas map ####
+#####-------------------------------------------------------------------------------#
+# TEXAS
+p_tx <- plot_usmap(data = dat, 
+                   regions = "counties", 
+                   values = "d_marg_change", 
+           include = c(fip_tx),
+           labels = TRUE, 
+           label.size = 0.1) +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "win margin") +
+  theme_void() +
+  theme(legend.position = "none") 
+
+p_tx$layers[[2]]$aes_params$size <- 2.5
+tx1 <- print(p_tx)
+
+tx2 <- plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = "Texas") +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void()
+
+
+tx_comp <- ggarrange(tx1, tx2, ncol=2)
+texas_comp <- annotate_figure(tx_comp,
+               top = text_grob("Texas 2016-2020: Change in Democratic \n Win Margins in Hispanic-Majority Counties", face = "bold", size = 13), 
+               bottom = text_grob("Source: Pew",
+                                  hjust = 1, x = 0.85, face = "italic", size = 10))
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_texas_comp.png", texas_comp)
+
+
+
+```
+
+```{r}
+#####-------------------------------------------------------------------------------#
+##### New Mexico map ####
+#####-------------------------------------------------------------------------------#
+p_nm <- plot_usmap(data = dat, 
+                   regions = "counties", 
+                   values = "d_marg_change", 
+           include = c(fip_nm),
+           labels = TRUE) +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "win margin") +
+  theme_void() +
+  theme(legend.position = "none") 
+
+p_nm$layers[[2]]$aes_params$size <- 4
+nm1 <- print(p_nm)
+
+nm2 <- plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = "New Mexico") +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void()
+
+
+nm_comp <- ggarrange(nm1, nm2, ncol=2)
+newmexico_comp <- annotate_figure(nm_comp,
+               top = text_grob("New Mexico 2016-2020: Change in Democratic \n Win Margins in Hispanic-Majority Counties", face = "bold", size = 13), 
+               bottom = text_grob("Source: Pew",
+                                  hjust = 1, x = 0.85, face = "italic", size = 10))
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_newmexico_comp.png", newmexico_comp)
+
+```
+
+```{r}
+#####-------------------------------------------------------------------------------#
+##### California map ####
+#####-------------------------------------------------------------------------------#
+
+p_ca <- plot_usmap(data = dat, 
+                   regions = "counties", 
+                   values = "d_marg_change", 
+           include = fip_ca,
+           labels = TRUE) +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void() +
+  theme(legend.position = "none") 
+
+p_ca$layers[[2]]$aes_params$size <- 4
+ca1 <- print(p_ca)
+
+ca2 <- plot_usmap(data = dat, regions = "counties", values = "d_marg_change", 
+           include = "California") +
+  scale_fill_gradient2(
+    high = "blue", 
+    mid = "white",
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void()
+
+
+ca_comp <- ggarrange(ca1, ca2, ncol=2)
+cali_comp <- annotate_figure(ca_comp,
+               top = text_grob("California 2016-2020: Change in Democratic \n Win Margins in Hispanic-Majority Counties", face = "bold", size = 13), 
+               bottom = text_grob("Source: Pew",
+                                  hjust = 1, x = 0.85, face = "italic", size = 10))
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_cali_comp.png", cali_comp)
+
+```
+
+# Reason 1: Rhetoric 
+- Trump's rhetoric resonated better among Hispanic voters, especially in Florida
+```{r}
+#####-------------------------------------------------------------------------------#
+##### Trump vs. Biden campaign speeches with General Hispanic messaging ####
+#####-------------------------------------------------------------------------------#
+
+#### General overview of buzz words ####
+
+## pre-process: make a `quanteda` corpus from dataframe
+speech_corpus <- corpus(speech_df, text_field = "text", docid_field = "url")
+
+## pre-process: tokenize, clean, select n-grams
+speech_toks_hispanic <- tokens(speech_corpus, 
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_numbers = TRUE,
+    remove_url = TRUE) %>% 
+    tokens_tolower() %>%
+    tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
+    tokens_remove(pattern=stopwords("en")) %>%
+    tokens_select(min_nchar=3) %>%
+    tokens_ngrams(n=2) %>%
+    tokens_select(pattern = c("hisp*", "communism", "latin*", "socialism", "dict*", "cuba*", "maduro", 
+                              "castro*"), padding = TRUE)
+
+print(speech_toks_hispanic)
+
+## pre-process: make doc-freq matrix
+speech_dfm_hispanic <- dfm(speech_toks_hispanic, groups = "candidate")
+
+## summarise and visualise
+tstat_freq_hispanic <- textstat_frequency(speech_dfm_hispanic)
+head(tstat_freq_hispanic, 100)
+
+textplot_wordcloud(speech_dfm_hispanic, color = c("red", "blue"), comparison = T)
+
+trump_keyness_hispanic <- textstat_keyness(speech_dfm_hispanic, target = "Donald Trump")
+textplot_keyness(trump_keyness_hispanic, 
+                 color = c("blue", "red"), 
+                 n = 10) 
+
+
+#####-------------------------------------------------------------------------------#
+##### Trump vs. Biden campaign speeches on cuba/venezula/nicaragua ####
+#####-------------------------------------------------------------------------------#
+
+
+## pre-process: make a `quanteda` corpus from dataframe
+speech_corpus <- corpus(speech_df, text_field = "text", docid_field = "url")
+
+## pre-process: tokenize, clean, select n-grams
+speech_toks_comm <- tokens(speech_corpus, 
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_numbers = TRUE,
+    remove_url = TRUE) %>% 
+    tokens_tolower() %>%
+    tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
+    tokens_remove(pattern=stopwords("en")) %>%
+    tokens_select(min_nchar=3) %>%
+    tokens_ngrams(n=2) %>%
+    tokens_select(pattern = c("maduro*", "castro*", "cuba*", "venezuel*", "nicarag*"))
+
+print(speech_toks_comm)
+
+## pre-process: make doc-freq matrix
+speech_dfm_comm <- dfm(speech_toks_comm, groups = "candidate")
+
+## summarise and visualise
+tstat_freq_comm <- textstat_frequency(speech_dfm_comm)
+head(tstat_freq_comm, 100)
+
+textplot_wordcloud(speech_dfm_comm, color = c("red", "blue"), comparison = T)
+
+trump_keyness_comm <- textstat_keyness(speech_dfm_comm, target = "Donald Trump")
+textplot_keyness(trump_keyness_comm, 
+                 color = c("red", "blue"), 
+                 margin = 0.4) 
+
+# this was too broad I think 
+# c("communis*", "sociali*","cuba*", "maduro", 
+#                              "castro*", "venezuela*", "chavez", "chavi*"), padding = TRUE)
+
+
+
+#####-------------------------------------------------------------------------------#
+##### Trump vs. Biden campaign speeches on socialism/communism ####
+#####-------------------------------------------------------------------------------#
+
+speech_corpus <- corpus(speech_df, text_field = "text", docid_field = "url")
+
+## pre-process: tokenize, clean, select n-grams
+speech_toks_soc <- tokens(speech_corpus, 
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_numbers = TRUE,
+    remove_url = TRUE) %>% 
+    tokens_tolower() %>%
+    tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
+    tokens_remove(pattern=stopwords("en")) %>%
+    tokens_select(min_nchar=3) %>%
+    tokens_ngrams(n=2) %>%
+    tokens_select(pattern = c("sociali*", "communis*"))
+
+print(speech_toks_soc)
+
+## pre-process: make doc-freq matrix
+speech_dfm_soc <- dfm(speech_toks_soc, groups = "candidate")
+
+## summarise and visualise
+tstat_freq_soc  <- textstat_frequency(speech_dfm_soc)
+head(tstat_freq_soc, 100)
+
+textplot_wordcloud(speech_dfm_comm, color = c("red", "blue"), comparison = T)
+
+trump_keyness_soc <- textstat_keyness(speech_dfm_soc, target = "Donald Trump")
+textplot_keyness(trump_keyness_soc, 
+                 color = c("red", "blue"), 
+                 margin = 0.4) 
+```
+
+# Reason 2: Ad Spending 
+```{r}
+# cleaning and joining FB data 
+fb_loc <- fb_location_df %>%
+  rename("state" = "Location Name", 
+         "spent" = "Amount Spent (USD)") %>%
+  mutate(state = state.abb[match(state,state.name)]) %>%
+  na.omit() 
+ fb_loc <- fb_loc %>%
+   mutate(ad_spent = as.numeric(fb_loc$spent))
+ 
+# plotting amount spent per state on FB ads
+plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
+  scale_fill_gradient2(
+    high = "indianred", 
+    mid = "white",
+    low = "grey", 
+    name = "Ad Money Spent")+ 
+    theme_void()+
+  labs(title = "2020: Total Facebook Ad Money Spent", 
+       subtitle = "Presidential Campaigns and their Supporters", 
+       caption = "Data: Facebook") + 
+  theme(plot.title = element_text(face = "bold"))
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_fb_spending.png", height = 5, width =10)
+```
+
+
+
+  

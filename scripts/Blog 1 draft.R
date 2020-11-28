@@ -257,7 +257,7 @@ ggplot(data = a, aes(x = year, y = TX_pv2_margin))+
   # This labels the Texas line
   geom_dl(aes(label = state), method = list(dl.trans(x = x + 0.05), "last.points", cex = 0.6))
 
-# I saaved the figure
+# I saved the figure
 ggsave("pop_vote_texas.png", height = 2, width = 4)
 
 
