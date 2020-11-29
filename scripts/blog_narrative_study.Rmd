@@ -64,13 +64,31 @@ pv_change <- pv_by_county_2000_2016_10 %>%
          d_marge_2020 = '2020') %>%
   mutate(d_marg_change = d_marge_2020 - d_marg_2016) 
 
-
+# hispanic and black vote
 hb <- hisp_black_county_2018 %>%
   mutate(county = str_remove_all(county, "County")) %>%
   filter(!str_detect(county, "Danville city"), 
          !str_detect(county, "Petersburg city"),
          !str_detect(county, "Portsmouth city"),
          !str_detect(county, "Richmond city"))
+
+# overall votes 2020 
+pv_2020_votes <- pv_by_county_2020_10 %>%
+  select("FIPS", "Geographic Name", "Geographic Subtype", "Total Vote", "Joseph R. Biden Jr.", "Donald J. Trump") %>%
+  rename(county = 'Geographic Name', 
+         type = 'Geographic Subtype',
+         total = 'Total Vote',
+         biden = 'Joseph R. Biden Jr.', 
+         trump = 'Donald J. Trump', 
+         fips = 'FIPS') %>%
+  mutate(total = as.numeric(total), 
+         biden = as.numeric(biden), 
+         trump = as.numeric(trump), 
+         fips = as.numeric(fips)) %>%
+  mutate(D_pv2p = biden/total, 
+         R_pv2p = trump/total, 
+         D_win_margin = 100* ((biden-trump)/total)) %>%
+  left_join(change.dat, by = c("county"))
 
 # write.csv(pv_change, "~/Desktop/R studio/carine-h.github.io/data/pv_change.csv", row.names = FALSE)
 # write.csv(hb, "~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv", row.names = FALSE)
@@ -81,12 +99,10 @@ change.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/hispanic_count
 
 # HISPANIC COUNTIES CHANGE IN D VOTE MARGIN 
 dat <-  left_join(change.dat,vote.dat) %>%
-  filter(largest_racial_ethnic_group == "Hispanic")
-
-
-dat %>%
-  filter(state == "California")
-  
+  filter(largest_racial_ethnic_group == "Hispanic") %>%
+  left_join(pv_2020_votes) %>%
+  select(state, county, percent_non_white, one_nonwhite_group, fips, d_marg_2016, d_marge_2020, d_marg_change, D_pv2p, R_pv2p, D_win_margin) %>%
+  mutate(fips = sprintf("%05d", fips))
 ```
 
 - narrative: Hispanics made this race a close call for Biden (at least one factor) and reaching this demographic was a huge failure for Democrats 
@@ -102,6 +118,21 @@ dat %>%
   - 2018: 151 US counties where Hispanics, blacks, and American Indians/Alaska Natives made up majority of pop
     - up from 110 in 2000 
     - 41 of new were black or Hispanic 
+
+# Overall relationship between prop hispanic and d vote 2020 
+```{r}
+dat %>%
+ggplot(aes(one_nonwhite_group, D_pv2p))+
+  geom_point() +
+  geom_smooth(method = lm) +
+  geom_hline(yintercept = 0.5, 
+             colour = "red", 
+             linetype = "dashed")
+```
+
+
+
+
 
 # Plots
 ```{r}
@@ -137,6 +168,20 @@ plot_usmap(data = dat, regions = "counties", values = "d_marg_change",
   subtitle = "Hispanic-Majority Counties") +
   theme(plot.title = element_text(face = "bold"))
 
+plot_usmap(data = dat, regions = "counties", values = "D_pv2p", 
+           include = states, 
+           exclude = "New York") +
+  scale_fill_gradient2(
+    high = "blue", 
+    low = "red", 
+    breaks = c(-50,-25,0,25,50), 
+    limits = c(-50,50),
+    name = "Win Margin") +
+  theme_void()+
+  labs(title = "2016-2020 Change in Democratic Win Margins",
+  subtitle = "Hispanic-Majority Counties") +
+  theme(plot.title = element_text(face = "bold"))
+
 
 #####-------------------------------------------------------------------------------#
 ##### USMAPS prep ####
@@ -149,7 +194,6 @@ fip_nm <- dat$fips[dat$state == "New Mexico"]
 fip_ks <- dat$fips[dat$state == "Kansas"]
 fip_az <- dat$fips[dat$state == "Arizona"]
 fip_cali <- dat$fips[dat$state == "California"]
-fip_ca <- sprintf("%05d", fip_cali)
 ```
 
 
@@ -335,6 +379,20 @@ cali_comp <- annotate_figure(ca_comp,
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_cali_comp.png", cali_comp)
 
 ```
+
+
+# Actual wins 
+```{r}
+
+
+
+```
+
+
+
+
+
+
 
 # Reason 1: Rhetoric 
 - Trump's rhetoric resonated better among Hispanic voters, especially in Florida
