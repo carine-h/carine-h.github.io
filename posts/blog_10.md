@@ -31,7 +31,7 @@ In this post I'll be looking at counties defined by [Pew](https://www.pewresearc
 
 Below, we see the county-by-county breakdown of the popular vote. The strength of the color is positively correlated with the vote share for Republicans (red) or Democrats (blue):
 
-![](../images/m2.png)
+![](../images/10_dem_win.png)
 
 Democrats seems to have stronger holds on Hispanic populations in California, Arizona, and just marginally, in Florida. Trump has a strong hold on West Texas, losing out to Biden in the Gulf. Trump also won broadly in Hispanic counties in Washington and Kansas. 
 
@@ -50,7 +50,7 @@ Nevertheless, Trump's hold on ]one third (32%)](https://www.theatlantic.com/idea
 
 While Democrats did not necessarily lose stronghold Hispanic counties, like Miami-Dade, they did *significantly shrink their margins of victory.* This map geographically represents these contractions: 
 
-![](../images/m1.png)
+![](../images/10_dem_comp.png)
 
 At first glance, Democrats lost many voters in the Rio Grande Valley in Texas as well as in south Florida. They gained some voters in California and, more subtly, in Kansas and Washington. Arizona Hispanic-majority counties saw less Democratic support while New Mexico was a mixed bag.
 
@@ -58,7 +58,7 @@ Let's take a closer look at some of the states that experiences this loss in Dem
 
 ### Texas
 
-![](../images/10_texas_comp.png.png)
+![](../images/10_texas_comp.png)
 
 Democrats saw steep contractions in their victory margins along the southern border. Though most of these counties still went for Biden (see my first figure), the shrinking margins certainly carry a message, especially in such a notable geographic area. These border counties are the most intimately linked to Trump's "Wall" and immigration agenda. Their shift in voting may mean that Trump's "law and order" rhetoric and his emphasis on secure border resonates with the Hispanic residents in those communities.
 
