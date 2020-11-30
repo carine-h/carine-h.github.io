@@ -76,9 +76,54 @@ Moreover, the [Trump campaign](https://www.nbcnews.com/news/latino/trump-cultiva
 
 ![](../images/10_arizona_comp.png)
 
-Arizona, like Florida, had blue counties lose some of their vote share to Trump though they remained blue. As border counties, perhaps these were groups of voters that likes Trump's "law and order" and secure border agenda. 
+Arizona, like Florida, had blue counties lose some of their vote share to Trump. As border counties, perhaps these were groups of voters that liked Trump's "law and order"/secure border agenda. 
 
 It is worth noting that Arizona, which unlike Florida, remained blue and had [exceptional ground outreach](https://www.nbcnews.com/news/latino/years-making-established-latino-groups-helped-biden-arizona-nevada-n1246864) by the Biden campaign among Hispanic voters in relation to other states with large Hispanic populations. There were also established outreach networks already in place in Arizona as well as Nevada that mobilized in support of the Biden campaign. 
+
+## So what happened?
+So far I've established that while Biden still won most Hispanic-majority counties and Democrats do fairly well in these places, Trump did take a sizeable chunk out of the blue win margin. I propose two possible reasons for this (which I briefly mentioned above in my state-by-state analysis):
+1. Trump's rhetoric aligned with different Hispanic communities 
+2. Trump's ground game and ad campaigns were more effective and better tailored towards different Hispanic communities
+
+### Rhetoric
+Trump's relative success with Hispanic populations may be linked to his emphasis on issues that align with these populations' values. For instance it is thought that Trump's fear-mongering around Biden's potential socialist agenda drove up Republican support in Florida where many Cuban and Venezuelan immigrants have settled. 
+
+#### Southern Florida
+Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
+
+![](../images/10_socialist_wc.png)
+<br>
+![](../images/10_socialist_plot.png)
+
+Overall, Trump also spoke more to issues around socialism and socialist regimes in places like Cuba, Venezuela, and Nicaragua than Biden:
+
+![](../images/10_castro_wc.png)
+<br>
+![](../images/10_castro_plot.png)
+
+#### Border Communities
+While this rhetoric certainly resonated with south Florida residents, what about Hispanic populations in the Rio Grande Valley who are of predominantly Mexican descent? Did something about Trump's rhetoric especially resonate with them? I hypothesize that his "law and order"/border security agenda appealed to border communities experiencing border-related crime. 
+
+![](../images/10_border_wc.png)
+<br>
+![](../images/10_border_plot.png)
+
+In this case, Biden did not necessarily speak less about the topic of the border and immigration, but his rhetoric was completely different. While Trump emphasized border security, a wall, and gang violence, Biden spoke mostly about immigration reform and immigrant rights. Given that Biden's vote share was smaller than Clinton's in 2016 in these counties, it's reasonable to believe that these are communities that value "border security" before reform. 
+
+This may have also been the case in border counties in Arizona and New Mexico which also saw shrinking vote shares on Democrats in Hispanic-majority communities (though Biden won both states). These are also predominantly Mexican communities. 
+
+Perhaps the strongest evidence for Trump's rhetorical success on the border is in Imperial County on California's southern border. While most other Hispanic-majority counties in California either increased their democratic vote share or stayed around the same, this 80% Hispanic county on the US-Mexican border increased its vote share for Trump since 2016. This implies that something about Trump's border rhetoric appealed to more members of this community than it did in 2016 (though it did vote blue in the end). 
+
+![](../images/10_cali_comp.png)
+
+Overall, most Hispanic-majority border counties across Texas, New Mexico, and Arizona remained blue (see first map). However, **each of these counties saw a contraction in the Democratic victory margin since 2016.**
+
+### Campaign Resources 
+
+
+
+
+
 
 
 
