@@ -91,7 +91,7 @@ Trump's relative success with Hispanic populations may be linked to his emphasis
 #### Southern Florida
 Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
  <br>
-![](../images/10_socialist_wc.png)
+![](../images/10_socialist_wc.png, width = "500")
 <br>
 <br>
 ![](../images/10_socialist_plot.png)
