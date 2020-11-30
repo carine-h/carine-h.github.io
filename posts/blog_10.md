@@ -104,6 +104,9 @@ Overall, Trump also spoke more to issues around socialism and socialist regimes 
 #### Border Communities
 While this rhetoric certainly resonated with south Florida residents, what about Hispanic populations in the Rio Grande Valley who are of predominantly Mexican descent? Did something about Trump's rhetoric especially resonate with them? I hypothesize that his "law and order"/border security agenda appealed to border communities experiencing border-related crime. 
 
+<img src="../images/10_border_wc.png" width="425"/> <img src="../images/10_border_plot.png" width="425"/> 
+
+
 ![](../images/10_border_wc.png)
 <br>
 ![](../images/10_border_plot.png)
@@ -119,6 +122,8 @@ Perhaps the strongest evidence for Trump's rhetorical success on the border is i
 Overall, most Hispanic-majority border counties across Texas, New Mexico, and Arizona remained blue (see first map). However, **each of these counties saw a contraction in the Democratic victory margin since 2016.**
 
 ### Campaign Resources 
+
+
 
 
 
