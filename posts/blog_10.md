@@ -40,28 +40,45 @@ This map, in no way, shows a red sweep for Trump in Hispanic communities. It doe
 But does this map indicate huge loses for Biden? Interestingly, Florida, which was touted as a huge failure for Democrats, still went blue in two out of three Hispanic-majority counties. While this may detract from the narrative of a Democratic failure, it does not say much about the change in Democratic vote share since 2016. 
 
 ## Vote Shares are Dwindling
-While Democrats did not necessarily lose stronghold Hispanic counties, like Miami-Dade, they did *significantly shrink their margins of victory* since 2016. The map below looks at the magnitude of these contractions: 
+Overall, there was a positive relationship between the percentage of Hispanic citizens in a Hispanic-majority county and the 2020 Democratic vote share. This lines up with Biden's support among two thirds of Hispanic voters. 
+
+![](../images/10_county_rel.png)
+
+Nevertheless, Trump's hold on ]one third (32%)](https://www.theatlantic.com/ideas/archive/2020/11/how-trump-grew-his-support-among-latinos/617033/) of Hispanic voters is an improvement from 2016, where he only gained 28% support, and signals a flaw in the Dems' outreach and messaging toward Hispanic voters across different communities. In Hispanic-majority counties, Democrats, on average, lost *almost ten points* in their victory margins since 2016: 
+
+![](../images/10_hist_d_change.png)
+
+While Democrats did not necessarily lose stronghold Hispanic counties, like Miami-Dade, they did *significantly shrink their margins of victory.* This map geographically represents these contractions: 
 
 ![](../images/m1.png)
 
 At first glance, Democrats lost many voters in the Rio Grande Valley in Texas as well as in south Florida. They gained some voters in California and, more subtly, in Kansas and Washington. Arizona Hispanic-majority counties saw less Democratic support while New Mexico was a mixed bag.
 
-Let's take a closer look at some of these states. 
+Let's take a closer look at some of the states that experiences this loss in Democratic votes. 
 
 ### Texas
+
 ![](../images/10_texas_comp.png.png)
 
-Democrats saw steep contractions in their victory margins along the southern border. Though most of these counties still went for Biden (see my first figure), the shrinking margins certainly carry a message, espcically in such a notable geographic area. These border counties are the most intimately linked to Trump's "Wall" and immigration agenda. Their shift in voting may mean that Trump's "law and order" rhetoric and his emphasis on secure border resonates with the Hispanic residents in those communities.
+Democrats saw steep contractions in their victory margins along the southern border. Though most of these counties still went for Biden (see my first figure), the shrinking margins certainly carry a message, especially in such a notable geographic area. These border counties are the most intimately linked to Trump's "Wall" and immigration agenda. Their shift in voting may mean that Trump's "law and order" rhetoric and his emphasis on secure border resonates with the Hispanic residents in those communities.
 
 ### Florida
-Florida seems to be at the center of the media narrative surrounding the Dems' failure among Hispanics. More specifically, Miami-Dade county, which saw a sizeable contraction in its Democratic support since 2020, has been drawing plenty of attention due to the demographic makeup of its Hispanic community. Miami-Dade and many other southern Floridian counties have large Cuban, Venezuelan, and Nicaraguan populations. The Venezuelan demographic, in particular, has continued to increase in 2016 as a result of the instability and mismanagement of Maduro's socialist regime. As the daughter of a Venezuelan immigrant, I have seen many of my family members and friends reallocate from Caracas to the Miami area in the past few years. 
+
+![](../images/10_florida_comp.png)
+
+Florida seems to be at the center of the media narrative surrounding the Dems' failure among Hispanics. More specifically, Miami-Dade county, which saw a sizable contraction in its Democratic support since 2020, has been drawing plenty of attention due to the demographic makeup of its Hispanic community. Miami-Dade and many other southern Floridian counties have large Cuban, Venezuelan, and Nicaraguan populations. The Venezuelan demographic, in particular, has continued to increase in 2016 as a result of the instability and mismanagement of Maduro's socialist regime. As the daughter of a Venezuelan immigrant, I have seen many of my family members and friends reallocate from Caracas to the Miami area in the past few years. 
 
 These specific communities have either recently (in the case of Venezuelans and Nicaraguans) or historically (in the case of Cubans) fled from socialist dictatorships in their ancestral counties. Trump's ability to brand Democrats as socialists may very well have resonated with these voters, compelling them to swap their previously blue votes for Trump. 
 
 Moreover, the [Trump campaign](https://www.nbcnews.com/news/latino/trump-cultivated-latino-vote-florida-it-paid-n1246226) had rallies and targeted ground presence in this key swing states, specifically catering to Hispanic voters. For instance, the Latinos for Trump coalition started in Florida as early as June 2019. Biden's campaigning in the state was less targeted and concentrated later in the election cycle. 
 
-![](../images/10_florida_comp.png)
+### Arizona
 
-Why did they do better in Arizona?
-invested more in ground game and voter registration efforts, more Latino community outreach
+![](../images/10_arizona_comp.png)
+
+Arizona, like Florida, had blue counties lose some of their vote share to Trump though they remained blue. As border counties, perhaps these were groups of voters that likes Trump's "law and order" and secure border agenda. 
+
+It is worth noting that Arizona, which unlike Florida, remained blue and had [exceptional ground outreach](https://www.nbcnews.com/news/latino/years-making-established-latino-groups-helped-biden-arizona-nevada-n1246864) by the Biden campaign among Hispanic voters in relation to other states with large Hispanic populations. There were also established outreach networks already in place in Arizona as well as Nevada that mobilized in support of the Biden campaign. 
+
+
 
