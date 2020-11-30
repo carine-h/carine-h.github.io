@@ -91,7 +91,7 @@ Trump's relative success with Hispanic populations may be linked to his emphasis
 #### Southern Florida
 Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
 
-<img src="../images/10_socialist_wc.png" width="500" height = "500"/> <img src="../images/10_socialist_plot.png" width="500" height = "500"/> 
+<img src="../images/10_socialist_wc.png" width="650" height = "500"/> <img src="../images/10_socialist_plot.png" width="650" height = "500"/> 
 
 ![](../images/10_socialist_wc.png)
 <br>
@@ -99,7 +99,7 @@ Using a word cloud of words and phrases used in Biden and Trump's campaign speec
 
 Overall, Trump also spoke more to issues around socialism and socialist regimes in places like Cuba, Venezuela, and Nicaragua than Biden:
 
-<img src="../images/10_castro_wc.png" width="500" height = "500"/> <img src="../images/10_castro_plot.png" width="500" height = "500"/> 
+<img src="../images/10_castro_wc.png" width="650" height = "500"/> <img src="../images/10_castro_plot.png" width="650" height = "500"/> 
 
 ![](../images/10_castro_wc.png)
 <br>
@@ -108,7 +108,7 @@ Overall, Trump also spoke more to issues around socialism and socialist regimes 
 #### Border Communities
 While this rhetoric certainly resonated with south Florida residents, what about Hispanic populations in the Rio Grande Valley who are of predominantly Mexican descent? Did something about Trump's rhetoric especially resonate with them? I hypothesize that his "law and order"/border security agenda appealed to border communities experiencing border-related crime. 
 
-<img src="../images/10_border_wc.png" width="500" height = "500"/> <img src="../images/10_border_plot.png" width="500" height = "500"/> 
+<img src="../images/10_border_wc.png" width="650" height = "500"/> <img src="../images/10_border_plot.png" width="650" height = "500"/> 
 
 
 ![](../images/10_border_wc.png)
