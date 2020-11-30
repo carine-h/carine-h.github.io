@@ -104,8 +104,11 @@ Overall, Trump also spoke more to issues around socialism and socialist regimes 
  <br>
 ![](../images/10_castro_plot.png)
  <br>
+ 
+ 
 #### Border Communities
 While this rhetoric certainly resonated with south Florida residents, what about Hispanic populations in the Rio Grande Valley who are of predominantly Mexican descent? Did something about Trump's rhetoric especially resonate with them? I hypothesize that his "law and order"/border security agenda appealed to border communities experiencing border-related crime. 
+
  <br>
 ![](../images/10_border_wc.png)
 <br>
