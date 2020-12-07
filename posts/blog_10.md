@@ -14,7 +14,7 @@ Many have called for a reexamination of Democrats' approach to Latino voters. Th
 1. The Latino vote is not a monolith blue bloc and cannot be taken for granted by Democrats
 2. Democrats must tailor their Latino outreach to specific communities, much like the Trump campaign did 
 3. The Trump campaign's emphasis on border safety as well as anti-socialism appealed directly to border counties in Texas and Cuban/Venezuelan/Nicaraguan communities in south Florida, respectively 
-4. The Trump campaign's ground and air game in Latino-majority communities made a huge difference, especially in relation to Democrats' lack of resource allocation in these places 
+4. The Trump campaign's air game in Latino-majority communities made a huge difference, especially in relation to Democrats' lack of resource allocation in these places 
 
 
 This widespread conversation has prompted me to do a systematic analysis of Democrats' hold on the Latino vote. In this blog I explore and test the following narrative: Democrats are losing their grip on the Hispanic voter bloc due to their lack of tailored outreach and campaign resource allocation. I'll test this narrative doing the following: 
@@ -126,7 +126,18 @@ Perhaps the strongest evidence for Trump's rhetorical success on the border is i
 
 Overall, most Hispanic-majority border counties across Texas, New Mexico, and Arizona remained blue (see first map). However, **each of these counties saw a contraction in the Democratic victory margin since 2016.**
 
-### Campaign Resources 
+### Campaign Resources
+Was rhetoric the only factor or did campaign resource allocation also help shrink Democrats' vote shares? I take a look at TV ad airings and Facebook ad purchases to seek an answer. 
+
+#### TV Ads
+A potential explanation for Trump's rising Hispanic vote share could be his superior outreach via campaign ads. Was this the case?
+
+![](../images/10_border_wc.png)
+
+Interestingly, we see the Biden campaign consistently outspending Trump in states where there are Hispanic-majority counties and large Hispanic communities in general. However, as I describe above, it may not be the ads themselves that are winning over voters. Rather, it may be that the *content* of the candidates' message. In this vein, Trump's rhetoric may be enough to eat away at Biden's Hispanic vote share despite spending less on TV ads. Additionally, Trump's ground outreach may have been better. His campaign did more rallies and door-knocking than Biden's. 
+
+#### Facebook Ads
+- theory that these have more impact because more spreadable 
 
 
 

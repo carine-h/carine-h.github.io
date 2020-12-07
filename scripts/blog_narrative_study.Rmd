@@ -26,6 +26,7 @@ pv_by_county_2020_10 <- read_csv("~/Desktop/R studio/carine-h.github.io/data/pop
 hisp_black_county_2018 <- read_xlsx("~/Desktop/R studio/carine-h.github.io/data/2018_hisp_black_counties.xlsx")
 fb_ad_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_ad.csv")
 fb_location_df <- read_csv("~/Desktop/R studio/carine-h.github.io/data/fb_location.csv")
+media_mkt_df <- read_xlsx("~/Desktop/R studio/carine-h.github.io/data/Release18_mapdata.xlsx")
 
 
 state <- pv_by_county_2000_2016_10 %>%
@@ -72,6 +73,9 @@ hb <- hisp_black_county_2018 %>%
          !str_detect(county, "Portsmouth city"),
          !str_detect(county, "Richmond city"))
 
+vote.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/pv_change.csv")
+change.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv")
+
 # overall votes 2020 
 pv_2020_votes <- pv_by_county_2020_10 %>%
   select("FIPS", "Geographic Name", "Geographic Subtype", "Total Vote", "Joseph R. Biden Jr.", "Donald J. Trump") %>%
@@ -93,9 +97,6 @@ pv_2020_votes <- pv_by_county_2020_10 %>%
 # write.csv(pv_change, "~/Desktop/R studio/carine-h.github.io/data/pv_change.csv", row.names = FALSE)
 # write.csv(hb, "~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv", row.names = FALSE)
 
-vote.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/pv_change.csv")
-change.dat = read_csv("~/Desktop/R studio/carine-h.github.io/data/hispanic_counties.csv")
-
 
 # HISPANIC COUNTIES CHANGE IN D VOTE MARGIN 
 dat <-  left_join(change.dat,vote.dat) %>%
@@ -103,6 +104,17 @@ dat <-  left_join(change.dat,vote.dat) %>%
   left_join(pv_2020_votes) %>%
   select(state, county, percent_non_white, one_nonwhite_group, fips, d_marg_2016, d_marge_2020, d_marg_change, D_pv2p, R_pv2p, D_win_margin) %>%
   mutate(fips = sprintf("%05d", fips))
+
+
+
+my_theme <- theme_bw() + 
+  theme(panel.border = element_blank(),
+        plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+        plot.title   = element_text(size = 15, hjust = 0.5, face = "bold"), 
+        axis.text    = element_text(size = 12),
+        strip.text   = element_text(size = 18),
+        axis.line    = element_line(colour = "black"),
+        legend.text = element_text(size = 12))
 ```
 
 - narrative: Hispanics made this race a close call for Biden (at least one factor) and reaching this demographic was a huge failure for Democrats 
@@ -354,7 +366,7 @@ ggsave("~/Desktop/R studio/carine-h.github.io/images/10_newmexico_comp.png", new
 p_ca <- plot_usmap(data = dat, 
                    regions = "counties", 
                    values = "d_marg_change", 
-           include = fip_ca,
+           include = fip_cali,
            labels = TRUE) +
   scale_fill_gradient2(
     high = "blue", 
@@ -388,7 +400,6 @@ cali_comp <- annotate_figure(ca_comp,
                                   hjust = 1, x = 0.85, face = "italic", size = 10))
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_cali_comp.png", cali_comp)
-
 ```
 ```{r}
 #####-------------------------------------------------------------------------------#
@@ -437,7 +448,7 @@ Arizona, like Florida, had blue counties (that remained blue) lose part of their
 
 # Reason 1: Rhetoric 
 - Trump's rhetoric resonated better among Hispanic voters, especially in Florida
-```{r}
+```{r, fig.width = 8, fig.height = 9}
 #####-------------------------------------------------------------------------------#
 ##### Trump vs. Biden campaign speeches with General Hispanic messaging ####
 #####-------------------------------------------------------------------------------#
@@ -457,7 +468,7 @@ speech_toks_hispanic <- tokens(speech_corpus,
     tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
     tokens_remove(pattern=stopwords("en")) %>%
     tokens_select(min_nchar=3) %>%
-    tokens_ngrams(n=2) %>%
+    tokens_ngrams(n=2, concatenator = " ") %>%
     tokens_select(pattern = c("hisp*", "communism", "latin*", "socialism", "dict*", "cuba*", "maduro", 
                               "castro*"), padding = TRUE)
 
@@ -496,7 +507,7 @@ speech_toks_comm <- tokens(speech_corpus,
     tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
     tokens_remove(pattern=stopwords("en")) %>%
     tokens_select(min_nchar=3) %>%
-    tokens_ngrams(n=2) %>%
+    tokens_ngrams(n=2, concatenator = " ") %>%
     tokens_select(pattern = c("maduro*", "castro*", "cuba*", "venezuel*", "nicarag*"))
 
 print(speech_toks_comm)
@@ -508,12 +519,17 @@ speech_dfm_comm <- dfm(speech_toks_comm, groups = "candidate")
 tstat_freq_comm <- textstat_frequency(speech_dfm_comm)
 head(tstat_freq_comm, 100)
 
+png("~/Desktop/R studio/carine-h.github.io/images/10_castro_wc.png", width=800, height=400)
 textplot_wordcloud(speech_dfm_comm, color = c("red", "blue"), comparison = T)
+dev.off()
+
 
 trump_keyness_comm <- textstat_keyness(speech_dfm_comm, target = "Donald Trump")
+png("~/Desktop/R studio/carine-h.github.io/images/10_castro_plot.png", width=800, height=400)
 textplot_keyness(trump_keyness_comm, 
                  color = c("red", "blue"), 
                  margin = 0.4) 
+dev.off()
 
 # this was too broad I think 
 # c("communis*", "sociali*","cuba*", "maduro", 
@@ -537,7 +553,7 @@ speech_toks_soc <- tokens(speech_corpus,
     tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
     tokens_remove(pattern=stopwords("en")) %>%
     tokens_select(min_nchar=3) %>%
-    tokens_ngrams(n=2) %>%
+    tokens_ngrams(n=2, concatenator = " ") %>%
     tokens_select(pattern = c("sociali*", "communis*"))
 
 print(speech_toks_soc)
@@ -549,12 +565,58 @@ speech_dfm_soc <- dfm(speech_toks_soc, groups = "candidate")
 tstat_freq_soc  <- textstat_frequency(speech_dfm_soc)
 head(tstat_freq_soc, 100)
 
-textplot_wordcloud(speech_dfm_comm, color = c("red", "blue"), comparison = T)
+png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_wc.png", width=800, height=400)
+textplot_wordcloud(speech_dfm_soc, color = c("red", "blue"), comparison = T, remove_punct = TRUE)
+dev.off()
 
 trump_keyness_soc <- textstat_keyness(speech_dfm_soc, target = "Donald Trump")
+png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_plot.png", width=800, height=400)
 textplot_keyness(trump_keyness_soc, 
                  color = c("red", "blue"), 
                  margin = 0.4) 
+dev.off()
+
+
+
+
+#####-------------------------------------------------------------------------------#
+##### Trump vs. Biden campaign speeches on border ####
+#####-------------------------------------------------------------------------------#
+
+speech_corpus <- corpus(speech_df, text_field = "text", docid_field = "url")
+
+## pre-process: tokenize, clean, select n-grams
+speech_toks_border <- tokens(speech_corpus, 
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_numbers = TRUE,
+    remove_url = TRUE) %>% 
+    tokens_tolower() %>%
+    tokens_remove(pattern=c("joe","biden","donald","trump","president","kamala","harris")) %>%
+    tokens_remove(pattern=stopwords("en")) %>%
+    tokens_select(min_nchar=3) %>%
+    tokens_ngrams(n=2, concatenator = " ") %>%
+    tokens_select(pattern = c("border*", "gang*", "wall", "immigra*", "border violence", "gang violence"))
+
+print(speech_toks_border)
+
+## pre-process: make doc-freq matrix
+speech_dfm_border <- dfm(speech_toks_border, groups = "candidate")
+
+## summarise and visualise
+tstat_freq_border <- textstat_frequency(speech_dfm_border)
+head(tstat_freq_border, 100)
+
+png("~/Desktop/R studio/carine-h.github.io/images/10_border_wc.png", width=800, height=400)
+textplot_wordcloud(speech_dfm_border, color = c("red", "blue"), comparison = T, remove_punct = TRUE)
+dev.off()
+
+trump_keyness_border <- textstat_keyness(speech_dfm_border, target = "Donald Trump")
+png("~/Desktop/R studio/carine-h.github.io/images/10_border_plot.png", width=800, height=400)
+textplot_keyness(trump_keyness_border, 
+                 color = c("red", "blue"), 
+                 margin = 0.5) 
+dev.off()
 ```
 
 # Reason 2: Ad Spending 
@@ -581,6 +643,68 @@ plot_usmap(data = fb_loc, regions = "state", values = "ad_spent") +
        caption = "Data: Facebook") + 
   theme(plot.title = element_text(face = "bold"))
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_fb_spending.png", height = 5, width =10)
+```
+
+# TV ad spending per media market
+```{r}
+state_ad <- media_mkt_df %>%
+  rename(state = "Market State", 
+         market = "Media Market", 
+         total_airings = "Total Airings 9Apr20 to 11Oct20", 
+         cost = "Est. Cost 9Apr20 to 11Oct29", 
+         biden_airings = "Pro-Biden Airings 9Apr20 to 11Oct20", 
+         trump_airings = "Pro-Trump Airings 9Apr20 to 11Oct20", 
+         biden_adv = "Biden Ad Adv 28Sept20 to 11Oct20") %>%
+  select(state, market, biden_airings, trump_airings, biden_adv) %>%
+  filter(state %in% c("TX", "AZ", "KS", "WA", "CA", "FL", "NM"))
+  
+state_sums <- state_ad %>%
+  group_by(state) %>%
+  summarise(total_ad_t = sum(trump_airings), 
+            total_ad_b = sum(biden_airings)) %>%
+  rename(Biden = "total_ad_b", 
+         Trump = "total_ad_t") %>%
+  gather(candidate, tot_ad, Trump:Biden) %>%
+  mutate(log_ad = log(tot_ad))
+
+
+ggplot(state_sums, aes(x = state, y = log_ad)) + 
+    geom_bar(aes(fill = candidate), stat = "identity", position = "dodge") +
+    scale_fill_manual(values = c("blue", "red")) +
+  labs(fill = "Candidate", 
+       title = "2020 Presidential Election: Log TV Ad Airings Per State", 
+       subtitle = "April 9th - October 20th",
+       x = "State", 
+       y = "Log Ad Airings", 
+       caption = "Source: Wesleyan Media Project") +
+  my_theme
+
+ggsave("~/Desktop/R studio/carine-h.github.io/images/10_TV_spending.png", height = 5, width = 10)
+```
+https://regionalspending.web.app/spending
+
+
+
+
+
+
+
+# Google 
+https://support.google.com/trends/answer/4355212?hl=en
+
+# Section 
+testing 
+```{r}
+region <- c("East", "Midwest", "South", "West")
+biden_vs <- c(78, 67, 55, 67)
+df1 <- data.frame(region, biden_vs)
+barplot(df1$biden_vs, names = c("East", "Midwest", "South", "West"), ylab = "Biden Vote Share", main = "Latino Vote is Not a Monolith: Regional Differences", col = "coral")
+
+name_ab <- c("Legal in all cases", "Legal in most cases", "Illegal in most cases")
+biden_vs_ab <- c(82, 63, 46)
+df2 <- data.frame(name_ab, biden_vs_ab)
+barplot(df2$biden_vs_ab, names = name_ab, ylab = "Biden Vote Share", main = "Latino Vote is Not a Monolith: Abortion Attitudes", col = "coral")
+
 ```
 
 
