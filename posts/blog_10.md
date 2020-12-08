@@ -82,11 +82,32 @@ It is worth noting that Arizona, which unlike Florida, remained blue and had [ex
 
 ## So what happened?
 So far I've established that while Biden still won most Hispanic-majority counties and Democrats do fairly well in these places, Trump did take a sizeable chunk out of the blue win margin. I propose two possible reasons for this (which I briefly mentioned above in my state-by-state analysis):
-1. Trump's rhetoric aligned with different Hispanic communities 
-2. Trump's ground game and ad campaigns were more effective and better tailored towards different Hispanic communities
+1. Trump's ground game and ad campaigns were more effective and better tailored towards different Hispanic communities
+2. Trump's rhetoric aligned with different Hispanic communities 
 
-### Rhetoric
-Trump's relative success with Hispanic populations may be linked to his emphasis on issues that align with these populations' values. For instance it is thought that Trump's fear-mongering around Biden's potential socialist agenda drove up Republican support in Florida where many Cuban and Venezuelan immigrants have settled. 
+### Reason 1: Campaign Resources
+Did insufficient campaign resource allocation shrink Democrats' vote shares? Did Trump do a better job on TV and on the ground? I take a look at data about TV ad airings as well as news coverage about ground game to seek an answer. 
+
+#### TV Ads
+A potential explanation for Trump's rising Hispanic vote share could be his superior outreach via campaign ads. Was this the case?
+
+![](../images/10_TV_spending.png)
+
+Interestingly, we see the Biden campaign mostly outspending Trump in states where there are Hispanic-majority counties and large Hispanic communities in general. I am hesitant to draw any conclusions from this graph, however, because it is state-wide, not county-wide data, and does not show any clear correlation between winners and TV airings. Moreover, as I've discussed in past blog posts, ads are not necessarily as effective as campaigns would hope. They are most effective when shows consistently up until an election. This would have to be the case in the Hispanic counties I looked at and unfortunately. there is not enough data available yet to verify the consistency and frequency of TV ad airings in these places. 
+
+Because of these uncertainties, it may not be the ads themselves that are winning over voters. Rather, it may be that the *content* of the candidates' message. In this vein, Trump's rhetoric may be enough to eat away at Biden's Hispanic vote share despite spending less on TV ads. Additionally, Trump's ground outreach may have been better. His campaign did more rallies and door-knocking than Biden's. 
+
+#### Ground Game
+Overall, Trump gained ground in Hispanic counties where Biden ground game was weak. 
+
+In Texas, for example, Trump's ground game was much stronger among Hispanic communities in the southern part of the state. An [*LA Times*](https://www.latimes.com/politics/story/2020-11-05/election-2020-latino-votes-democrats) article detailed the more extensive outreach effort among more conservative Hispanic communities in Texas who have benefited from Trump's increase in Border Patrol and oilfield jobs. 
+
+Trump's [ground game](https://www.npr.org/2020/10/26/927453369/outspent-in-the-homestretch-trump-campaign-says-its-ground-game-is-stronger), especially in places like Florida, was sizable compared to Biden's. Though the Biden campaign outspent Trump, volunteer outreach was a key factor in winning Florida for Trump and presumably in making inroads with Hispanics in the state. 
+
+Biden's victory in Arizona, especially among Hispanics, may be the strongest evidence of his campaign's ground game flaws. In Arizona, Biden had strong Hispanic organizing groups already in place mobilizing for the Democratic ticket. This was not the case in places like Florida and Texas where his vote share was especially eroded. 
+
+### Reason 2: Rhetoric
+More than anything, Trump's relative success with Hispanic populations may be linked to his emphasis on issues that align with these populations' values. For instance it is thought that Trump's fear-mongering around Biden's potential socialist agenda drove up Republican support in Florida where many Cuban and Venezuelan immigrants have settled. 
 
 #### Southern Florida
 Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
@@ -126,18 +147,17 @@ Perhaps the strongest evidence for Trump's rhetorical success on the border is i
 
 Overall, most Hispanic-majority border counties across Texas, New Mexico, and Arizona remained blue (see first map). However, **each of these counties saw a contraction in the Democratic victory margin since 2016.**
 
-### Campaign Resources
-Was rhetoric the only factor or did campaign resource allocation also help shrink Democrats' vote shares? I take a look at TV ad airings and Facebook ad purchases to seek an answer. 
 
-#### TV Ads
-A potential explanation for Trump's rising Hispanic vote share could be his superior outreach via campaign ads. Was this the case?
+## Takeaways
+Overall, I come away with these major points from my analysis:
+1. TV ads say very little about Hispanic turnout 
+2. Trump did better with Hispanics in Florida and Texas because of a superior ground game while Biden did better in Arizona for the same reason 
+3. The tone and message of Trump's speeches appealed more to Hispanics than in 2016 
+4. Trump's speeches show that he touched on specific interest areas among the Hispanic community while Biden stayed general 
+5. Trump spoke more about the Hispanic community in more heterogeneous terms than Biden
 
-![](../images/10_TV_spending.png)
+Putting my campaign resource and speech analysis together, I conclude that Trump, more than Biden, catered to the heterogeneous interests across different Hispanic groups. His message about the border in Texas or socialism in Florida appealed directly to groups in those states, making these same groups feel forsaken by the Biden campaign, who largely took the Hispanic vote for granted. 
 
-Interestingly, we see the Biden campaign consistently outspending Trump in states where there are Hispanic-majority counties and large Hispanic communities in general. However, as I describe above, it may not be the ads themselves that are winning over voters. Rather, it may be that the *content* of the candidates' message. In this vein, Trump's rhetoric may be enough to eat away at Biden's Hispanic vote share despite spending less on TV ads. Additionally, Trump's ground outreach may have been better. His campaign did more rallies and door-knocking than Biden's. 
-
-#### Facebook Ads
-- theory that these have more impact because more spreadable 
 
 
 

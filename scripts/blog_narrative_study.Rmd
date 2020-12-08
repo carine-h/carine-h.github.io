@@ -668,6 +668,8 @@ state_sums <- state_ad %>%
   mutate(log_ad = log(tot_ad))
 
 
+
+
 spend_tv <- ggplot(state_sums, aes(x = state, y = log_ad)) + 
     geom_bar(aes(fill = candidate), stat = "identity", position = "dodge") +
     scale_fill_manual(values = c("blue", "red")) +
@@ -678,6 +680,8 @@ spend_tv <- ggplot(state_sums, aes(x = state, y = log_ad)) +
        y = "Log Ad Airings", 
        caption = "Source: Wesleyan Media Project") +
   my_theme
+
+
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_TV_spending.png", spend_tv, height = 5, width = 10)
 ```
