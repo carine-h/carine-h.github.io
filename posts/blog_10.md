@@ -132,7 +132,7 @@ Was rhetoric the only factor or did campaign resource allocation also help shrin
 #### TV Ads
 A potential explanation for Trump's rising Hispanic vote share could be his superior outreach via campaign ads. Was this the case?
 
-![](../images/10_border_wc.png)
+![](../images/10_TV_spending.png)
 
 Interestingly, we see the Biden campaign consistently outspending Trump in states where there are Hispanic-majority counties and large Hispanic communities in general. However, as I describe above, it may not be the ads themselves that are winning over voters. Rather, it may be that the *content* of the candidates' message. In this vein, Trump's rhetoric may be enough to eat away at Biden's Hispanic vote share despite spending less on TV ads. Additionally, Trump's ground outreach may have been better. His campaign did more rallies and door-knocking than Biden's. 
 
