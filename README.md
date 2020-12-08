@@ -27,6 +27,8 @@ If you have any questions or comments, feel free to reach out to me at **cmhajja
 
 # [9. Post-Election Analysis: How My Prediction Stacks Up](posts/blog_9.md)
 
+# [10. Post-Election Narrative: How and Why are Dems Losing Touch With Hispanics?](posts/blog_10.md)
+
 
 
 
