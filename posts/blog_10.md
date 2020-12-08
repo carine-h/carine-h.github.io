@@ -102,6 +102,13 @@ Biden's victory in Arizona, especially among Hispanics, may be the strongest evi
 ### Reason 2: Rhetoric
 More than anything, Trump's relative success with Hispanic populations may be linked to his emphasis on issues that align with these populations' values. For instance it is thought that Trump's fear-mongering around Biden's potential socialist agenda drove up Republican support in Florida where many Cuban and Venezuelan immigrants have settled. 
 
+#### At First Glance
+Using a speech processing function in R, I filtered for the words "Hispanic", "Latino", and "Spanish" as well as similar iterations of these words. 
+
+![](../images/10_hisp_gen_plot.png)
+
+Overall, Trump spoke more frequently about the Hispanic community than Biden. He also often used words like "love" and "prosperity," coming across a bit warmer and more attentive. However, we need to take a closer look at the tone and content of Trump and Biden's speeches. Sure, Trump spoke *more* about Hispanics, but what exactly did he say? The Latino vote is not a monolith, therefore I take a look at words and phrases that would appeal to different Latino voter blocs throughout the country, focusing on Florida and Texas. 
+
 #### Southern Florida
 Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
 
