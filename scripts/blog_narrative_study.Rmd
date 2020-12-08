@@ -447,7 +447,7 @@ Arizona, like Florida, had blue counties (that remained blue) lose part of their
 
 # Reason 1: Rhetoric 
 - Trump's rhetoric resonated better among Hispanic voters, especially in Florida
-```{r, fig.width = 8, fig.height = 9}
+```{r}
 #####-------------------------------------------------------------------------------#
 ##### Trump vs. Biden campaign speeches with General Hispanic messaging ####
 #####-------------------------------------------------------------------------------#
@@ -458,7 +458,7 @@ Arizona, like Florida, had blue counties (that remained blue) lose part of their
 speech_corpus <- corpus(speech_df, text_field = "text", docid_field = "url")
 
 ## pre-process: tokenize, clean, select n-grams
-speech_toks_hispanic <- tokens(speech_corpus, 
+speech_toks_gen <- tokens(speech_corpus, 
     remove_punct = TRUE,
     remove_symbols = TRUE,
     remove_numbers = TRUE,
@@ -468,24 +468,23 @@ speech_toks_hispanic <- tokens(speech_corpus,
     tokens_remove(pattern=stopwords("en")) %>%
     tokens_select(min_nchar=3) %>%
     tokens_ngrams(n=2, concatenator = " ") %>%
-    tokens_select(pattern = c("hisp*", "communism", "latin*", "socialism", "dict*", "cuba*", "maduro", 
-                              "castro*"), padding = TRUE)
+    tokens_select(pattern = c("hisp*", "latin*"), padding = TRUE)
 
-print(speech_toks_hispanic)
+print(speech_toks_gen)
 
 ## pre-process: make doc-freq matrix
-speech_dfm_hispanic <- dfm(speech_toks_hispanic, groups = "candidate")
+speech_dfm_gen <- dfm(speech_toks_gen, groups = "candidate")
 
 ## summarise and visualise
-tstat_freq_hispanic <- textstat_frequency(speech_dfm_hispanic)
-head(tstat_freq_hispanic, 100)
+tstat_freq_gen <- textstat_frequency(speech_dfm_gen)
+head(tstat_freq_gen, 100) 
 
-textplot_wordcloud(speech_dfm_hispanic, color = c("red", "blue"), comparison = T)
-
-trump_keyness_hispanic <- textstat_keyness(speech_dfm_hispanic, target = "Donald Trump")
-textplot_keyness(trump_keyness_hispanic, 
-                 color = c("blue", "red"), 
-                 n = 10) 
+trump_keyness_gen <- textstat_keyness(speech_dfm_gen, target = "Donald Trump")
+png("~/Desktop/R studio/carine-h.github.io/images/10_hisp_gen_plot.png", width=1000, height=800)
+textplot_keyness(trump_keyness_gen, 
+                 color = c("red", "blue"), 
+                 margin = 0.2) 
+dev.off()
 
 
 #####-------------------------------------------------------------------------------#
@@ -518,13 +517,13 @@ speech_dfm_comm <- dfm(speech_toks_comm, groups = "candidate")
 tstat_freq_comm <- textstat_frequency(speech_dfm_comm)
 head(tstat_freq_comm, 100)
 
-png("~/Desktop/R studio/carine-h.github.io/images/10_castro_wc.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_castro_wc.png", width=1000, height=800)
 textplot_wordcloud(speech_dfm_comm, color = c("red", "blue"), comparison = T)
 dev.off()
 
 
 trump_keyness_comm <- textstat_keyness(speech_dfm_comm, target = "Donald Trump")
-png("~/Desktop/R studio/carine-h.github.io/images/10_castro_plot.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_castro_plot.png", width=1000, height=800)
 textplot_keyness(trump_keyness_comm, 
                  color = c("red", "blue"), 
                  margin = 0.4) 
@@ -564,12 +563,12 @@ speech_dfm_soc <- dfm(speech_toks_soc, groups = "candidate")
 tstat_freq_soc  <- textstat_frequency(speech_dfm_soc)
 head(tstat_freq_soc, 100)
 
-png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_wc.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_wc.png", width=1000, height=800)
 textplot_wordcloud(speech_dfm_soc, color = c("red", "blue"), comparison = T, remove_punct = TRUE)
 dev.off()
 
 trump_keyness_soc <- textstat_keyness(speech_dfm_soc, target = "Donald Trump")
-png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_plot.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_socialist_plot.png", width=1000, height=800)
 textplot_keyness(trump_keyness_soc, 
                  color = c("red", "blue"), 
                  margin = 0.4) 
@@ -606,12 +605,12 @@ speech_dfm_border <- dfm(speech_toks_border, groups = "candidate")
 tstat_freq_border <- textstat_frequency(speech_dfm_border)
 head(tstat_freq_border, 100)
 
-png("~/Desktop/R studio/carine-h.github.io/images/10_border_wc.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_border_wc.png", width=1000, height=800)
 textplot_wordcloud(speech_dfm_border, color = c("red", "blue"), comparison = T, remove_punct = TRUE)
 dev.off()
 
 trump_keyness_border <- textstat_keyness(speech_dfm_border, target = "Donald Trump")
-png("~/Desktop/R studio/carine-h.github.io/images/10_border_plot.png", width=800, height=400)
+png("~/Desktop/R studio/carine-h.github.io/images/10_border_plot.png", width=1000, height=800)
 textplot_keyness(trump_keyness_border, 
                  color = c("red", "blue"), 
                  margin = 0.5) 
