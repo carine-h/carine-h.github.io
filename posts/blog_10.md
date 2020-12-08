@@ -1,30 +1,23 @@
-The narrative can be about any aspect of the campaign or election - anything that you find interesting -  just as long as it is being discussed in the public sphere.  A testable implication means that you are not attempting a definitive test of the truth of a narrative, which often involves difficult questions of causality and data that may not be available, but rather you are looking for initial evidence that the data is consistent or inconsistent with the claims.  A way to think about this is to say “if X is true, it would imply Y” and then go look for Y.  Y does not need to definitely prove or disprove X, only be one piece of evidence.
-
-For your blog post, you should:
-Summarize the narrative you are choosing to investigate and briefly explain why the narrative might be important to test  in the context of the various election-related variables we have discussed this semester.
-Describe and justify a testable implication of this narrative. 
-Describe the data you collected.
-Describe the results of your test and whether it supports the narrative. This should include graphics.  
-
 
 # Evaluating a Post-Election Narrative: Did Democrats Lose Big With Hispanics?
 While most Latinos voted for Biden this election cycle, Democrats' hold on this traditionally blue block is [reportedly](https://www.vox.com/21551025/latino-national-vote-biden-trump-2020-florida-texas) slipping. Indeed, the Democratic vote share margin drastically contracted in places like the Rio Grande Valley in Texas and southern Florida. Meanwhile, Latinos in Arizona and California mostly voted blue, though some margins shrank in certain counties throughout these states. Overall, at least in Florida and Texas, Biden's performance fell flat in comparison to Clinton's run in 2016. 
 
 Many have called for a reexamination of Democrats' approach to Latino voters. The main flaws being discussed seem to center around the following: 
 1. The Latino vote is not a monolith blue bloc and cannot be taken for granted by Democrats
-2. Democrats must tailor their Latino outreach to specific communities, much like the Trump campaign did 
-3. The Trump campaign's emphasis on border safety as well as anti-socialism appealed directly to border counties in Texas and Cuban/Venezuelan/Nicaraguan communities in south Florida, respectively 
-4. The Trump campaign's air game in Latino-majority communities made a huge difference, especially in relation to Democrats' lack of resource allocation in these places 
+2. Democrats must tailor their Latino outreach to specific communities and their unique needs, much like the Trump campaign did 
+ The Trump campaign's emphasis on border safety as well as anti-socialism appealed directly to border counties in Texas and Cuban/Venezuelan/Nicaraguan communities in south Florida, respectively 
+3. The Trump campaign's ground game in Latino-majority communities made a huge difference, especially in relation to Democrats' lack of resource allocation in these places 
 
-
-This widespread conversation has prompted me to do a systematic analysis of Democrats' hold on the Latino vote. In this blog I explore and test the following narrative: Democrats are losing their grip on the Hispanic voter bloc due to their lack of tailored outreach and campaign resource allocation. I'll test this narrative doing the following: 
+This widespread conversation has prompted me to do a systematic analysis of Democrats' hold on the Latino vote. In this blog I explore and test the following narrative: **Democrats are losing their grip on the Hispanic voter bloc** which I hypothesize is due to their lack of tailored outreach and campaign resource allocation. I'll test this narrative doing the following: 
 1. Looking at the relationship between the percentage of Hispanic residents in a Hispanic majority county and that county's 2020 Democratic vote share
 2. Examining whether or not Democrats won in Hispanic-majority counties
 3. Looking at the change between the 2016 and 2020 Democratic victory margin in Hispanic-majority counties
-4. Examining the difference between the amount and content of Trump and Biden's Hispanic-targeted rhetoric 
-5. Measuring the amount of campaign resources allocated to states with large Hispanic populations 
+4. Examining the difference between the amount/content of Trump and Biden's Hispanic-targeted rhetoric 
+5. Measuring the amount of campaign resources (TV ads and ground game) allocated to states with large Hispanic populations 
 
 By examining these factors, we'll also be able to look at the importance of things like ground game, campaign ads, and campaign messaging. 
+
+Understanding the Latino vote is increasingly important as America trends towards being a majority-minority country, with the Latino demographic as one of the fastest-growing blocs. Democrats and Republicans alike should have an interest in understanding the needs of this expanding voter bloc. 
 
 ## The Aftermath: 2020 Winners in Hispanic-Majority Counties 
 In this post I'll be looking at counties defined by [Pew](https://www.pewresearch.org/fact-tank/2019/11/20/in-a-rising-number-of-u-s-counties-hispanic-and-black-americans-are-the-majority/) (using US census data) as having majority Hispanic residents. (I omit Bronx county from New York due to lack of data.)
@@ -156,15 +149,6 @@ Overall, I come away with these major points from my analysis:
 4. Trump's speeches show that he touched on specific interest areas among the Hispanic community while Biden stayed general 
 5. Trump spoke more about the Hispanic community in more heterogeneous terms than Biden
 
-Putting my campaign resource and speech analysis together, I conclude that Trump, more than Biden, catered to the heterogeneous interests across different Hispanic groups. His message about the border in Texas or socialism in Florida appealed directly to groups in those states, making these same groups feel forsaken by the Biden campaign, who largely took the Hispanic vote for granted. 
-
-
-
-
-
-
-
-
-
+Putting my campaign resource and speech analysis together, I conclude that Trump, more than Biden, catered to the heterogeneous interests across different Hispanic groups. His message about the border in Texas or socialism in Florida appealed directly to groups in those states, making these same groups feel forsaken by the Biden campaign, who largely took the Hispanic vote for granted. Coming back to my narrative, it is abundantly clear that Democrats did show they are losing touch with Hispanic voters and even taking them for granted. 
 
 
