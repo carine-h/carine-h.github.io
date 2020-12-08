@@ -110,8 +110,7 @@ Using a speech processing function in R, I filtered for the words "Hispanic", "L
 Overall, Trump spoke more frequently about the Hispanic community than Biden. He also often used words like "love" and "prosperity," coming across a bit warmer and more attentive. However, we need to take a closer look at the tone and content of Trump and Biden's speeches. Sure, Trump spoke *more* about Hispanics, but what exactly did he say? The Latino vote is not a monolith, therefore I take a look at words and phrases that would appeal to different Latino voter blocs throughout the country, focusing on Florida and Texas. 
 
 #### Southern Florida
-Using a word cloud of words and phrases used in Biden and Trump's campaign speeches, it becomes clear that Trump places a greater emphasis on socialism and communism throughout his speeches: 
-
+Filtering for different iterations of communism and socialism in the candidates' speeches, it becomes clear that Trump places a greater emphasis on socialism and communism, specifically linked to the Left. 
 
 ![](../images/10_socialist_wc.png)
 
@@ -120,20 +119,21 @@ Using a word cloud of words and phrases used in Biden and Trump's campaign speec
 
 ![](../images/10_socialist_plot.png)
 
+Trump's use of phrases like "socialist takeover", "socialist agenda", and "socialist country" presumably created fear around Democrats' vision for the country, especially among a demographic that has such recent and horrible associations with communism and socialism. He also used these words more frequently than Biden, drilling in the idea and cementing the fear of a "socialist country. 
 
 
-Overall, Trump also spoke more to issues around socialism and socialist regimes in places like Cuba, Venezuela, and Nicaragua than Biden:
+Trump also spoke more to issues around socialism and socialist regimes in places like Cuba, Venezuela, and Nicaragua than Biden:
 
 
 ![](../images/10_castro_wc.png)
 
 
 
-
 ![](../images/10_castro_plot.png)
 
- 
+Biden hardly speaks about dictators that come from the country of origin of many Hispanic Americans. Meanwhile, Trump frequently condemns these dictators, linking them to idelogy ("Venezuela ideology") and presumably to Democrats and their more progressive agenda. 
 
+ 
 #### Border Communities
 While this rhetoric certainly resonated with south Florida residents, what about Hispanic populations in the Rio Grande Valley who are of predominantly Mexican descent? Did something about Trump's rhetoric especially resonate with them? I hypothesize that his "law and order"/border security agenda appealed to border communities experiencing border-related crime. 
 
