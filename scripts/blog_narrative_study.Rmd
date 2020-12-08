@@ -144,7 +144,9 @@ ggplot(aes(one_nonwhite_group, D_pv2p))+
        subtitle = "Hispanic-Majority Counties", 
        x = "Percentage of Hispanic Citizens per County", 
        y= "Democratic Vote Share") +
-  theme(plot.title = element_text(face = "bold")) 
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent) +
+  my_theme
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_county_rel.png", county_rel)
 ```
@@ -165,14 +167,10 @@ png("~/Desktop/R studio/carine-h.github.io/images/10_hist_d_change.png", width=8
 hist(dat$d_marg_change, 
      main = "Hispanic-Majority County-Level Change in \nDemocratic Vote Share Margin: 2016-2020", 
      col = "dodgerblue", 
-     xlab = "Change in Democratic Margin of Victory")
+     xlab = "% Change in Democratic Margin of Victory")
 abline(v = mean(dat$d_marg_change, na.rm = TRUE), col = 'red', lwd = 2)
 dev.off()
 
-pv_change %>%
-  ggplot(aes(d_marge_2020, d_marg_2016))+ 
-  geom_point()+
-  geom_smooth(method = lm)
 
 # all together
   # Q does this look good tho???
@@ -203,6 +201,7 @@ m2 <- plot_usmap(data = dat, regions = "counties", values = "D_pv2p",
        subtitle = "Presidential Election 2020") +
   theme(plot.title = element_text(face = "bold")) +
   theme(legend.position = "none")
+
 
 ggsave("~/Desktop/R studio/carine-h.github.io/images/10_dem_win.png", m2)
     
