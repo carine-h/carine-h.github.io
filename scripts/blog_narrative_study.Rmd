@@ -162,12 +162,19 @@ ggsave("~/Desktop/R studio/carine-h.github.io/images/10_county_rel.png", county_
 #####-------------------------------------------------------------------------------#
 
 states <- c("Arizona", "California", "Florida", "Kansas", "New Mexico", "New York", "Texas", "Washington")
-
-png("~/Desktop/R studio/carine-h.github.io/images/10_hist_d_change.png", width=800, height=400)
+labs <- seq(-60, 10, by = 10)
+labs2 <- seq(0, 25, by = 5)
+png("~/Desktop/R studio/carine-h.github.io/images/10_hist_d_change.png", width=1000, height=600)
 hist(dat$d_marg_change, 
      main = "Hispanic-Majority County-Level Change in \nDemocratic Vote Share Margin: 2016-2020", 
      col = "dodgerblue", 
-     xlab = "% Change in Democratic Margin of Victory")
+     xlab = "% Change in Democratic Margin of Victory", 
+     cex.axis = 1.25, 
+     cex.lab = 1.25, 
+     cex.main = 1.5, 
+     axes = FALSE)
+axis(side = 1, at = labs, labels = paste0(labs, "%"), cex.axis = 1)
+axis(side = 2, at = labs2, labels = paste0(labs2), cex.axis = 1)
 abline(v = mean(dat$d_marg_change, na.rm = TRUE), col = 'red', lwd = 2)
 dev.off()
 
